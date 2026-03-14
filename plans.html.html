@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Omnikai – Choose Your Path</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #080b10;
+      --blue: #00c8ff;
+      --blue-glow: rgba(0, 200, 255, 0.18);
+      --blue-glow-strong: rgba(0, 200, 255, 0.35);
+      --white: #f0f4f8;
+      --muted: #5a6a7a;
+      --border: rgba(0, 200, 255, 0.15);
+      --card-bg: rgba(255,255,255,0.03);
+    }
+
+    html, body {
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--white);
+      font-family: 'Rajdhani', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* BACKGROUND */
+    .bg-layer {
+      position: fixed; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 20% 50%, rgba(0,200,255,0.06) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 50% at 80% 50%, rgba(0,100,180,0.06) 0%, transparent 70%),
+        var(--bg);
+    }
+    .grid-lines {
+      position: fixed; inset: 0; z-index: 0;
+      background-image:
+        linear-gradient(rgba(0,200,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,200,255,0.04) 1px, transparent 1px);
+      background-size: 48px 48px;
+      animation: gridDrift 20s linear infinite;
+    }
+    @keyframes gridDrift {
+      0%   { transform: translateY(0); }
+      100% { transform: translateY(48px); }
+    }
+
+    /* PAGE */
+    .page {
+      position: relative; z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 24px;
+    }
+
+    /* HEADER */
+    .header {
+      text-align: center;
+      margin-bottom: 56px;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .logo-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+
+    .logo-icon {
+      width: 48px; height: 48px;
+      border: 2px solid var(--blue);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 0 18px var(--blue-glow-strong);
+    }
+    .logo-icon img { width: 100%; height: 100%; object-fit: cover; }
+
+    .logo-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem;
+      letter-spacing: 0.12em;
+      color: var(--white);
+    }
+    .logo-name span { color: var(--blue); }
+
+    .header-eyebrow {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 12px;
+    }
+
+    .header-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      letter-spacing: 0.06em;
+      line-height: 1;
+      color: var(--white);
+      margin-bottom: 12px;
+    }
+    .header-title span { color: var(--blue); text-shadow: 0 0 30px rgba(0,200,255,0.4); }
+
+    .header-sub {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 300;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+    }
+
+    /* CARDS */
+    .cards {
+      display: flex;
+      gap: 28px;
+      align-items: stretch;
+      width: 100%;
+      max-width: 860px;
+    }
+
+    .card {
+      flex: 1;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px 36px;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color 0.3s, transform 0.2s, box-shadow 0.3s;
+      animation: fadeUp 0.6s ease both;
+    }
+    .card:nth-child(1) { animation-delay: 0.1s; }
+    .card:nth-child(2) { animation-delay: 0.2s; }
+
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(0,200,255,0.4);
+      box-shadow: 0 8px 40px rgba(0,200,255,0.1);
+    }
+
+    /* WARRIOR card special glow */
+    .card.featured {
+      border-color: var(--blue);
+      box-shadow: 0 0 40px rgba(0,200,255,0.12), inset 0 0 60px rgba(0,200,255,0.03);
+    }
+    .card.featured:hover {
+      box-shadow: 0 8px 60px rgba(0,200,255,0.25), inset 0 0 60px rgba(0,200,255,0.05);
+    }
+
+    /* popular badge */
+    .badge {
+      position: absolute;
+      top: 20px; right: 20px;
+      background: var(--blue);
+      color: #080b10;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      padding: 4px 12px;
+      border-radius: 999px;
+      box-shadow: 0 0 16px var(--blue-glow-strong);
+    }
+
+    /* card corner accent */
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 60px; height: 60px;
+      background: linear-gradient(135deg, rgba(0,200,255,0.1) 0%, transparent 60%);
+      border-radius: 16px 0 0 0;
+    }
+
+    .card-tier {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 8px;
+    }
+
+    .card-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 3rem;
+      letter-spacing: 0.08em;
+      line-height: 1;
+      color: var(--white);
+      margin-bottom: 6px;
+    }
+
+    .card-price {
+      font-family: 'Inter', sans-serif;
+      margin-bottom: 28px;
+    }
+    .price-amount {
+      font-size: 2rem;
+      font-weight: 500;
+      color: var(--white);
+    }
+    .price-free {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+    }
+    .price-period {
+      font-size: 0.82rem;
+      color: var(--muted);
+      font-weight: 300;
+    }
+
+    .divider-line {
+      height: 1px;
+      background: var(--border);
+      margin-bottom: 24px;
+    }
+
+    .features-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    .features {
+      list-style: none;
+      margin-bottom: 36px;
+    }
+    .features li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 0.92rem;
+      font-weight: 500;
+      color: var(--white);
+      padding: 7px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .features li:last-child { border-bottom: none; }
+
+    .check {
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+      font-size: 0.65rem;
+    }
+    .check.yes {
+      background: rgba(0,200,255,0.15);
+      color: var(--blue);
+      border: 1px solid rgba(0,200,255,0.3);
+    }
+    .check.no {
+      background: rgba(255,255,255,0.05);
+      color: var(--muted);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .locked {
+      color: var(--muted) !important;
+      font-style: italic;
+    }
+
+    /* CTA BUTTON */
+    .cta-btn {
+      width: 100%;
+      border: none;
+      border-radius: 8px;
+      padding: 15px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: 0.18em;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-btn.free {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+      color: var(--white);
+    }
+    .cta-btn.free:hover {
+      background: rgba(255,255,255,0.1);
+      border-color: rgba(0,200,255,0.3);
+    }
+
+    .cta-btn.premium {
+      background: var(--blue);
+      color: #080b10;
+      box-shadow: 0 0 24px var(--blue-glow-strong), 0 0 60px rgba(0,200,255,0.2);
+    }
+    .cta-btn.premium:hover {
+      background: #1ad4ff;
+      box-shadow: 0 0 40px rgba(0,200,255,0.6), 0 0 80px rgba(0,200,255,0.3);
+      transform: translateY(-1px);
+    }
+    .cta-btn.premium::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.4s;
+    }
+    .cta-btn.premium:hover::before { left: 100%; }
+
+    /* bottom note */
+    .bottom-note {
+      margin-top: 32px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 300;
+      color: var(--muted);
+      text-align: center;
+      animation: fadeUp 0.6s ease 0.4s both;
+    }
+    .bottom-note a { color: var(--blue); text-decoration: none; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 700px) {
+      .cards { flex-direction: column; max-width: 420px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="bg-layer"></div>
+<div class="grid-lines"></div>
+
+<div class="page">
+
+  <div class="header">
+    <div class="logo-row">
+      <div class="logo-icon"><img src="logo.png" alt="Omnikai"/></div>
+      <div class="logo-name">OMNI<span>KAI</span></div>
+    </div>
+    <div class="header-eyebrow">Choose Your Path</div>
+    <div class="header-title">BEGIN YOUR <span>JOURNEY</span></div>
+    <div class="header-sub">Select the plan that matches your training ambitions</div>
+  </div>
+
+  <div class="cards">
+
+    <!-- WANDERER -->
+    <div class="card" onclick="selectPlan('wanderer')">
+      <div class="card-tier">Free Forever</div>
+      <div class="card-name">Wanderer</div>
+      <div class="card-price">
+        <span class="price-free">FREE</span>
+      </div>
+
+      <div class="divider-line"></div>
+      <div class="features-label">What's included</div>
+
+      <ul class="features">
+        <li><span class="check yes">✓</span> Access to 3 martial arts</li>
+        <li><span class="check yes">✓</span> Basic workout library</li>
+        <li><span class="check yes">✓</span> Round timer</li>
+        <li><span class="check yes">✓</span> Basic workout log</li>
+        <li><span class="check no locked">✗</span> <span class="locked">Full martial arts library</span></li>
+        <li><span class="check no locked">✗</span> <span class="locked">Personalized progress tracking</span></li>
+        <li><span class="check no locked">✗</span> <span class="locked">Custom workout plans</span></li>
+        <li><span class="check no locked">✗</span> <span class="locked">Nutrition guidance</span></li>
+      </ul>
+
+      <button class="cta-btn free">Start for Free</button>
+    </div>
+
+    <!-- WARRIOR -->
+    <div class="card featured" onclick="selectPlan('warrior')">
+      <div class="badge">Most Popular</div>
+      <div class="card-tier">Premium</div>
+      <div class="card-name">Warrior</div>
+      <div class="card-price">
+        <span class="price-amount">$9.99</span>
+        <span class="price-period"> / month</span>
+      </div>
+
+      <div class="divider-line"></div>
+      <div class="features-label">Everything in Wanderer, plus</div>
+
+      <ul class="features">
+        <li><span class="check yes">✓</span> ALL martial arts unlocked</li>
+        <li><span class="check yes">✓</span> Full workout library (100+ workouts)</li>
+        <li><span class="check yes">✓</span> Personalized progress tracking</li>
+        <li><span class="check yes">✓</span> Bodyweight, reps & weight tracking</li>
+        <li><span class="check yes">✓</span> Custom workout plans</li>
+        <li><span class="check yes">✓</span> Nutrition guidance for fighters</li>
+        <li><span class="check yes">✓</span> Video demonstrations</li>
+        <li><span class="check yes">✓</span> Personal records & milestones</li>
+      </ul>
+
+      <button class="cta-btn premium">Begin as a Warrior</button>
+    </div>
+
+  </div>
+
+  <div class="bottom-note">
+    Already have an account? <a href="index.html">Sign in here</a> &nbsp;·&nbsp; Cancel anytime &nbsp;·&nbsp; No hidden fees
+  </div>
+
+</div>
+
+<script>
+  function selectPlan(plan) {
+    if (plan === 'wanderer') {
+      alert('🥋 Welcome, Wanderer! Your free journey begins now. (Dashboard coming soon)');
+    } else {
+      alert('⚡ Welcome, Warrior! Redirecting to payment... (Coming soon)');
+    }
+  }
+</script>
+</body>
+</html>
