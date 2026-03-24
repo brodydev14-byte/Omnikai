@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Omnikai – Your Equipment</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --bg:#080b10; --blue:#00c8ff; --blue-glow:rgba(0,200,255,0.18);
+      --blue-glow-strong:rgba(0,200,255,0.35); --white:#f0f4f8;
+      --muted:#5a6a7a; --border:rgba(0,200,255,0.15); --card:rgba(255,255,255,0.03);
+    }
+    html,body { min-height:100%; background:var(--bg); color:var(--white); font-family:'Rajdhani',sans-serif; overflow-x:hidden; }
+    .bg-layer { position:fixed; inset:0; z-index:0; background:radial-gradient(ellipse 70% 50% at 50% 20%, rgba(0,200,255,0.06) 0%, transparent 70%), var(--bg); }
+    .grid-lines { position:fixed; inset:0; z-index:0; background-image:linear-gradient(rgba(0,200,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,200,255,0.03) 1px,transparent 1px); background-size:48px 48px; animation:gridDrift 20s linear infinite; }
+    @keyframes gridDrift { 0%{transform:translateY(0)} 100%{transform:translateY(48px)} }
+
+    .page { position:relative; z-index:1; min-height:100vh; display:flex; flex-direction:column; align-items:center; padding:40px 20px 60px; }
+
+    .logo-row { display:flex; align-items:center; gap:12px; margin-bottom:28px; }
+    .logo-icon { width:38px; height:38px; border:1.5px solid var(--blue); border-radius:8px; overflow:hidden; box-shadow:0 0 12px var(--blue-glow); }
+    .logo-icon img { width:100%; height:100%; object-fit:cover; }
+    .logo-name { font-family:'Bebas Neue',sans-serif; font-size:1.6rem; letter-spacing:0.12em; }
+    .logo-name span { color:var(--blue); }
+
+    .steps { display:flex; align-items:center; gap:8px; margin-bottom:28px; }
+    .step { width:40px; height:4px; border-radius:999px; background:rgba(255,255,255,0.08); transition:background 0.3s; }
+    .step.done { background:rgba(0,200,255,0.4); }
+    .step.active { background:var(--blue); box-shadow:0 0 8px var(--blue); }
+
+    .card { width:100%; max-width:600px; background:var(--card); border:1px solid var(--border); border-radius:16px; padding:40px 36px; }
+    .card-eyebrow { font-size:0.68rem; font-weight:700; letter-spacing:0.25em; text-transform:uppercase; color:var(--blue); margin-bottom:6px; }
+    .card-title { font-family:'Bebas Neue',sans-serif; font-size:2.2rem; letter-spacing:0.06em; line-height:1; margin-bottom:6px; }
+    .card-sub { font-family:'Inter',sans-serif; font-size:0.85rem; font-weight:300; color:var(--muted); margin-bottom:28px; line-height:1.5; }
+
+    /* ART SECTION */
+    .art-section { margin-bottom:28px; border-bottom:1px solid var(--border); padding-bottom:24px; }
+    .art-section:last-child { border-bottom:none; padding-bottom:0; margin-bottom:0; }
+    .art-header { display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+    .art-emoji-label { font-size:1.4rem; }
+    .art-title-label { font-family:'Bebas Neue',sans-serif; font-size:1.3rem; letter-spacing:0.1em; color:var(--blue); }
+
+    /* EQUIPMENT ITEMS */
+    .equipment-list { display:flex; flex-direction:column; gap:10px; }
+    .equip-item { display:flex; align-items:center; justify-content:space-between; background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:10px; padding:14px 16px; transition:all 0.2s; }
+    .equip-item.has-it { border-color:var(--blue); background:rgba(0,200,255,0.06); }
+    .equip-left { display:flex; align-items:center; gap:12px; }
+    .equip-icon { font-size:1.2rem; }
+    .equip-name { font-size:0.92rem; font-weight:700; letter-spacing:0.05em; }
+    .equip-sub { font-family:'Inter',sans-serif; font-size:0.72rem; color:var(--muted); margin-top:2px; }
+
+    /* TOGGLE */
+    .toggle-wrap { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+    .toggle { position:relative; width:44px; height:24px; cursor:pointer; }
+    .toggle input { opacity:0; width:0; height:0; }
+    .toggle-slider { position:absolute; inset:0; background:rgba(255,255,255,0.1); border-radius:999px; transition:0.3s; border:1px solid var(--border); }
+    .toggle-slider:before { content:''; position:absolute; width:18px; height:18px; left:2px; top:2px; background:var(--muted); border-radius:50%; transition:0.3s; }
+    input:checked + .toggle-slider { background:var(--blue); box-shadow:0 0 10px var(--blue-glow); border-color:var(--blue); }
+    input:checked + .toggle-slider:before { transform:translateX(20px); background:#080b10; }
+
+    /* TUTORIAL PROMPT */
+    .tutorial-prompt { margin-top:10px; background:rgba(0,200,255,0.06); border:1px solid rgba(0,200,255,0.2); border-radius:10px; padding:14px 16px; display:none; animation:fadeUp 0.3s ease; }
+    .tutorial-prompt.show { display:block; }
+    .tutorial-question { font-size:0.88rem; font-weight:700; margin-bottom:12px; }
+    .tutorial-btns { display:flex; gap:8px; }
+    .tut-btn { flex:1; padding:9px; border-radius:7px; border:none; font-family:'Rajdhani',sans-serif; font-size:0.85rem; font-weight:700; letter-spacing:0.1em; cursor:pointer; transition:all 0.2s; }
+    .tut-btn.yes { background:var(--blue); color:#080b10; }
+    .tut-btn.no { background:rgba(255,255,255,0.06); border:1px solid var(--border); color:var(--white); }
+    .tut-btn:hover { opacity:0.85; }
+
+    /* TUTORIAL MODAL */
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:100; display:none; align-items:center; justify-content:center; padding:20px; }
+    .modal-overlay.show { display:flex; animation:fadeUp 0.3s ease; }
+    .modal { background:#0d1117; border:1px solid var(--blue); border-radius:16px; padding:32px 28px; max-width:520px; width:100%; box-shadow:0 0 40px rgba(0,200,255,0.15); max-height:85vh; overflow-y:auto; }
+    .modal-title { font-family:'Bebas Neue',sans-serif; font-size:1.8rem; letter-spacing:0.08em; color:var(--blue); margin-bottom:6px; }
+    .modal-sub { font-family:'Inter',sans-serif; font-size:0.82rem; color:var(--muted); margin-bottom:20px; }
+
+    /* VIDEO EMBED */
+    .video-wrap { position:relative; padding-bottom:56.25%; height:0; border-radius:10px; overflow:hidden; margin-bottom:20px; border:1px solid var(--border); }
+    .video-wrap iframe { position:absolute; top:0; left:0; width:100%; height:100%; border:none; }
+
+    /* STEPS LIST */
+    .steps-list { list-style:none; margin-bottom:24px; }
+    .steps-list li { display:flex; gap:12px; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.05); font-family:'Inter',sans-serif; font-size:0.85rem; line-height:1.5; }
+    .steps-list li:last-child { border-bottom:none; }
+    .step-num { width:24px; height:24px; border-radius:50%; background:var(--blue); color:#080b10; font-family:'Bebas Neue',sans-serif; font-size:0.9rem; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
+
+    .modal-close { width:100%; background:var(--blue); border:none; border-radius:8px; padding:13px; color:#080b10; font-family:'Bebas Neue',sans-serif; font-size:1rem; letter-spacing:0.18em; cursor:pointer; box-shadow:0 0 20px var(--blue-glow-strong); transition:all 0.2s; }
+    .modal-close:hover { background:#1ad4ff; }
+
+    /* BOTTOM BUTTONS */
+    .btn-row { display:flex; gap:12px; margin-top:32px; }
+    .btn-back { flex:0 0 auto; background:rgba(255,255,255,0.05); border:1px solid var(--border); border-radius:8px; padding:14px 20px; color:var(--muted); font-family:'Bebas Neue',sans-serif; font-size:1rem; letter-spacing:0.15em; cursor:pointer; transition:all 0.2s; }
+    .btn-back:hover { color:var(--white); border-color:rgba(0,200,255,0.3); }
+    .btn-next { flex:1; background:var(--blue); border:none; border-radius:8px; padding:14px; color:#080b10; font-family:'Bebas Neue',sans-serif; font-size:1.1rem; letter-spacing:0.18em; cursor:pointer; transition:all 0.2s; box-shadow:0 0 24px var(--blue-glow-strong); position:relative; overflow:hidden; }
+    .btn-next:hover { background:#1ad4ff; box-shadow:0 0 40px rgba(0,200,255,0.5); transform:translateY(-1px); }
+
+    @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  </style>
+</head>
+<body>
+<div class="bg-layer"></div>
+<div class="grid-lines"></div>
+
+<!-- TUTORIAL MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle">Hand Wrap Tutorial</div>
+    <div class="modal-sub" id="modalSub">Watch the video and follow the steps below</div>
+    <div class="video-wrap">
+      <iframe id="modalVideo" src="" allowfullscreen></iframe>
+    </div>
+    <ol class="steps-list" id="modalSteps"></ol>
+    <button class="modal-close" onclick="closeModal()">I'm Ready to Train! →</button>
+  </div>
+</div>
+
+<div class="page">
+  <div class="logo-row">
+    <div class="logo-icon"><img src="logo.png" alt="Omnikai"/></div>
+    <div class="logo-name">OMNI<span>KAI</span></div>
+  </div>
+
+  <div class="steps">
+    <div class="step done"></div>
+    <div class="step done"></div>
+    <div class="step done"></div>
+    <div class="step active"></div>
+    <div class="step"></div>
+    <div class="step"></div>
+    <div class="step"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-eyebrow">Almost There</div>
+    <div class="card-title">Your Equipment</div>
+    <div class="card-sub">Tell us what you have available so we only show workouts you can actually do.</div>
+
+    <div id="equipmentSections">
+      <!-- filled by JS based on selected arts -->
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-back" onclick="goBack()">← Back</button>
+      <button class="btn-next" onclick="finish()">Continue →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const arts = JSON.parse(sessionStorage.getItem('omniArts') || '["Boxing"]');
+
+  // Equipment data per art
+  const artEquipment = {
+    'Boxing': {
+      emoji: '🥊', 
+      items: [
+        { id:'heavy_bag', icon:'🎯', name:'Heavy Bag', sub:'Punching bag for power and combinations' },
+        { id:'speed_bag', icon:'⚡', name:'Speed Bag', sub:'Small bag for timing and rhythm' },
+        { id:'jump_rope', icon:'🪢', name:'Jump Rope', sub:'For conditioning and footwork' },
+        { id:'boxing_gloves', icon:'🥊', name:'Boxing Gloves', sub:'Required for bag and pad work', tutorial: { question:"Is this your first time using hand wraps?", title:"How to Wrap Your Hands", sub:"Protect your hands and wrists before every session", video:"https://www.youtube.com/embed/4Ee6JW1XTQI", steps:["Loop the thumb hole over your thumb to anchor the wrap","Wrap around your wrist 3 times going towards your knuckles","Wrap across your palm and between each finger, starting with the pinky","Come back across the palm covering the knuckles","Wrap around the wrist again to secure","Finish with the velcro strap around the wrist — snug but not too tight","Make a fist to test — it should feel supported, not numb"] }},
+        { id:'focus_mitts', icon:'🤜', name:'Focus Mitts', sub:'Need a partner to hold pads' },
+      ]
+    },
+    'Muay Thai': {
+      emoji: '🦵',
+      items: [
+        { id:'mt_heavy_bag', icon:'🎯', name:'Heavy Bag', sub:'Essential for Muay Thai striking' },
+        { id:'thai_pads', icon:'🤜', name:'Thai Pads', sub:'Need a partner or trainer' },
+        { id:'shin_guards', icon:'🦵', name:'Shin Guards', sub:'For sparring and pad work' },
+        { id:'mt_gloves', icon:'🥊', name:'Muay Thai Gloves', sub:'Heavier than boxing gloves', tutorial:{ question:"Is this your first time using hand wraps?", title:"How to Wrap Your Hands for Muay Thai", sub:"Muay Thai wrapping covers wrists and thumb differently", video:"https://www.youtube.com/embed/4Ee6JW1XTQI", steps:["Anchor the thumb loop and wrap the wrist 3 times","Cross over the back of the hand diagonally","Wrap between each finger starting from pinky","Cover the knuckles with 2-3 passes","Secure around the wrist with remaining wrap","The Muay Thai style leaves the thumb more mobile for clinch work","Test by making a fist — fingers should move freely"] }},
+        { id:'mt_jump_rope', icon:'🪢', name:'Jump Rope', sub:'For conditioning' },
+      ]
+    },
+    'BJJ': {
+      emoji: '🥋',
+      items: [
+        { id:'gi', icon:'🥋', name:'BJJ Gi', sub:'Traditional uniform for gi BJJ', tutorial:{ question:"Is this your first time tying your belt?", title:"How to Tie Your BJJ Belt", sub:"The proper belt tie is part of BJJ tradition", video:"https://www.youtube.com/embed/u9y-pDJQMqQ", steps:["Fold the belt in half to find the center","Place the center on your belly button","Wrap both ends around your back","Cross the ends in front — right over left","Bring the right end up and under all layers","Pull both ends tight and even","The knot should sit flat — both ends equal length"] }},
+        { id:'mat_space', icon:'🟦', name:'Mat Space', sub:'At least 6x6ft of soft floor space' },
+        { id:'grappling_dummy', icon:'🤸', name:'Grappling Dummy', sub:'For solo drilling submissions' },
+      ]
+    },
+    'Wrestling': {
+      emoji: '🤼',
+      items: [
+        { id:'mat_space_w', icon:'🟦', name:'Mat Space', sub:'At least 6x6ft of soft floor space' },
+        { id:'resistance_bands', icon:'🔗', name:'Resistance Bands', sub:'For explosive movement training' },
+      ]
+    },
+    'MMA': {
+      emoji: '⚡',
+      items: [
+        { id:'mma_heavy_bag', icon:'🎯', name:'Heavy Bag', sub:'For striking combinations' },
+        { id:'mma_gloves', icon:'🥊', name:'MMA Gloves', sub:'Open finger gloves for grappling + striking', tutorial:{ question:"Is this your first time using hand wraps?", title:"How to Wrap Your Hands for MMA", sub:"MMA wrapping is lighter to allow grappling grip", video:"https://www.youtube.com/embed/4Ee6JW1XTQI", steps:["Use a shorter wrap than boxing — around 108 inches","Anchor at thumb and wrap wrist twice","Cross palm once and wrap knuckles lightly","Keep fingers more free than boxing wraps","Secure at wrist — MMA wraps should be snug but flexible","Test grip strength — you need to grab and clinch freely","Replace wraps if they lose elasticity"] }},
+        { id:'mma_mat', icon:'🟦', name:'Mat Space', sub:'For ground work and takedowns' },
+        { id:'mma_bands', icon:'🔗', name:'Resistance Bands', sub:'For explosive athletic training' },
+        { id:'mma_rope', icon:'🪢', name:'Jump Rope', sub:'For cardio and conditioning' },
+      ]
+    },
+    'Judo': {
+      emoji: '👘',
+      items: [
+        { id:'judo_gi', icon:'👘', name:'Judo Gi', sub:'Heavier than BJJ gi — required for throws', tutorial:{ question:"Is this your first time tying your belt?", title:"How to Tie Your Judo Belt", sub:"The Judo belt tie is slightly different from BJJ", video:"https://www.youtube.com/embed/u9y-pDJQMqQ", steps:["Find the center of the belt and place on belly","Wrap around your back bringing both ends to the front","Cross right end over left end","Bring right end under ALL layers from bottom","Loop right end over itself to create the knot","Pull both ends firmly and evenly","Both ends should hang equal length — this is tradition in Judo"] }},
+        { id:'judo_mat', icon:'🟦', name:'Mat Space', sub:'Essential — throwing without mats is dangerous' },
+      ]
+    },
+    'Karate': {
+      emoji: '🦶',
+      items: [
+        { id:'karate_gi', icon:'🥋', name:'Karate Gi', sub:'Traditional uniform — optional for solo training', tutorial:{ question:"Is this your first time tying your belt?", title:"How to Tie Your Karate Belt", sub:"The Karate knot is the foundation of your uniform", video:"https://www.youtube.com/embed/u9y-pDJQMqQ", steps:["Find center of belt and place on solar plexus","Wrap both ends around your back","Cross right over left in the front","Bring the right end under all layers","Loop over itself and pull both ends tight","Ends should be even — adjust if needed","In Karate the belt knot represents your discipline and commitment"] }},
+        { id:'focus_mitts_k', icon:'🤜', name:'Focus Mitts', sub:'Optional — for partner striking drills' },
+      ]
+    },
+    'Kung Fu': {
+      emoji: '🐉',
+      items: [
+        { id:'kf_staff', icon:'🪄', name:'Staff / Bo', sub:'Traditional weapon — optional' },
+        { id:'kf_space', icon:'🟦', name:'Open Space', sub:'Kung Fu forms require room to move' },
+      ]
+    },
+    'Krav Maga': {
+      emoji: '🛡️',
+      items: [
+        { id:'km_bag', icon:'🎯', name:'Heavy Bag', sub:'For strike combinations and aggression training' },
+        { id:'km_mitts', icon:'🤜', name:'Focus Mitts', sub:'Need a partner — great for realistic drills' },
+      ]
+    },
+    'Taekwondo': {
+      emoji: '🦶',
+      items: [
+        { id:'tkd_paddle', icon:'🎯', name:'Kicking Paddle', sub:'For practicing kick accuracy and power' },
+        { id:'tkd_space', icon:'🟦', name:'Open Space', sub:'High kicks need ceiling clearance!' },
+      ]
+    },
+  };
+
+  // Equipment state
+  const equipmentState = {};
+
+  // Build sections for selected arts
+  const container = document.getElementById('equipmentSections');
+  arts.forEach(art => {
+    const data = artEquipment[art];
+    if (!data) return;
+
+    const section = document.createElement('div');
+    section.className = 'art-section';
+    section.innerHTML = `
+      <div class="art-header">
+        <div class="art-emoji-label">${data.emoji}</div>
+        <div class="art-title-label">${art}</div>
+      </div>
+      <div class="equipment-list" id="list-${art.replace(/\s/g,'_')}"></div>
+    `;
+    container.appendChild(section);
+
+    const list = section.querySelector('.equipment-list');
+    data.items.forEach(item => {
+      equipmentState[item.id] = false;
+      const div = document.createElement('div');
+      div.className = 'equip-item';
+      div.id = `item-${item.id}`;
+      div.innerHTML = `
+        <div class="equip-left">
+          <div class="equip-icon">${item.icon}</div>
+          <div>
+            <div class="equip-name">${item.name}</div>
+            <div class="equip-sub">${item.sub}</div>
+          </div>
+        </div>
+        <div class="toggle-wrap">
+          <label class="toggle">
+            <input type="checkbox" onchange="toggleEquip('${item.id}', this.checked, ${item.tutorial ? `'${item.id}_tut'` : 'null'})"/>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      `;
+      list.appendChild(div);
+
+      // Add tutorial prompt if exists
+      if (item.tutorial) {
+        const tut = document.createElement('div');
+        tut.className = 'tutorial-prompt';
+        tut.id = `${item.id}_tut`;
+        tut.innerHTML = `
+          <div class="tutorial-question">${item.tutorial.question}</div>
+          <div class="tutorial-btns">
+            <button class="tut-btn no" onclick="closeTutorialPrompt('${item.id}_tut')">Yes, I know how ✓</button>
+            <button class="tut-btn yes" onclick="showTutorial('${JSON.stringify(item.tutorial).replace(/'/g,"\\'")}')">Show me how! →</button>
+          </div>
+        `;
+        list.appendChild(tut);
+      }
+    });
+  });
+
+  function toggleEquip(id, checked, tutId) {
+    equipmentState[id] = checked;
+    const item = document.getElementById(`item-${id}`);
+    if (checked) {
+      item.classList.add('has-it');
+      if (tutId) document.getElementById(tutId).classList.add('show');
+    } else {
+      item.classList.remove('has-it');
+      if (tutId) document.getElementById(tutId).classList.remove('show');
+    }
+  }
+
+  function closeTutorialPrompt(tutId) {
+    document.getElementById(tutId).classList.remove('show');
+  }
+
+  function showTutorial(tutDataStr) {
+    const tut = JSON.parse(tutDataStr.replace(/\\'/g, "'"));
+    document.getElementById('modalTitle').textContent = tut.title;
+    document.getElementById('modalSub').textContent = tut.sub;
+    document.getElementById('modalVideo').src = tut.video;
+    const stepsList = document.getElementById('modalSteps');
+    stepsList.innerHTML = tut.steps.map((s,i) => `<li><span class="step-num">${i+1}</span>${s}</li>`).join('');
+    document.getElementById('modalOverlay').classList.add('show');
+  }
+
+  function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('show');
+    document.getElementById('modalVideo').src = '';
+  }
+
+  function goBack() {
+    window.location.href = 'setup.html';
+  }
+
+  function finish() {
+    sessionStorage.setItem('omniEquipment', JSON.stringify(equipmentState));
+    window.location.href = 'body.html';
+  }
+</script>
+</body>
+</html>
