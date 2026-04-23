@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Omnikai – Core: Rotational Power</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --bg:#080b10; --blue:#00c8ff; --blue-glow:rgba(0,200,255,0.18);
+      --blue-glow-strong:rgba(0,200,255,0.35); --white:#f0f4f8;
+      --muted:#5a6a7a; --border:rgba(0,200,255,0.15); --card:rgba(255,255,255,0.03);
+      --green:#00ff88; --orange:#ffaa00; --core:#00e5a0; --nav-h:72px;
+    }
+    html,body { min-height:100%; background:var(--bg); color:var(--white); font-family:'Rajdhani',sans-serif; overflow-x:hidden; }
+    .bg-layer { position:fixed; inset:0; z-index:0; background:radial-gradient(ellipse 70% 40% at 50% 10%, rgba(0,229,160,0.05) 0%, transparent 70%), var(--bg); }
+    .grid-lines { position:fixed; inset:0; z-index:0; background-image:linear-gradient(rgba(0,200,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,200,255,0.025) 1px,transparent 1px); background-size:48px 48px; }
+    .scroll-wrap { position:relative; z-index:1; min-height:100vh; padding:24px 20px calc(var(--nav-h) + 24px); max-width:600px; margin:0 auto; }
+
+    .workout-header { display:flex; align-items:center; gap:14px; margin-bottom:28px; }
+    .back-btn { width:38px; height:38px; background:var(--card); border:1px solid var(--border); border-radius:8px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:1rem; transition:all 0.2s; flex-shrink:0; text-decoration:none; color:var(--white); }
+    .back-btn:hover { border-color:var(--blue); }
+    .header-eyebrow { font-size:0.65rem; font-weight:700; letter-spacing:0.22em; text-transform:uppercase; color:var(--core); margin-bottom:2px; }
+    .header-title { font-family:'Bebas Neue',sans-serif; font-size:1.8rem; letter-spacing:0.06em; line-height:1; }
+    .level-badge { background:rgba(0,229,160,0.1); border:1px solid rgba(0,229,160,0.25); border-radius:999px; padding:3px 12px; font-size:0.68rem; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:var(--core); }
+
+    .martial-tie { background:rgba(0,229,160,0.05); border:1px solid rgba(0,229,160,0.2); border-radius:12px; padding:16px 18px; margin-bottom:24px; display:flex; gap:14px; align-items:flex-start; }
+    .tie-icon { font-size:1.6rem; flex-shrink:0; }
+    .tie-text { font-family:'Inter',sans-serif; font-size:0.83rem; color:var(--white); line-height:1.5; }
+    .tie-text strong { color:var(--core); }
+
+    .section { margin-bottom:20px; }
+    .section-header { font-size:0.65rem; font-weight:700; letter-spacing:0.22em; text-transform:uppercase; color:var(--muted); margin-bottom:10px; }
+
+    .drill-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:24px 20px; margin-bottom:12px; }
+    .drill-card.completed { border-color:var(--green); background:rgba(0,255,136,0.03); }
+    .drill-card.featured { border-color:var(--core); box-shadow:0 0 20px rgba(0,229,160,0.1); }
+    .drill-name { font-family:'Bebas Neue',sans-serif; font-size:1.3rem; letter-spacing:0.06em; line-height:1; margin-bottom:6px; }
+    .drill-meta { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+    .meta-chip { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); border-radius:999px; padding:4px 12px; font-size:0.7rem; font-weight:600; color:var(--muted); }
+    .meta-chip.highlight { border-color:rgba(0,229,160,0.25); color:var(--core); background:rgba(0,229,160,0.06); }
+    .drill-status { width:32px; height:32px; border-radius:50%; border:2px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:0.9rem; flex-shrink:0; cursor:pointer; transition:all 0.2s; }
+    .drill-status.done { background:var(--green); border-color:var(--green); color:#080b10; font-weight:900; }
+
+    .tips-wrap { display:flex; flex-direction:column; gap:12px; margin-bottom:16px; }
+    .tip-row { display:flex; align-items:flex-start; gap:10px; font-family:'Inter',sans-serif; font-size:0.82rem; color:var(--white); line-height:1.5; }
+    .tip-dot { width:6px; height:6px; border-radius:50%; background:var(--core); flex-shrink:0; margin-top:5px; }
+
+    .tutorial-link { display:flex; align-items:center; gap:10px; background:rgba(255,0,0,0.06); border:1px solid rgba(255,0,0,0.2); border-radius:8px; padding:12px 14px; margin-bottom:16px; cursor:pointer; transition:all 0.2s; text-decoration:none; }
+    .tutorial-link:hover { background:rgba(255,0,0,0.1); }
+    .yt-icon { font-size:1.4rem; flex-shrink:0; }
+    .tutorial-link-text { font-size:0.82rem; font-weight:700; color:var(--white); }
+    .tutorial-link-sub { font-family:'Inter',sans-serif; font-size:0.7rem; color:var(--muted); }
+
+    .timer-wrap { background:rgba(0,0,0,0.3); border-radius:10px; padding:16px; margin-top:4px; text-align:center; }
+    .timer-display { font-family:'Bebas Neue',sans-serif; font-size:3rem; letter-spacing:0.1em; color:var(--core); line-height:1; text-shadow:0 0 20px rgba(0,229,160,0.3); }
+    .timer-label { font-size:0.68rem; font-weight:600; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); margin-bottom:8px; }
+    .timer-set-info { font-size:0.78rem; font-weight:700; color:var(--muted); margin-bottom:10px; }
+    .timer-set-info span { color:var(--white); }
+    .timer-btns { display:flex; gap:8px; justify-content:center; }
+    .timer-btn { padding:10px 24px; border-radius:7px; border:none; font-family:'Bebas Neue',sans-serif; font-size:0.95rem; letter-spacing:0.15em; cursor:pointer; transition:all 0.2s; }
+    .timer-btn.start { background:var(--core); color:#080b10; box-shadow:0 0 16px rgba(0,229,160,0.3); }
+    .timer-btn.start:hover { background:#00ffb3; }
+    .timer-btn.reset { background:rgba(255,255,255,0.06); border:1px solid var(--border); color:var(--muted); }
+
+    .rep-counter { background:rgba(0,0,0,0.3); border-radius:10px; padding:16px; margin-top:4px; text-align:center; }
+    .rep-display { font-family:'Bebas Neue',sans-serif; font-size:3rem; color:var(--core); line-height:1; text-shadow:0 0 20px rgba(0,229,160,0.3); margin-bottom:10px; }
+    .rep-btns { display:flex; gap:8px; justify-content:center; }
+    .rep-btn { padding:12px 28px; border-radius:7px; border:none; font-family:'Bebas Neue',sans-serif; font-size:1.4rem; cursor:pointer; transition:all 0.2s; }
+    .rep-btn.minus { background:rgba(255,255,255,0.06); border:1px solid var(--border); color:var(--muted); }
+    .rep-btn.plus { background:var(--core); color:#080b10; box-shadow:0 0 12px rgba(0,229,160,0.3); }
+    .rep-label { font-size:0.68rem; font-weight:600; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); margin-bottom:8px; }
+
+    /* FAILURE TRACKER */
+    .failure-card { background:rgba(0,229,160,0.05); border:1px solid rgba(0,229,160,0.2); border-radius:10px; padding:14px 16px; margin-top:12px; }
+    .failure-title { font-size:0.7rem; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:var(--core); margin-bottom:8px; }
+    .failure-btns { display:flex; gap:8px; }
+    .failure-btn { flex:1; padding:10px; border-radius:7px; border:none; font-family:'Rajdhani',sans-serif; font-size:0.85rem; font-weight:700; cursor:pointer; transition:all 0.2s; }
+    .failure-btn.yes { background:rgba(0,229,160,0.15); border:1px solid var(--core); color:var(--core); }
+    .failure-btn.no { background:rgba(255,255,255,0.05); border:1px solid var(--border); color:var(--muted); }
+    .failure-result { margin-top:10px; font-family:'Inter',sans-serif; font-size:0.82rem; line-height:1.5; display:none; padding:10px 12px; border-radius:8px; }
+
+    .cooldown-list { display:flex; flex-direction:column; gap:10px; }
+    .cooldown-item { display:flex; align-items:center; gap:12px; background:var(--card); border:1px solid var(--border); border-radius:8px; padding:12px 14px; font-size:0.88rem; font-weight:600; }
+    .cooldown-icon { font-size:1.2rem; flex-shrink:0; }
+
+    .complete-btn { width:100%; background:var(--core); border:none; border-radius:10px; padding:16px; color:#080b10; font-family:'Bebas Neue',sans-serif; font-size:1.1rem; letter-spacing:0.18em; cursor:pointer; box-shadow:0 0 24px rgba(0,229,160,0.3); transition:all 0.2s; margin-top:8px; }
+    .complete-btn:hover { background:#00ffb3; transform:translateY(-1px); }
+
+    .bottom-nav { position:fixed; bottom:0; left:0; right:0; height:var(--nav-h); background:rgba(8,11,16,0.95); border-top:1px solid var(--border); backdrop-filter:blur(16px); display:flex; align-items:center; justify-content:space-around; z-index:100; padding:0 8px; }
+    .nav-item { display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; padding:8px 16px; border-radius:10px; flex:1; }
+    .nav-icon { font-size:1.3rem; }
+    .nav-label { font-size:0.58rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); }
+    .nav-item.active .nav-label { color:var(--blue); }
+  </style>
+</head>
+<body>
+<div class="bg-layer"></div>
+<div class="grid-lines"></div>
+
+<div class="scroll-wrap">
+
+  <div class="workout-header">
+    <a class="back-btn" href="library.html">←</a>
+    <div>
+      <div class="header-eyebrow">🎯 Core · Rotational Power</div>
+      <div class="header-title">Core Session B</div>
+    </div>
+    <div class="level-badge">Rotational</div>
+  </div>
+
+  <div class="martial-tie">
+    <div class="tie-icon">🥊</div>
+    <div class="tie-text"><strong>Why rotational power matters:</strong> Every punch, kick, throw and submission involves rotation. The stronger your rotational core, the more power you generate from your hips and the harder you are to sweep or off-balance.</div>
+  </div>
+
+  <!-- WARMUP -->
+  <div class="section">
+    <div class="section-header">🔥 Warm Up</div>
+    <div class="drill-card" id="warmup-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div class="drill-name">Rotational Warm Up</div>
+        <div class="drill-status" id="warmupStatus" onclick="completeDrill('warmup')">○</div>
+      </div>
+      <div class="drill-meta">
+        <div class="meta-chip highlight">3 Minutes</div>
+        <div class="meta-chip">Loosen the spine</div>
+      </div>
+      <div class="tips-wrap">
+        <div class="tip-row"><div class="tip-dot"></div>Standing torso twists — arms out wide, rotate left and right, 20 slow reps</div>
+        <div class="tip-row"><div class="tip-dot"></div>Hip circles — hands on hips, big slow circles each direction, 10 each way</div>
+        <div class="tip-row"><div class="tip-dot"></div>Seated twist stretch — sit cross legged, rotate and hold each side 15 seconds</div>
+      </div>
+      <div class="timer-wrap">
+        <div class="timer-label">Warm Up Timer</div>
+        <div class="timer-display" id="warmupTimer">3:00</div>
+        <div class="timer-btns">
+          <button class="timer-btn start" onclick="startTimer('warmup',180)">Start</button>
+          <button class="timer-btn reset" onclick="resetTimer('warmup',180)">Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RUSSIAN TWIST — FEATURED -->
+  <div class="section">
+    <div class="section-header">⭐ Exercise 1 — Russian Twist</div>
+    <div class="drill-card featured" id="russian-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div class="drill-name">Russian Twist</div>
+        <div class="drill-status" id="russianStatus" onclick="completeDrill('russian')">○</div>
+      </div>
+      <div class="drill-meta">
+        <div class="meta-chip highlight" id="russianSets">3 Sets</div>
+        <div class="meta-chip highlight">Go to near failure</div>
+        <div class="meta-chip">30 sec rest</div>
+      </div>
+
+      <a class="tutorial-link" href="https://www.youtube.com/watch?v=JyUqwkVpsi8" target="_blank">
+        <div class="yt-icon">▶️</div>
+        <div>
+          <div class="tutorial-link-text">Russian Twist — Proper Form</div>
+          <div class="tutorial-link-sub">Watch the feet and spine position carefully</div>
+        </div>
+      </a>
+
+      <div class="tips-wrap">
+        <div class="tip-row"><div class="tip-dot"></div><strong>Legs up:</strong> Slightly lift both legs off the floor and keep them together throughout — this is what makes it a real core exercise</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Rotation:</strong> Rotate left and right, touching the floor on each side with your hands — that's one rep</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Lean back:</strong> Keep your torso at about 45 degrees — not sitting straight up, not lying flat</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Go to near failure:</strong> Push through the burn — stop just before your form breaks down</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>The higher your legs:</strong> The harder it gets — start low if you're new, raise them as you get stronger</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Martial arts connection:</strong> This is the exact rotational movement used in hooks, body shots and throwing in BJJ/Judo</div>
+      </div>
+
+      <div class="rep-counter">
+        <div class="rep-label">Rep Counter (Left + Right = 1 Rep)</div>
+        <div class="rep-display" id="russianCount">0</div>
+        <div class="rep-btns">
+          <button class="rep-btn minus" onclick="changeRep('russian',-1)">−</button>
+          <button class="rep-btn plus" onclick="changeRep('russian',1)">+</button>
+        </div>
+      </div>
+
+      <!-- NEAR FAILURE TRACKER -->
+      <div class="failure-card" id="russianFailure">
+        <div class="failure-title">Did you reach near failure?</div>
+        <div class="failure-btns">
+          <button class="failure-btn yes" onclick="failureResult('russian', true)">Yes — pushed through! 💪</button>
+          <button class="failure-btn no" onclick="failureResult('russian', false)">Not quite</button>
+        </div>
+        <div class="failure-result" id="russianFailureResult"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLOOR LEG RAISES -->
+  <div class="section">
+    <div class="section-header">💪 Exercise 2 — Leg Raises</div>
+    <div class="drill-card" id="legraise-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div class="drill-name">Floor Leg Raises</div>
+        <div class="drill-status" id="lograiseStatus" onclick="completeDrill('lograise')">○</div>
+      </div>
+      <div class="drill-meta">
+        <div class="meta-chip highlight">3 Sets</div>
+        <div class="meta-chip highlight" id="legRaiseReps">10 reps</div>
+        <div class="meta-chip">30 sec rest</div>
+      </div>
+
+      <a class="tutorial-link" href="https://www.youtube.com/watch?v=JB2oyawG9KI" target="_blank">
+        <div class="yt-icon">▶️</div>
+        <div>
+          <div class="tutorial-link-text">Leg Raises — Form & Variations</div>
+          <div class="tutorial-link-sub">Lower back position is critical — watch first</div>
+        </div>
+      </a>
+
+      <div class="tips-wrap">
+        <div class="tip-row"><div class="tip-dot"></div><strong>Setup:</strong> Lie flat on your back, hands under your glutes or by your sides, legs straight</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Lower back:</strong> Press your lower back into the floor — never let it arch up during the movement</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Lower slowly:</strong> The hardest part is lowering slowly — resist gravity on the way down</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Don't touch the floor:</strong> Stop just before your feet hit the ground — keep the tension on your core</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Martial arts connection:</strong> Hip flexor and lower ab strength — critical for guard retention in BJJ and high kicks in striking arts</div>
+      </div>
+
+      <div class="rep-counter">
+        <div class="rep-label">Rep Counter</div>
+        <div class="rep-display" id="lograiseCount">0</div>
+        <div class="rep-btns">
+          <button class="rep-btn minus" onclick="changeRep('lograise',-1)">−</button>
+          <button class="rep-btn plus" onclick="changeRep('lograise',1)">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BICYCLE CRUNCHES -->
+  <div class="section">
+    <div class="section-header">💪 Exercise 3 — Bicycle Crunches</div>
+    <div class="drill-card" id="bicycle-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div class="drill-name">Bicycle Crunches</div>
+        <div class="drill-status" id="bicycleStatus" onclick="completeDrill('bicycle')">○</div>
+      </div>
+      <div class="drill-meta">
+        <div class="meta-chip highlight">3 Sets</div>
+        <div class="meta-chip highlight" id="bicycleReps">16 reps total</div>
+        <div class="meta-chip">30 sec rest</div>
+        <div class="meta-chip">Slow and controlled</div>
+      </div>
+
+      <div class="tips-wrap">
+        <div class="tip-row"><div class="tip-dot"></div><strong>Movement:</strong> Hands behind head, bring opposite elbow to opposite knee while extending the other leg</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Don't pull your neck:</strong> Hands behind head for support only — your core does the work, not your arms</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Slow it down:</strong> 2 seconds per rotation — slow bicycle crunches are 10x harder and more effective than fast ones</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Full rotation:</strong> Really rotate your torso — don't just move your elbows</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Martial arts connection:</strong> The rotational pattern mirrors the hip rotation in hooks and body shots</div>
+      </div>
+
+      <div class="rep-counter">
+        <div class="rep-label">Rep Counter (Each Side = 1)</div>
+        <div class="rep-display" id="bicycleCount">0</div>
+        <div class="rep-btns">
+          <button class="rep-btn minus" onclick="changeRep('bicycle',-1)">−</button>
+          <button class="rep-btn plus" onclick="changeRep('bicycle',1)">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIDE PLANK -->
+  <div class="section">
+    <div class="section-header">💪 Exercise 4 — Side Plank</div>
+    <div class="drill-card" id="sideplank-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div class="drill-name">Side Plank Hold</div>
+        <div class="drill-status" id="sideplankStatus" onclick="completeDrill('sideplank')">○</div>
+      </div>
+      <div class="drill-meta">
+        <div class="meta-chip highlight">2 Sets each side</div>
+        <div class="meta-chip highlight" id="sidePlankDuration">20 sec each</div>
+        <div class="meta-chip">20 sec rest</div>
+      </div>
+
+      <div class="tips-wrap">
+        <div class="tip-row"><div class="tip-dot"></div><strong>Setup:</strong> On your side, elbow directly under shoulder, feet stacked, hips lifted</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Keep hips up:</strong> Don't let them sag toward the floor — squeeze your obliques the whole time</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Easier version:</strong> Drop your bottom knee to the floor — still effective, builds up to full side plank</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Martial arts connection:</strong> Oblique and lateral core strength — crucial for clinch work, sprawling and ground fighting</div>
+      </div>
+
+      <div class="timer-wrap">
+        <div class="timer-label">Hold Timer</div>
+        <div class="timer-display" id="sideplankTimer">0:20</div>
+        <div class="timer-set-info">Hold each side — <span id="sideplankSide">Left Side</span></div>
+        <div class="timer-btns">
+          <button class="timer-btn start" onclick="startSidePlank()">Start</button>
+          <button class="timer-btn reset" onclick="resetSidePlank()">Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COOLDOWN -->
+  <div class="section">
+    <div class="section-header">🧘 Cool Down</div>
+    <div class="drill-card" id="cooldown-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div class="drill-name">Rotational Stretch</div>
+        <div class="drill-status" id="cooldownStatus" onclick="completeDrill('cooldown')">○</div>
+      </div>
+      <div class="cooldown-list">
+        <div class="cooldown-item"><div class="cooldown-icon">🌀</div>Seated spinal twist — 30 sec each side, breathe into the rotation</div>
+        <div class="cooldown-item"><div class="cooldown-icon">🧘</div>Supine twist — lying on back, knees to one side, 30 sec each</div>
+        <div class="cooldown-item"><div class="cooldown-icon">🤸</div>Thread the needle — on all fours, rotate arm under body, 30 sec each side</div>
+      </div>
+    </div>
+  </div>
+
+  <button class="complete-btn" onclick="completeSession()">✓ Core Session B Complete</button>
+
+</div>
+
+<div class="bottom-nav">
+  <div class="nav-item" onclick="window.location.href='dashboard.html'"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></div>
+  <div class="nav-item active"><div class="nav-icon">📚</div><div class="nav-label">Library</div></div>
+  <div class="nav-item"><div class="nav-icon">📅</div><div class="nav-label">Plans</div></div>
+  <div class="nav-item"><div class="nav-icon">⚔️</div><div class="nav-label">Challenges</div></div>
+  <div class="nav-item"><div class="nav-icon">👤</div><div class="nav-label">Profile</div></div>
+</div>
+
+<script>
+  const bodyData = JSON.parse(sessionStorage.getItem('omniBody') || '{}');
+  const weight = parseFloat(bodyData.weight) || 160;
+  const unit = bodyData.unit || 'imperial';
+  const weightLbs = unit === 'metric' ? weight * 2.205 : weight;
+  const isHeavy = weightLbs > 200;
+  const isMid = weightLbs > 160 && weightLbs <= 200;
+
+  // Adaptive reps
+  const legRaiseReps = isHeavy ? 8 : isMid ? 10 : 12;
+  const bicycleReps = isHeavy ? 12 : isMid ? 16 : 20;
+  const sidePlankSec = isHeavy ? 15 : isMid ? 20 : 25;
+
+  document.getElementById('legRaiseReps').textContent = legRaiseReps + ' reps';
+  document.getElementById('bicycleReps').textContent = bicycleReps + ' reps total';
+  document.getElementById('sidePlankDuration').textContent = sidePlankSec + ' sec each';
+  document.getElementById('sideplankTimer').textContent = '0:' + sidePlankSec.toString().padStart(2,'0');
+
+  const timers = {};
+  const timerStates = {};
+  const repCounts = { russian: 0, lograise: 0, bicycle: 0 };
+
+  function formatTime(s) {
+    const m = Math.floor(s/60);
+    const sec = s%60;
+    return `${m}:${sec.toString().padStart(2,'0')}`;
+  }
+
+  function startTimer(id, seconds) {
+    if (timers[id]) clearInterval(timers[id]);
+    if (!timerStates[id]) timerStates[id] = { remaining: seconds, set: 1 };
+    timers[id] = setInterval(() => {
+      timerStates[id].remaining--;
+      document.getElementById(`${id}Timer`).textContent = formatTime(timerStates[id].remaining);
+      if (timerStates[id].remaining <= 0) {
+        clearInterval(timers[id]);
+        document.getElementById(`${id}Timer`).textContent = 'REST!';
+      }
+    }, 1000);
+  }
+
+  function resetTimer(id, seconds) {
+    if (timers[id]) clearInterval(timers[id]);
+    delete timerStates[id];
+    document.getElementById(`${id}Timer`).textContent = formatTime(seconds);
+  }
+
+  // Side plank with side switching
+  let sidePlankTimer = null;
+  let sidePlankRemaining = sidePlankSec;
+  let sidePlankSide = 'left';
+
+  function startSidePlank() {
+    if (sidePlankTimer) clearInterval(sidePlankTimer);
+    sidePlankTimer = setInterval(() => {
+      sidePlankRemaining--;
+      document.getElementById('sideplankTimer').textContent = formatTime(sidePlankRemaining);
+      if (sidePlankRemaining <= 0) {
+        clearInterval(sidePlankTimer);
+        if (sidePlankSide === 'left') {
+          sidePlankSide = 'right';
+          document.getElementById('sideplankSide').textContent = 'Right Side';
+          sidePlankRemaining = sidePlankSec;
+          document.getElementById('sideplankTimer').textContent = 'SWITCH!';
+          setTimeout(() => {
+            document.getElementById('sideplankTimer').textContent = formatTime(sidePlankSec);
+          }, 3000);
+        } else {
+          document.getElementById('sideplankTimer').textContent = 'DONE!';
+        }
+      }
+    }, 1000);
+  }
+
+  function resetSidePlank() {
+    if (sidePlankTimer) clearInterval(sidePlankTimer);
+    sidePlankRemaining = sidePlankSec;
+    sidePlankSide = 'left';
+    document.getElementById('sideplankTimer').textContent = formatTime(sidePlankSec);
+    document.getElementById('sideplankSide').textContent = 'Left Side';
+  }
+
+  function changeRep(id, delta) {
+    repCounts[id] = Math.max(0, repCounts[id] + delta);
+    document.getElementById(`${id}Count`).textContent = repCounts[id];
+  }
+
+  function failureResult(id, reached) {
+    const result = document.getElementById(`${id}FailureResult`);
+    result.style.display = 'block';
+    if (reached) {
+      result.style.background = 'rgba(0,229,160,0.06)';
+      result.style.border = '1px solid rgba(0,229,160,0.2)';
+      result.innerHTML = '🔥 That\'s the burn that builds real rotational power. Next session aim for 2-3 more reps before failure!';
+    } else {
+      result.style.background = 'rgba(255,170,0,0.06)';
+      result.style.border = '1px solid rgba(255,170,0,0.2)';
+      result.innerHTML = '💪 No worries — note your rep count and beat it next session. Progress is progress!';
+    }
+  }
+
+  function completeDrill(id) {
+    const statusEl = document.getElementById(`${id}Status`) || document.getElementById(`${id.replace('lograise','lograise')}Status`);
+    if (statusEl) { statusEl.textContent = '✓'; statusEl.classList.add('done'); }
+    const cardEl = document.getElementById(`${id}-card`) || document.getElementById(`${id.replace('lograise','legraise')}-card`);
+    if (cardEl) cardEl.classList.add('completed');
+  }
+
+  function completeSession() {
+    const count = parseInt(sessionStorage.getItem('omniWorkouts')||'0') + 1;
+    sessionStorage.setItem('omniWorkouts', count);
+    alert('🔥 Core Session B Complete! That rotational power will show up next time you throw a punch or hook. See you for Session C!');
+    window.location.href = 'dashboard.html';
+  }
+</script>
+</body>
+</html>
