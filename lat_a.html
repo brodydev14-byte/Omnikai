@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Omnikai – Lats: Bodyweight</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --bg:#080b10; --blue:#00c8ff; --blue-glow:rgba(0,200,255,0.18);
+      --white:#f0f4f8; --muted:#5a6a7a; --border:rgba(0,200,255,0.15);
+      --card:rgba(255,255,255,0.03); --green:#00ff88; --nav-h:72px;
+      --accent:#7c3aed;
+    }
+    html,body { min-height:100%; background:var(--bg); color:var(--white); font-family:'Rajdhani',sans-serif; overflow-x:hidden; }
+    .bg-layer { position:fixed; inset:0; z-index:0; background:radial-gradient(ellipse 70% 40% at 50% 10%, rgba(124,58,237,0.05) 0%, transparent 70%), var(--bg); }
+    .grid-lines { position:fixed; inset:0; z-index:0; background-image:linear-gradient(rgba(0,200,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,200,255,0.025) 1px,transparent 1px); background-size:48px 48px; }
+    .scroll-wrap { position:relative; z-index:1; min-height:100vh; padding:24px 20px calc(var(--nav-h) + 24px); max-width:600px; margin:0 auto; }
+
+    .workout-header { display:flex; align-items:center; gap:14px; margin-bottom:28px; }
+    .back-btn { width:38px; height:38px; background:var(--card); border:1px solid var(--border); border-radius:8px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:1rem; transition:all 0.2s; flex-shrink:0; text-decoration:none; color:var(--white); }
+    .back-btn:hover { border-color:var(--accent); }
+    .header-eyebrow { font-size:0.65rem; font-weight:700; letter-spacing:0.22em; text-transform:uppercase; color:var(--accent); margin-bottom:2px; }
+    .header-title { font-family:'Bebas Neue',sans-serif; font-size:1.8rem; letter-spacing:0.06em; line-height:1; }
+    .level-badge { background:rgba(124,58,237,0.1); border:1px solid rgba(124,58,237,0.25); border-radius:999px; padding:3px 12px; font-size:0.68rem; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:var(--accent); white-space:nowrap; }
+
+    .martial-tie { background:rgba(124,58,237,0.05); border:1px solid rgba(124,58,237,0.2); border-radius:12px; padding:16px 18px; margin-bottom:24px; display:flex; gap:14px; }
+    .tie-icon { font-size:1.6rem; flex-shrink:0; }
+    .tie-text { font-family:'Inter',sans-serif; font-size:0.83rem; color:var(--white); line-height:1.5; }
+    .tie-text strong { color:var(--accent); }
+
+    .section { margin-bottom:20px; }
+    .section-header { font-size:0.65rem; font-weight:700; letter-spacing:0.22em; text-transform:uppercase; color:var(--muted); margin-bottom:10px; }
+
+    .drill-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:24px 20px; margin-bottom:12px; }
+    .drill-card.completed { border-color:var(--green); background:rgba(0,255,136,0.03); }
+    .drill-name { font-family:'Bebas Neue',sans-serif; font-size:1.3rem; letter-spacing:0.06em; line-height:1; margin-bottom:6px; }
+    .drill-meta { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+    .meta-chip { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); border-radius:999px; padding:4px 12px; font-size:0.7rem; font-weight:600; color:var(--muted); }
+    .meta-chip.highlight { border-color:rgba(124,58,237,0.25); color:var(--accent); background:rgba(124,58,237,0.06); }
+    .drill-status { width:32px; height:32px; border-radius:50%; border:2px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:0.9rem; flex-shrink:0; cursor:pointer; transition:all 0.2s; }
+    .drill-status.done { background:var(--green); border-color:var(--green); color:#080b10; font-weight:900; }
+
+    .tips-wrap { display:flex; flex-direction:column; gap:12px; margin-bottom:16px; }
+    .tip-row { display:flex; align-items:flex-start; gap:10px; font-family:'Inter',sans-serif; font-size:0.82rem; color:var(--white); line-height:1.5; }
+    .tip-dot { width:6px; height:6px; border-radius:50%; background:var(--accent); flex-shrink:0; margin-top:5px; }
+
+    .tutorial-link { display:flex; align-items:center; gap:10px; background:rgba(255,0,0,0.06); border:1px solid rgba(255,0,0,0.2); border-radius:8px; padding:12px 14px; margin-bottom:16px; cursor:pointer; transition:all 0.2s; text-decoration:none; }
+    .tutorial-link:hover { background:rgba(255,0,0,0.1); }
+    .yt-icon { font-size:1.4rem; flex-shrink:0; }
+    .tutorial-link-text { font-size:0.82rem; font-weight:700; color:var(--white); }
+    .tutorial-link-sub { font-family:'Inter',sans-serif; font-size:0.7rem; color:var(--muted); }
+
+    .timer-wrap { background:rgba(0,0,0,0.3); border-radius:10px; padding:16px; margin-top:4px; text-align:center; }
+    .timer-display { font-family:'Bebas Neue',sans-serif; font-size:3rem; letter-spacing:0.1em; color:var(--accent); line-height:1; }
+    .timer-label { font-size:0.68rem; font-weight:600; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); margin-bottom:8px; }
+    .timer-set-info { font-size:0.78rem; font-weight:700; color:var(--muted); margin-bottom:10px; }
+    .timer-set-info span { color:var(--white); }
+    .timer-btns { display:flex; gap:8px; justify-content:center; }
+    .timer-btn { padding:10px 24px; border-radius:7px; border:none; font-family:'Bebas Neue',sans-serif; font-size:0.95rem; letter-spacing:0.15em; cursor:pointer; transition:all 0.2s; }
+    .timer-btn.start { background:var(--accent); color:#fff; }
+    .timer-btn.start:hover { background:#9461ff; }
+    .timer-btn.reset { background:rgba(255,255,255,0.06); border:1px solid var(--border); color:var(--muted); }
+
+    .rep-counter { background:rgba(0,0,0,0.3); border-radius:10px; padding:16px; margin-top:4px; text-align:center; }
+    .rep-display { font-family:'Bebas Neue',sans-serif; font-size:3rem; color:var(--accent); line-height:1; margin-bottom:10px; }
+    .rep-btns { display:flex; gap:8px; justify-content:center; }
+    .rep-btn { padding:12px 28px; border-radius:7px; border:none; font-family:'Bebas Neue',sans-serif; font-size:1.4rem; cursor:pointer; transition:all 0.2s; }
+    .rep-btn.minus { background:rgba(255,255,255,0.06); border:1px solid var(--border); color:var(--muted); }
+    .rep-btn.plus { background:var(--accent); color:#fff; }
+    .rep-label { font-size:0.68rem; font-weight:600; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); margin-bottom:8px; }
+
+    .progression-card { background:rgba(124,58,237,0.06); border:1px solid rgba(124,58,237,0.2); border-radius:10px; padding:14px 16px; margin-bottom:14px; }
+    .progression-title { font-size:0.7rem; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:var(--accent); margin-bottom:10px; }
+    .progression-item { display:flex; align-items:flex-start; gap:10px; font-family:'Inter',sans-serif; font-size:0.8rem; color:var(--white); padding:6px 0; border-bottom:1px solid rgba(124,58,237,0.1); line-height:1.4; }
+    .progression-item:last-child { border-bottom:none; }
+    .prog-badge { background:rgba(124,58,237,0.2); border:1px solid rgba(124,58,237,0.3); border-radius:999px; padding:2px 8px; font-size:0.65rem; font-weight:700; color:var(--accent); white-space:nowrap; flex-shrink:0; }
+
+    .cooldown-list { display:flex; flex-direction:column; gap:10px; }
+    .cooldown-item { display:flex; align-items:center; gap:12px; background:var(--card); border:1px solid var(--border); border-radius:8px; padding:12px 14px; font-size:0.88rem; font-weight:600; }
+    .cooldown-icon { font-size:1.2rem; flex-shrink:0; }
+
+    .complete-btn { width:100%; background:var(--accent); border:none; border-radius:10px; padding:16px; color:#fff; font-family:'Bebas Neue',sans-serif; font-size:1.1rem; letter-spacing:0.18em; cursor:pointer; transition:all 0.2s; margin-top:8px; }
+    .complete-btn:hover { background:#9461ff; transform:translateY(-1px); }
+
+    .bottom-nav { position:fixed; bottom:0; left:0; right:0; height:var(--nav-h); background:rgba(8,11,16,0.95); border-top:1px solid var(--border); backdrop-filter:blur(16px); display:flex; align-items:center; justify-content:space-around; z-index:100; padding:0 8px; }
+    .nav-item { display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; padding:8px 16px; border-radius:10px; flex:1; }
+    .nav-icon { font-size:1.3rem; }
+    .nav-label { font-size:0.58rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); }
+    .nav-item.active .nav-label { color:var(--blue); }
+  </style>
+</head>
+<body>
+<div class="bg-layer"></div>
+<div class="grid-lines"></div>
+<div class="scroll-wrap">
+
+  <div class="workout-header">
+    <a class="back-btn" href="library.html">←</a>
+    <div>
+      <div class="header-eyebrow">💪 Lats · Bodyweight</div>
+      <div class="header-title">Lat Session A</div>
+    </div>
+    <div class="level-badge">No Equipment</div>
+  </div>
+
+  <div class="martial-tie">
+    <div class="tie-icon">🥋</div>
+    <div class="tie-text"><strong>Why lats matter in martial arts:</strong> The lats are the largest muscle in your back and the engine behind every pulling movement in combat sports — clinch control, guard pulls in BJJ, takedown defense, and generating rotational power in strikes. Strong lats = harder to move and control.</div>
+  </div>
+
+  <!-- WARMUP -->
+  <div class="section">
+    <div class="section-header">🔥 Warm Up</div>
+    <div class="drill-card" id="warmup-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div class="drill-name">Back Activation</div>
+        <div class="drill-status" id="warmupStatus" onclick="completeDrill('warmup')">○</div>
+      </div>
+      <div class="drill-meta"><div class="meta-chip highlight">3 Minutes</div></div>
+      <div class="tips-wrap">
+        <div class="tip-row"><div class="tip-dot"></div>Cat-cow — 10 slow reps, loosen the entire spine</div>
+        <div class="tip-row"><div class="tip-dot"></div>Lat stretch — reach one arm overhead, lean to the side, hold 20 sec each</div>
+        <div class="tip-row"><div class="tip-dot"></div>Doorway lat stretch — grab doorframe overhead, lean back and feel the lat stretch</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEAD HANG -->
+  <div class="section">
+    <div class="section-header">💪 Exercise 1 — Dead Hang</div>
+    <div class="drill-card" id="hang-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div class="drill-name">Dead Hang</div>
+        <div class="drill-status" id="hangStatus" onclick="completeDrill('hang')">○</div>
+      </div>
+      <div class="drill-meta">
+        <div class="meta-chip highlight">3 Sets</div>
+        <div class="meta-chip highlight" id="hangDuration">30 sec each</div>
+        <div class="meta-chip">30 sec rest</div>
+        <div class="meta-chip">Bar or sturdy door frame</div>
+      </div>
+      <div class="tips-wrap">
+        <div class="tip-row"><div class="tip-dot"></div><strong>Full dead hang:</strong> Arms completely straight — don't engage your shoulders, just hang and relax</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Grip:</strong> Overhand grip shoulder-width — this is also building your grip strength for grappling</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Breathe:</strong> Slow deep breaths — this decompresses your spine and stretches the lats simultaneously</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Martial arts connection:</strong> Dead hangs build the grip and shoulder stability needed for clinch work, guard retention and submission defense</div>
+      </div>
+      <div class="timer-wrap">
+        <div class="timer-label">Hold Timer</div>
+        <div class="timer-display" id="hangTimer">0:30</div>
+        <div class="timer-set-info">Set <span id="hangCurrentSet">1</span> of <span>3</span></div>
+        <div class="timer-btns">
+          <button class="timer-btn start" onclick="startTimer('hang', hangSeconds)">Start</button>
+          <button class="timer-btn reset" onclick="resetTimer('hang', hangSeconds)">Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BODYWEIGHT ROWS -->
+  <div class="section">
+    <div class="section-header">💪 Exercise 2 — Bodyweight Rows</div>
+    <div class="drill-card" id="rows-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div class="drill-name">Bodyweight Rows</div>
+        <div class="drill-status" id="rowsStatus" onclick="completeDrill('rows')">○</div>
+      </div>
+      <div class="drill-meta">
+        <div class="meta-chip highlight">3 Sets</div>
+        <div class="meta-chip highlight" id="rowsReps">10 reps</div>
+        <div class="meta-chip">45 sec rest</div>
+        <div class="meta-chip">Table or low bar</div>
+      </div>
+      <a class="tutorial-link" href="https://www.youtube.com/watch?v=rloXYB8M3vU" target="_blank">
+        <div class="yt-icon">▶️</div>
+        <div>
+          <div class="tutorial-link-text">Bodyweight Rows — Setup & Form</div>
+          <div class="tutorial-link-sub">How to set up at home with a table</div>
+        </div>
+      </a>
+      <div class="tips-wrap">
+        <div class="tip-row"><div class="tip-dot"></div><strong>Setup:</strong> Lie under a sturdy table, grab the edge with overhand grip, body straight like a plank</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Pull chest to table:</strong> Squeeze shoulder blades together as you pull up — lead with your chest not your arms</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Body stays straight:</strong> Don't let your hips sag — maintain that plank position throughout</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Harder version:</strong> Elevate your feet on a chair — more bodyweight = harder pull</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Easier version:</strong> Bend your knees more — less bodyweight engaged</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Martial arts connection:</strong> The pulling motion directly trains the clinch pulling and guard pull strength used in BJJ and wrestling</div>
+      </div>
+      <div class="rep-counter">
+        <div class="rep-label">Rep Counter</div>
+        <div class="rep-display" id="rowsCount">0</div>
+        <div class="rep-btns">
+          <button class="rep-btn minus" onclick="changeRep('rows',-1)">−</button>
+          <button class="rep-btn plus" onclick="changeRep('rows',1)">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BAND PULLDOWNS -->
+  <div class="section">
+    <div class="section-header">💪 Exercise 3 — Band Pulldowns</div>
+    <div class="drill-card" id="band-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div class="drill-name">Resistance Band Pulldowns</div>
+        <div class="drill-status" id="bandStatus" onclick="completeDrill('band')">○</div>
+      </div>
+      <div class="drill-meta">
+        <div class="meta-chip highlight">3 Sets</div>
+        <div class="meta-chip highlight" id="bandReps">12 reps</div>
+        <div class="meta-chip">30 sec rest</div>
+        <div class="meta-chip">Resistance band needed</div>
+      </div>
+      <div class="tips-wrap">
+        <div class="tip-row"><div class="tip-dot"></div><strong>Setup:</strong> Anchor band overhead in a door or wrap around a pull up bar — kneel or sit below</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Pull to chest:</strong> Pull the band down to your upper chest — elbows drive down and back</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Squeeze lats:</strong> At the bottom squeeze your lats hard — imagine trying to put your elbows in your back pockets</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>No band?</strong> Skip this exercise and add an extra set of bodyweight rows instead</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Martial arts connection:</strong> The pulldown motion is exactly what you do when pulling someone into a clinch or dragging them to the ground</div>
+      </div>
+      <div class="rep-counter">
+        <div class="rep-label">Rep Counter</div>
+        <div class="rep-display" id="bandCount">0</div>
+        <div class="rep-btns">
+          <button class="rep-btn minus" onclick="changeRep('band',-1)">−</button>
+          <button class="rep-btn plus" onclick="changeRep('band',1)">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PULL UP PROGRESSION -->
+  <div class="section">
+    <div class="section-header">💪 Exercise 4 — Pull Up Progression</div>
+    <div class="drill-card" id="pullup-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div class="drill-name">Pull Up Progression</div>
+        <div class="drill-status" id="pullupStatus" onclick="completeDrill('pullup')">○</div>
+      </div>
+      <div class="drill-meta">
+        <div class="meta-chip highlight">3 Sets</div>
+        <div class="meta-chip highlight">Pick your level below</div>
+        <div class="meta-chip">60 sec rest</div>
+      </div>
+
+      <div class="progression-card">
+        <div class="progression-title">📊 Find Your Level</div>
+        <div class="progression-item">
+          <div class="prog-badge">0 reps</div>
+          <div>Band assisted pull ups or jumping pull ups — use a resistance band looped over the bar for assistance</div>
+        </div>
+        <div class="progression-item">
+          <div class="prog-badge">1-3 reps</div>
+          <div>Negative pull ups — jump to top position, lower yourself as SLOWLY as possible (5-10 seconds down). Do 3-5 negatives per set</div>
+        </div>
+        <div class="progression-item">
+          <div class="prog-badge">4-9 reps</div>
+          <div>Full pull ups — do as many as you can with good form, rest, repeat. Track your max each session</div>
+        </div>
+        <div class="progression-item">
+          <div class="prog-badge">10+ reps</div>
+          <div>You're ready for Session C — weighted pull ups and variations await you! 🔥</div>
+        </div>
+      </div>
+
+      <div class="tips-wrap">
+        <div class="tip-row"><div class="tip-dot"></div><strong>Dead hang start:</strong> Always start from a full dead hang — no half reps from a bent arm position</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Pull elbows down:</strong> Think of pulling your elbows to your hips — not pulling your hands to your chest</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Chin over bar:</strong> Full rep = chin clears the bar — no partial reps</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Martial arts connection:</strong> Pull ups are arguably the single best exercise for combat athletes — every grappling movement uses these exact muscles</div>
+      </div>
+      <div class="rep-counter">
+        <div class="rep-label">Rep Counter</div>
+        <div class="rep-display" id="pullupCount">0</div>
+        <div class="rep-btns">
+          <button class="rep-btn minus" onclick="changeRep('pullup',-1)">−</button>
+          <button class="rep-btn plus" onclick="changeRep('pullup',1)">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COOLDOWN -->
+  <div class="section">
+    <div class="section-header">🧘 Cool Down</div>
+    <div class="drill-card" id="cooldown-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div class="drill-name">Back & Lat Stretch</div>
+        <div class="drill-status" id="cooldownStatus" onclick="completeDrill('cooldown')">○</div>
+      </div>
+      <div class="cooldown-list">
+        <div class="cooldown-item"><div class="cooldown-icon">🙆</div>Overhead lat stretch — 30 sec each side, reach and lean</div>
+        <div class="cooldown-item"><div class="cooldown-icon">🧘</div>Child's pose — 45 sec, arms extended overhead</div>
+        <div class="cooldown-item"><div class="cooldown-icon">🤸</div>Dead hang stretch — passive hang 30 sec, decompress spine</div>
+      </div>
+    </div>
+  </div>
+
+  <button class="complete-btn" onclick="completeSession()">✓ Lat Session A Complete</button>
+
+</div>
+
+<div class="bottom-nav">
+  <div class="nav-item" onclick="window.location.href='dashboard.html'"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></div>
+  <div class="nav-item active"><div class="nav-icon">📚</div><div class="nav-label">Library</div></div>
+  <div class="nav-item"><div class="nav-icon">📅</div><div class="nav-label">Plans</div></div>
+  <div class="nav-item"><div class="nav-icon">⚔️</div><div class="nav-label">Challenges</div></div>
+  <div class="nav-item"><div class="nav-icon">👤</div><div class="nav-label">Profile</div></div>
+</div>
+
+<script>
+  const bodyData = JSON.parse(sessionStorage.getItem('omniBody') || '{}');
+  const weight = parseFloat(bodyData.weight) || 160;
+  const unit = bodyData.unit || 'imperial';
+  const weightLbs = unit === 'metric' ? weight * 2.205 : weight;
+  const isHeavy = weightLbs > 200;
+  const isMid = weightLbs > 160 && weightLbs <= 200;
+
+  const hangSeconds = isHeavy ? 20 : isMid ? 30 : 40;
+  const rowsReps = isHeavy ? 8 : isMid ? 10 : 12;
+  const bandReps = isHeavy ? 10 : isMid ? 12 : 15;
+
+  document.getElementById('hangDuration').textContent = hangSeconds + ' sec each';
+  document.getElementById('hangTimer').textContent = '0:' + hangSeconds.toString().padStart(2,'0');
+  document.getElementById('rowsReps').textContent = rowsReps + ' reps';
+  document.getElementById('bandReps').textContent = bandReps + ' reps';
+
+  const timers = {};
+  const repCounts = { rows:0, band:0, pullup:0 };
+
+  function formatTime(s) {
+    const m = Math.floor(s/60);
+    const sec = s%60;
+    return `${m}:${sec.toString().padStart(2,'0')}`;
+  }
+
+  function startTimer(id, seconds) {
+    if (timers[id]) clearInterval(timers[id]);
+    let remaining = seconds;
+    timers[id] = setInterval(() => {
+      remaining--;
+      document.getElementById(`${id}Timer`).textContent = formatTime(remaining);
+      if (remaining <= 0) { clearInterval(timers[id]); document.getElementById(`${id}Timer`).textContent = 'REST!'; }
+    }, 1000);
+  }
+
+  function resetTimer(id, seconds) {
+    if (timers[id]) clearInterval(timers[id]);
+    document.getElementById(`${id}Timer`).textContent = formatTime(seconds);
+  }
+
+  function changeRep(id, delta) {
+    repCounts[id] = Math.max(0, repCounts[id] + delta);
+    document.getElementById(`${id}Count`).textContent = repCounts[id];
+  }
+
+  function completeDrill(id) {
+    const s = document.getElementById(`${id}Status`);
+    const c = document.getElementById(`${id}-card`);
+    if(s){ s.textContent='✓'; s.classList.add('done'); }
+    if(c) c.classList.add('completed');
+  }
+
+  function completeSession() {
+    const count = parseInt(sessionStorage.getItem('omniWorkouts')||'0') + 1;
+    sessionStorage.setItem('omniWorkouts', count);
+    alert('💪 Lat Session A Complete! Those lats are going to make you a nightmare to control on the ground. See you next session!');
+    window.location.href = 'dashboard.html';
+  }
+</script>
+</body>
+</html>

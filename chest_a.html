@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Omnikai – Chest: Bodyweight</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --bg:#080b10; --blue:#00c8ff; --blue-glow:rgba(0,200,255,0.18);
+      --white:#f0f4f8; --muted:#5a6a7a; --border:rgba(0,200,255,0.15);
+      --card:rgba(255,255,255,0.03); --green:#00ff88; --nav-h:72px;
+      --accent:#ff6b35;
+    }
+    html,body { min-height:100%; background:var(--bg); color:var(--white); font-family:'Rajdhani',sans-serif; overflow-x:hidden; }
+    .bg-layer { position:fixed; inset:0; z-index:0; background:radial-gradient(ellipse 70% 40% at 50% 10%, rgba(255,107,53,0.04) 0%, transparent 70%), var(--bg); }
+    .grid-lines { position:fixed; inset:0; z-index:0; background-image:linear-gradient(rgba(0,200,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,200,255,0.025) 1px,transparent 1px); background-size:48px 48px; }
+    .scroll-wrap { position:relative; z-index:1; min-height:100vh; padding:24px 20px calc(var(--nav-h) + 24px); max-width:600px; margin:0 auto; }
+
+    .workout-header { display:flex; align-items:center; gap:14px; margin-bottom:28px; }
+    .back-btn { width:38px; height:38px; background:var(--card); border:1px solid var(--border); border-radius:8px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:1rem; transition:all 0.2s; flex-shrink:0; text-decoration:none; color:var(--white); }
+    .back-btn:hover { border-color:var(--accent); }
+    .header-eyebrow { font-size:0.65rem; font-weight:700; letter-spacing:0.22em; text-transform:uppercase; color:var(--accent); margin-bottom:2px; }
+    .header-title { font-family:'Bebas Neue',sans-serif; font-size:1.8rem; letter-spacing:0.06em; line-height:1; }
+    .level-badge { background:rgba(255,107,53,0.1); border:1px solid rgba(255,107,53,0.25); border-radius:999px; padding:3px 12px; font-size:0.68rem; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:var(--accent); white-space:nowrap; }
+
+    .martial-tie { background:rgba(255,107,53,0.05); border:1px solid rgba(255,107,53,0.2); border-radius:12px; padding:16px 18px; margin-bottom:24px; display:flex; gap:14px; }
+    .tie-icon { font-size:1.6rem; flex-shrink:0; }
+    .tie-text { font-family:'Inter',sans-serif; font-size:0.83rem; color:var(--white); line-height:1.5; }
+    .tie-text strong { color:var(--accent); }
+
+    .section { margin-bottom:20px; }
+    .section-header { font-size:0.65rem; font-weight:700; letter-spacing:0.22em; text-transform:uppercase; color:var(--muted); margin-bottom:10px; }
+
+    .drill-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:24px 20px; margin-bottom:12px; }
+    .drill-card.completed { border-color:var(--green); background:rgba(0,255,136,0.03); }
+    .drill-name { font-family:'Bebas Neue',sans-serif; font-size:1.3rem; letter-spacing:0.06em; line-height:1; margin-bottom:6px; }
+    .drill-meta { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+    .meta-chip { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); border-radius:999px; padding:4px 12px; font-size:0.7rem; font-weight:600; color:var(--muted); }
+    .meta-chip.highlight { border-color:rgba(255,107,53,0.25); color:var(--accent); background:rgba(255,107,53,0.06); }
+    .drill-status { width:32px; height:32px; border-radius:50%; border:2px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:0.9rem; flex-shrink:0; cursor:pointer; transition:all 0.2s; }
+    .drill-status.done { background:var(--green); border-color:var(--green); color:#080b10; font-weight:900; }
+
+    .tips-wrap { display:flex; flex-direction:column; gap:12px; margin-bottom:16px; }
+    .tip-row { display:flex; align-items:flex-start; gap:10px; font-family:'Inter',sans-serif; font-size:0.82rem; color:var(--white); line-height:1.5; }
+    .tip-dot { width:6px; height:6px; border-radius:50%; background:var(--accent); flex-shrink:0; margin-top:5px; }
+
+    .tutorial-link { display:flex; align-items:center; gap:10px; background:rgba(255,0,0,0.06); border:1px solid rgba(255,0,0,0.2); border-radius:8px; padding:12px 14px; margin-bottom:16px; cursor:pointer; transition:all 0.2s; text-decoration:none; }
+    .tutorial-link:hover { background:rgba(255,0,0,0.1); }
+    .yt-icon { font-size:1.4rem; flex-shrink:0; }
+    .tutorial-link-text { font-size:0.82rem; font-weight:700; color:var(--white); }
+    .tutorial-link-sub { font-family:'Inter',sans-serif; font-size:0.7rem; color:var(--muted); }
+
+    .rep-counter { background:rgba(0,0,0,0.3); border-radius:10px; padding:16px; margin-top:4px; text-align:center; }
+    .rep-display { font-family:'Bebas Neue',sans-serif; font-size:3rem; color:var(--accent); line-height:1; margin-bottom:10px; }
+    .rep-btns { display:flex; gap:8px; justify-content:center; }
+    .rep-btn { padding:12px 28px; border-radius:7px; border:none; font-family:'Bebas Neue',sans-serif; font-size:1.4rem; cursor:pointer; transition:all 0.2s; }
+    .rep-btn.minus { background:rgba(255,255,255,0.06); border:1px solid var(--border); color:var(--muted); }
+    .rep-btn.plus { background:var(--accent); color:#fff; }
+    .rep-label { font-size:0.68rem; font-weight:600; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); margin-bottom:8px; }
+
+    /* MAX TEST */
+    .max-test { background:rgba(255,107,53,0.05); border:1px solid rgba(255,107,53,0.2); border-radius:10px; padding:14px 16px; margin-bottom:14px; }
+    .max-test-title { font-size:0.7rem; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:var(--accent); margin-bottom:8px; }
+    .max-input-row { display:flex; align-items:center; gap:12px; margin-bottom:8px; }
+    .max-input { background:rgba(255,255,255,0.04); border:1px solid rgba(255,107,53,0.3); border-radius:8px; padding:10px 14px; color:var(--white); font-family:'Bebas Neue',sans-serif; font-size:1.6rem; width:90px; text-align:center; outline:none; }
+    .max-input:focus { border-color:var(--accent); }
+    .max-label { font-size:0.82rem; font-weight:700; color:var(--muted); }
+    .goal-display { font-family:'Inter',sans-serif; font-size:0.82rem; color:var(--white); display:none; padding:8px 10px; background:rgba(255,107,53,0.06); border-radius:6px; }
+    .goal-display.show { display:block; }
+    .goal-display span { color:var(--accent); font-family:'Bebas Neue',sans-serif; font-size:1rem; }
+
+    .cooldown-list { display:flex; flex-direction:column; gap:10px; }
+    .cooldown-item { display:flex; align-items:center; gap:12px; background:var(--card); border:1px solid var(--border); border-radius:8px; padding:12px 14px; font-size:0.88rem; font-weight:600; }
+    .cooldown-icon { font-size:1.2rem; flex-shrink:0; }
+
+    .complete-btn { width:100%; background:var(--accent); border:none; border-radius:10px; padding:16px; color:#fff; font-family:'Bebas Neue',sans-serif; font-size:1.1rem; letter-spacing:0.18em; cursor:pointer; transition:all 0.2s; margin-top:8px; }
+    .complete-btn:hover { background:#ff8255; transform:translateY(-1px); }
+
+    .bottom-nav { position:fixed; bottom:0; left:0; right:0; height:var(--nav-h); background:rgba(8,11,16,0.95); border-top:1px solid var(--border); backdrop-filter:blur(16px); display:flex; align-items:center; justify-content:space-around; z-index:100; padding:0 8px; }
+    .nav-item { display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; padding:8px 16px; border-radius:10px; flex:1; }
+    .nav-icon { font-size:1.3rem; }
+    .nav-label { font-size:0.58rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); }
+    .nav-item.active .nav-label { color:var(--blue); }
+  </style>
+</head>
+<body>
+<div class="bg-layer"></div>
+<div class="grid-lines"></div>
+
+<div class="scroll-wrap">
+
+  <div class="workout-header">
+    <a class="back-btn" href="library.html">←</a>
+    <div>
+      <div class="header-eyebrow">💪 Chest · Bodyweight</div>
+      <div class="header-title">Chest Session A</div>
+    </div>
+    <div class="level-badge">No Equipment</div>
+  </div>
+
+  <div class="martial-tie">
+    <div class="tie-icon">🥊</div>
+    <div class="tie-text"><strong>Why chest matters in martial arts:</strong> Chest strength powers the extension and follow-through of every punch. Strong pecs also help control opponents in the clinch, resist takedowns, and post on the ground in BJJ and wrestling.</div>
+  </div>
+
+  <!-- WARMUP -->
+  <div class="section">
+    <div class="section-header">🔥 Warm Up</div>
+    <div class="drill-card" id="warmup-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div class="drill-name">Chest Activation</div>
+        <div class="drill-status" id="warmupStatus" onclick="completeDrill('warmup')">○</div>
+      </div>
+      <div class="drill-meta">
+        <div class="meta-chip highlight">3 Minutes</div>
+      </div>
+      <div class="tips-wrap">
+        <div class="tip-row"><div class="tip-dot"></div>Arm swings across chest — 20 reps, loosen the pec muscles</div>
+        <div class="tip-row"><div class="tip-dot"></div>Doorway stretch — stand in doorway, arms out, lean forward gently 30 sec</div>
+        <div class="tip-row"><div class="tip-dot"></div>10 very easy pushups — just warming up the movement pattern</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STANDARD PUSHUPS -->
+  <div class="section">
+    <div class="section-header">💪 Exercise 1 — Standard Pushups</div>
+    <div class="drill-card" id="standard-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div class="drill-name">Standard Pushups</div>
+        <div class="drill-status" id="standardStatus" onclick="completeDrill('standard')">○</div>
+      </div>
+      <div class="drill-meta">
+        <div class="meta-chip highlight">Max Test — Then Sets</div>
+        <div class="meta-chip highlight" id="standardSets">3 Sets</div>
+        <div class="meta-chip">45 sec rest</div>
+      </div>
+      <a class="tutorial-link" href="https://www.youtube.com/watch?v=IODxDxX7oi4" target="_blank">
+        <div class="yt-icon">▶️</div>
+        <div>
+          <div class="tutorial-link-text">Perfect Pushup Form</div>
+          <div class="tutorial-link-sub">Most people do pushups wrong — watch first</div>
+        </div>
+      </a>
+
+      <!-- MAX TEST -->
+      <div class="max-test">
+        <div class="max-test-title">📊 Day 1 Max Test</div>
+        <div class="max-input-row">
+          <input type="number" class="max-input" id="pushupMax" placeholder="0" min="0" oninput="calcPushupGoal()"/>
+          <div class="max-label">max reps today</div>
+        </div>
+        <div class="goal-display" id="pushupGoal">Tomorrow's target: <span id="pushupGoalNum">—</span> reps 💪</div>
+      </div>
+
+      <div class="tips-wrap">
+        <div class="tip-row"><div class="tip-dot"></div><strong>Hand position:</strong> Slightly wider than shoulder-width, fingers pointing forward</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Elbows at 45°:</strong> Don't let elbows flare straight out — 45 degree angle protects the shoulder</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Chest to floor:</strong> Full range of motion — chest should nearly touch the ground each rep</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Core tight:</strong> Don't let your hips sag — plank position the whole time</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Martial arts connection:</strong> Pushup strength directly translates to punch power, clinch control and ground fighting</div>
+      </div>
+      <div class="rep-counter">
+        <div class="rep-label">Rep Counter</div>
+        <div class="rep-display" id="standardCount">0</div>
+        <div class="rep-btns">
+          <button class="rep-btn minus" onclick="changeRep('standard',-1)">−</button>
+          <button class="rep-btn plus" onclick="changeRep('standard',1)">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WIDE PUSHUPS -->
+  <div class="section">
+    <div class="section-header">💪 Exercise 2 — Wide Pushups</div>
+    <div class="drill-card" id="wide-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div class="drill-name">Wide Grip Pushups</div>
+        <div class="drill-status" id="wideStatus" onclick="completeDrill('wide')">○</div>
+      </div>
+      <div class="drill-meta">
+        <div class="meta-chip highlight">3 Sets</div>
+        <div class="meta-chip highlight" id="wideReps">10 reps</div>
+        <div class="meta-chip">30 sec rest</div>
+        <div class="meta-chip">Targets outer chest</div>
+      </div>
+      <div class="tips-wrap">
+        <div class="tip-row"><div class="tip-dot"></div><strong>Hands wider:</strong> Place hands significantly wider than shoulder-width — this shifts focus to the outer chest</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Elbows flare more:</strong> On wide pushups elbows flare out more — this is correct for this variation</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Slower movement:</strong> Go slower than standard pushups — feel the stretch at the bottom</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Martial arts connection:</strong> Outer chest width helps with clinch control and creating frames against opponents</div>
+      </div>
+      <div class="rep-counter">
+        <div class="rep-label">Rep Counter</div>
+        <div class="rep-display" id="wideCount">0</div>
+        <div class="rep-btns">
+          <button class="rep-btn minus" onclick="changeRep('wide',-1)">−</button>
+          <button class="rep-btn plus" onclick="changeRep('wide',1)">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIAMOND PUSHUPS -->
+  <div class="section">
+    <div class="section-header">💪 Exercise 3 — Diamond Pushups</div>
+    <div class="drill-card" id="diamond-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div class="drill-name">Diamond Pushups</div>
+        <div class="drill-status" id="diamondStatus" onclick="completeDrill('diamond')">○</div>
+      </div>
+      <div class="drill-meta">
+        <div class="meta-chip highlight">3 Sets</div>
+        <div class="meta-chip highlight" id="diamondReps">8 reps</div>
+        <div class="meta-chip">30 sec rest</div>
+        <div class="meta-chip">Inner chest + triceps</div>
+      </div>
+      <div class="tips-wrap">
+        <div class="tip-row"><div class="tip-dot"></div><strong>Hand position:</strong> Form a diamond shape with thumbs and index fingers touching under your chest</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Elbows back:</strong> Elbows track back toward your body — not flaring out</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Harder than standard:</strong> This is significantly harder — reduce reps if needed</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Martial arts connection:</strong> Inner chest and tricep strength — the punch extension power at the end of a straight</div>
+      </div>
+      <div class="rep-counter">
+        <div class="rep-label">Rep Counter</div>
+        <div class="rep-display" id="diamondCount">0</div>
+        <div class="rep-btns">
+          <button class="rep-btn minus" onclick="changeRep('diamond',-1)">−</button>
+          <button class="rep-btn plus" onclick="changeRep('diamond',1)">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DECLINE PUSHUPS -->
+  <div class="section">
+    <div class="section-header">💪 Exercise 4 — Decline Pushups</div>
+    <div class="drill-card" id="decline-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div class="drill-name">Decline Pushups</div>
+        <div class="drill-status" id="declineStatus" onclick="completeDrill('decline')">○</div>
+      </div>
+      <div class="drill-meta">
+        <div class="meta-chip highlight">2 Sets</div>
+        <div class="meta-chip highlight" id="declineReps">8 reps</div>
+        <div class="meta-chip">30 sec rest</div>
+        <div class="meta-chip">Upper chest focus</div>
+      </div>
+      <div class="tips-wrap">
+        <div class="tip-row"><div class="tip-dot"></div><strong>Feet elevated:</strong> Place feet on a chair, couch or step — the higher your feet the more upper chest activation</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Same form:</strong> Keep same body alignment as standard pushup — just angled</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Start low:</strong> If new to decline — use a low surface first, maybe 12 inches off the ground</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Martial arts connection:</strong> Upper chest strength helps with underhooks, over-under clinch battles and pushing opponents away</div>
+      </div>
+      <div class="rep-counter">
+        <div class="rep-label">Rep Counter</div>
+        <div class="rep-display" id="declineCount">0</div>
+        <div class="rep-btns">
+          <button class="rep-btn minus" onclick="changeRep('decline',-1)">−</button>
+          <button class="rep-btn plus" onclick="changeRep('decline',1)">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COOLDOWN -->
+  <div class="section">
+    <div class="section-header">🧘 Cool Down</div>
+    <div class="drill-card" id="cooldown-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div class="drill-name">Chest Stretch</div>
+        <div class="drill-status" id="cooldownStatus" onclick="completeDrill('cooldown')">○</div>
+      </div>
+      <div class="cooldown-list">
+        <div class="cooldown-item"><div class="cooldown-icon">🚪</div>Doorway chest stretch — 45 sec, lean into the doorframe</div>
+        <div class="cooldown-item"><div class="cooldown-icon">🙆</div>Hands behind back chest opener — hold 30 sec</div>
+        <div class="cooldown-item"><div class="cooldown-icon">🧘</div>Child's pose — 30 sec, decompress the spine</div>
+      </div>
+    </div>
+  </div>
+
+  <button class="complete-btn" onclick="completeSession()">✓ Chest Session A Complete</button>
+
+</div>
+
+<div class="bottom-nav">
+  <div class="nav-item" onclick="window.location.href='dashboard.html'"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></div>
+  <div class="nav-item active"><div class="nav-icon">📚</div><div class="nav-label">Library</div></div>
+  <div class="nav-item"><div class="nav-icon">📅</div><div class="nav-label">Plans</div></div>
+  <div class="nav-item"><div class="nav-icon">⚔️</div><div class="nav-label">Challenges</div></div>
+  <div class="nav-item"><div class="nav-icon">👤</div><div class="nav-label">Profile</div></div>
+</div>
+
+<script>
+  const bodyData = JSON.parse(sessionStorage.getItem('omniBody') || '{}');
+  const weight = parseFloat(bodyData.weight) || 160;
+  const unit = bodyData.unit || 'imperial';
+  const weightLbs = unit === 'metric' ? weight * 2.205 : weight;
+  const isHeavy = weightLbs > 200;
+  const isMid = weightLbs > 160 && weightLbs <= 200;
+
+  const wideReps = isHeavy ? 8 : isMid ? 10 : 12;
+  const diamondReps = isHeavy ? 5 : isMid ? 8 : 10;
+  const declineReps = isHeavy ? 6 : isMid ? 8 : 10;
+
+  document.getElementById('wideReps').textContent = wideReps + ' reps';
+  document.getElementById('diamondReps').textContent = diamondReps + ' reps';
+  document.getElementById('declineReps').textContent = declineReps + ' reps';
+
+  function calcPushupGoal() {
+    const max = parseInt(document.getElementById('pushupMax').value) || 0;
+    if (!max) return;
+    const increment = weightLbs > 200 ? 1 : weightLbs > 160 ? 2 : 3;
+    const goal = max + increment;
+    document.getElementById('pushupGoalNum').textContent = goal;
+    document.getElementById('pushupGoal').classList.add('show');
+    sessionStorage.setItem('chestPushupMax', max);
+    sessionStorage.setItem('chestPushupGoal', goal);
+  }
+
+  const repCounts = { standard:0, wide:0, diamond:0, decline:0 };
+
+  function changeRep(id, delta) {
+    repCounts[id] = Math.max(0, repCounts[id] + delta);
+    document.getElementById(`${id}Count`).textContent = repCounts[id];
+  }
+
+  function completeDrill(id) {
+    const s = document.getElementById(`${id}Status`);
+    const c = document.getElementById(`${id}-card`);
+    if(s){ s.textContent='✓'; s.classList.add('done'); }
+    if(c) c.classList.add('completed');
+  }
+
+  function completeSession() {
+    const count = parseInt(sessionStorage.getItem('omniWorkouts')||'0') + 1;
+    sessionStorage.setItem('omniWorkouts', count);
+    alert('💪 Chest Session A Complete! Every pushup is building real punching power. See you next session!');
+    window.location.href = 'dashboard.html';
+  }
+</script>
+</body>
+</html>
