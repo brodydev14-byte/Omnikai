@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Omnikai – Profile</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --bg:#080b10; --blue:#00c8ff; --blue-glow:rgba(0,200,255,0.18);
+      --blue-glow-strong:rgba(0,200,255,0.35); --white:#f0f4f8;
+      --muted:#5a6a7a; --border:rgba(0,200,255,0.15); --card:rgba(255,255,255,0.03);
+      --green:#00ff88; --gold:#ffd700; --nav-h:72px;
+    }
+    html,body { min-height:100%; background:var(--bg); color:var(--white); font-family:'Rajdhani',sans-serif; overflow-x:hidden; }
+    .bg-layer { position:fixed; inset:0; z-index:0; background:radial-gradient(ellipse 70% 40% at 50% 10%, rgba(0,200,255,0.05) 0%, transparent 70%), var(--bg); }
+    .grid-lines { position:fixed; inset:0; z-index:0; background-image:linear-gradient(rgba(0,200,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,200,255,0.025) 1px,transparent 1px); background-size:48px 48px; }
+    .scroll-wrap { position:relative; z-index:1; min-height:100vh; padding:32px 20px calc(var(--nav-h) + 32px); max-width:600px; margin:0 auto; }
+
+    /* HEADER */
+    .profile-header { text-align:center; margin-bottom:32px; }
+    .avatar-large { width:80px; height:80px; border-radius:50%; background:linear-gradient(135deg, rgba(0,200,255,0.2), rgba(0,100,180,0.3)); border:2px solid var(--blue); display:flex; align-items:center; justify-content:center; font-family:'Bebas Neue',sans-serif; font-size:2.2rem; color:var(--blue); margin:0 auto 14px; box-shadow:0 0 24px var(--blue-glow); }
+    .profile-name { font-family:'Bebas Neue',sans-serif; font-size:2rem; letter-spacing:0.1em; margin-bottom:6px; }
+    .plan-badge { display:inline-flex; align-items:center; gap:6px; padding:4px 16px; border-radius:999px; font-size:0.72rem; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; }
+    .plan-badge.warrior { background:rgba(255,215,0,0.1); border:1px solid rgba(255,215,0,0.3); color:var(--gold); }
+    .plan-badge.wanderer { background:rgba(0,200,255,0.08); border:1px solid rgba(0,200,255,0.2); color:var(--blue); }
+
+    /* STATS ROW */
+    .stats-row { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:24px; }
+    .stat-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px 12px; text-align:center; }
+    .stat-num { font-family:'Bebas Neue',sans-serif; font-size:1.8rem; color:var(--blue); text-shadow:0 0 12px var(--blue-glow); line-height:1; margin-bottom:4px; }
+    .stat-label { font-size:0.62rem; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:var(--muted); }
+
+    /* SECTIONS */
+    .section { margin-bottom:20px; }
+    .section-title { font-size:0.65rem; font-weight:700; letter-spacing:0.22em; text-transform:uppercase; color:var(--muted); margin-bottom:10px; }
+    .info-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 16px; }
+    .info-row { display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.04); }
+    .info-row:last-child { border-bottom:none; padding-bottom:0; }
+    .info-label { font-size:0.78rem; font-weight:600; color:var(--muted); letter-spacing:0.08em; text-transform:uppercase; }
+    .info-value { font-size:0.88rem; font-weight:700; color:var(--white); text-align:right; }
+
+    /* ARTS */
+    .arts-wrap { display:flex; flex-wrap:wrap; gap:8px; }
+    .art-tag { background:rgba(0,200,255,0.08); border:1px solid rgba(0,200,255,0.2); border-radius:999px; padding:5px 14px; font-size:0.75rem; font-weight:700; color:var(--blue); }
+
+    /* MUSCLES */
+    .muscle-wrap { display:flex; flex-wrap:wrap; gap:8px; }
+    .muscle-tag { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:999px; padding:5px 14px; font-size:0.75rem; font-weight:600; color:var(--white); }
+
+    /* SWITCH PROFILE */
+    .switch-btn { width:100%; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:16px; color:var(--muted); font-family:'Bebas Neue',sans-serif; font-size:1rem; letter-spacing:0.18em; cursor:pointer; transition:all 0.2s; margin-top:8px; }
+    .switch-btn:hover { border-color:rgba(255,100,100,0.3); color:#ff6b6b; background:rgba(255,100,100,0.04); }
+
+    /* CONFIRM MODAL */
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:200; display:none; align-items:center; justify-content:center; padding:20px; }
+    .modal-overlay.show { display:flex; }
+    .modal-box { background:#0d1117; border:1px solid rgba(255,100,100,0.3); border-radius:16px; padding:32px 28px; max-width:440px; width:100%; text-align:center; }
+    .modal-icon { font-size:2.5rem; margin-bottom:12px; }
+    .modal-title { font-family:'Bebas Neue',sans-serif; font-size:1.6rem; letter-spacing:0.06em; margin-bottom:8px; }
+    .modal-sub { font-family:'Inter',sans-serif; font-size:0.85rem; color:var(--muted); margin-bottom:24px; line-height:1.5; }
+    .modal-btns { display:flex; flex-direction:column; gap:10px; }
+    .modal-btn { padding:14px; border-radius:8px; border:none; font-family:'Bebas Neue',sans-serif; font-size:1rem; letter-spacing:0.15em; cursor:pointer; transition:all 0.2s; }
+    .modal-btn.confirm { background:rgba(255,100,100,0.15); border:1px solid rgba(255,100,100,0.3); color:#ff6b6b; }
+    .modal-btn.confirm:hover { background:rgba(255,100,100,0.25); }
+    .modal-btn.cancel { background:rgba(0,200,255,0.08); border:1px solid var(--border); color:var(--blue); }
+    .modal-btn.cancel:hover { background:rgba(0,200,255,0.15); }
+
+    /* BOTTOM NAV */
+    .bottom-nav { position:fixed; bottom:0; left:0; right:0; height:var(--nav-h); background:rgba(8,11,16,0.95); border-top:1px solid var(--border); backdrop-filter:blur(16px); display:flex; align-items:center; justify-content:space-around; z-index:100; padding:0 8px; }
+    .nav-item { display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; padding:8px 16px; border-radius:10px; flex:1; transition:all 0.2s; }
+    .nav-icon { font-size:1.3rem; }
+    .nav-label { font-size:0.58rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); }
+    .nav-item.active .nav-label { color:var(--blue); }
+  </style>
+</head>
+<body>
+<div class="bg-layer"></div>
+<div class="grid-lines"></div>
+
+<div class="scroll-wrap">
+
+  <!-- PROFILE HEADER -->
+  <div class="profile-header">
+    <div class="avatar-large" id="avatarLarge">?</div>
+    <div class="profile-name" id="profileName">WARRIOR</div>
+    <div class="plan-badge" id="planBadge">⚡ Warrior</div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-num" id="statWorkouts">0</div>
+      <div class="stat-label">Workouts</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="statArts">0</div>
+      <div class="stat-label">Arts</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="statMuscles">0</div>
+      <div class="stat-label">Focus Areas</div>
+    </div>
+  </div>
+
+  <!-- BODY STATS -->
+  <div class="section">
+    <div class="section-title">📊 Body Stats</div>
+    <div class="info-card">
+      <div class="info-row">
+        <div class="info-label">Weight</div>
+        <div class="info-value" id="statWeight">—</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">Goal</div>
+        <div class="info-value" id="statGoal">—</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">Activity Level</div>
+        <div class="info-value" id="statActivity">—</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">Training Access</div>
+        <div class="info-value" id="statGym">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MARTIAL ARTS -->
+  <div class="section">
+    <div class="section-title">🥋 Your Martial Arts</div>
+    <div class="info-card">
+      <div class="arts-wrap" id="artsWrap"></div>
+    </div>
+  </div>
+
+  <!-- FOCUS MUSCLES -->
+  <div class="section" id="musclesSection" style="display:none;">
+    <div class="section-title">💪 Body Map Focus Areas</div>
+    <div class="info-card">
+      <div class="muscle-wrap" id="musclesWrap"></div>
+    </div>
+  </div>
+
+  <!-- SWITCH PROFILE / START OVER -->
+  <div class="section">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <button class="switch-btn" onclick="showConfirm('startover')">↺ Start Over</button>
+      <button class="switch-btn" onclick="showConfirm('switch')">⇄ Switch Account</button>
+    </div>
+    <div style="font-family:'Inter',sans-serif;font-size:0.72rem;color:var(--muted);text-align:center;margin-top:10px;line-height:1.5;">
+      Start Over keeps you signed in but resets your profile.<br/>Switch Account takes you back to the login screen.
+    </div>
+  </div>
+
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal-box">
+    <div class="modal-icon" id="modalIcon">⚠️</div>
+    <div class="modal-title" id="modalTitle">Start Over?</div>
+    <div class="modal-sub" id="modalSub">This will reset your profile and take you back through onboarding. You stay signed in to the same account.</div>
+    <div class="modal-btns">
+      <button class="modal-btn confirm" id="modalConfirmBtn" onclick="confirmAction()">Yes, Start Over</button>
+      <button class="modal-btn cancel" onclick="hideConfirm()">Cancel — Stay Here</button>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="nav-item" onclick="window.location.href='dashboard.html'"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></div>
+  <div class="nav-item" onclick="window.location.href='library.html'"><div class="nav-icon">📚</div><div class="nav-label">Library</div></div>
+  <div class="nav-item" onclick="window.location.href='nutrition.html'"><div class="nav-icon">🥗</div><div class="nav-label">Nutrition</div></div>
+  <div class="nav-item" onclick="window.location.href='progress.html'"><div class="nav-icon">📈</div><div class="nav-label">Progress</div></div>
+  <div class="nav-item active"><div class="nav-icon">👤</div><div class="nav-label">Profile</div></div>
+</div>
+
+<script>
+  // Load data
+  const name = sessionStorage.getItem('omniName') || 'Warrior';
+  const plan = sessionStorage.getItem('omniPlan') || 'wanderer';
+  const arts = JSON.parse(sessionStorage.getItem('omniArts') || '["Boxing"]');
+  const bodyData = JSON.parse(sessionStorage.getItem('omniBody') || '{}');
+  const gymAccess = sessionStorage.getItem('omniGymAccess');
+  const workouts = sessionStorage.getItem('omniWorkouts') || '0';
+  const focusMuscles = bodyData.focusMuscles || [];
+  const isWarrior = plan === 'warrior';
+
+  // Header
+  document.getElementById('avatarLarge').textContent = name.charAt(0).toUpperCase();
+  document.getElementById('profileName').textContent = name.toUpperCase();
+
+  const badge = document.getElementById('planBadge');
+  if (isWarrior) {
+    badge.textContent = '⚡ Warrior Plan';
+    badge.classList.add('warrior');
+  } else {
+    badge.textContent = '🌊 Wanderer Plan';
+    badge.classList.add('wanderer');
+  }
+
+  // Stats
+  document.getElementById('statWorkouts').textContent = workouts;
+  document.getElementById('statArts').textContent = arts.length;
+  document.getElementById('statMuscles').textContent = focusMuscles.length;
+
+  // Body stats
+  const weight = bodyData.weight || '—';
+  const unit = bodyData.unit || 'imperial';
+  document.getElementById('statWeight').textContent = weight !== '—' ? `${weight} ${unit === 'metric' ? 'kg' : 'lbs'}` : '—';
+  document.getElementById('statGoal').textContent = bodyData.goal ? bodyData.goal.charAt(0).toUpperCase() + bodyData.goal.slice(1) : '—';
+  document.getElementById('statActivity').textContent = bodyData.activity ? bodyData.activity.charAt(0).toUpperCase() + bodyData.activity.slice(1) : '—';
+  document.getElementById('statGym').textContent = gymAccess === 'true' ? '🏋️ Gym Access' : gymAccess === 'false' ? '🏠 Training at Home' : '—';
+
+  // Arts
+  const artsWrap = document.getElementById('artsWrap');
+  arts.forEach(art => {
+    const tag = document.createElement('div');
+    tag.className = 'art-tag';
+    tag.textContent = art;
+    artsWrap.appendChild(tag);
+  });
+
+  // Focus muscles
+  if (focusMuscles.length > 0) {
+    document.getElementById('musclesSection').style.display = 'block';
+    const musclesWrap = document.getElementById('musclesWrap');
+    focusMuscles.forEach(m => {
+      const tag = document.createElement('div');
+      tag.className = 'muscle-tag';
+      tag.textContent = m;
+      musclesWrap.appendChild(tag);
+    });
+  }
+
+  // Modal
+  let currentAction = 'startover';
+
+  function showConfirm(action) {
+    currentAction = action;
+    if (action === 'startover') {
+      document.getElementById('modalIcon').textContent = '↺';
+      document.getElementById('modalTitle').textContent = 'Start Over?';
+      document.getElementById('modalSub').textContent = 'This will reset your profile and take you back through onboarding. You stay signed in to the same account.';
+      document.getElementById('modalConfirmBtn').textContent = 'Yes, Start Over';
+    } else {
+      document.getElementById('modalIcon').textContent = '⇄';
+      document.getElementById('modalTitle').textContent = 'Switch Account?';
+      document.getElementById('modalSub').textContent = 'This will sign you out and take you back to the login screen. You can sign back in anytime to restore your profile.';
+      document.getElementById('modalConfirmBtn').textContent = 'Yes, Switch Account';
+    }
+    document.getElementById('confirmModal').classList.add('show');
+  }
+
+  function hideConfirm() {
+    document.getElementById('confirmModal').classList.remove('show');
+  }
+
+  function confirmAction() {
+    localStorage.removeItem('omniData');
+    sessionStorage.clear();
+    if (currentAction === 'startover') {
+      window.location.href = 'plans.html';
+    } else {
+      window.location.href = 'index.html';
+    }
+  }
+</script>
+</body>
+</html>
