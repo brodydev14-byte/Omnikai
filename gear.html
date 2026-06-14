@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Omnikai – Gear & Etiquette</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --bg:#080b10; --blue:#00c8ff; --blue-glow:rgba(0,200,255,0.18);
+      --white:#f0f4f8; --muted:#5a6a7a; --border:rgba(0,200,255,0.15);
+      --card:rgba(255,255,255,0.03); --green:#00ff88; --gold:#ffd700; --nav-h:72px;
+    }
+    html,body { min-height:100%; background:var(--bg); color:var(--white); font-family:'Rajdhani',sans-serif; overflow-x:hidden; }
+    .bg-layer { position:fixed; inset:0; z-index:0; background:radial-gradient(ellipse 70% 40% at 50% 10%, rgba(0,200,255,0.05) 0%, transparent 70%), var(--bg); }
+    .grid-lines { position:fixed; inset:0; z-index:0; background-image:linear-gradient(rgba(0,200,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,200,255,0.025) 1px,transparent 1px); background-size:48px 48px; }
+    .scroll-wrap { position:relative; z-index:1; min-height:100vh; padding:24px 20px calc(var(--nav-h) + 24px); max-width:600px; margin:0 auto; }
+
+    .workout-header { display:flex; align-items:center; gap:14px; margin-bottom:24px; }
+    .back-btn { width:38px; height:38px; background:var(--card); border:1px solid var(--border); border-radius:8px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:1rem; text-decoration:none; color:var(--white); }
+    .header-eyebrow { font-size:0.65rem; font-weight:700; letter-spacing:0.22em; text-transform:uppercase; color:var(--blue); margin-bottom:2px; }
+    .header-title { font-family:'Bebas Neue',sans-serif; font-size:1.8rem; letter-spacing:0.06em; line-height:1; }
+
+    /* WARRIOR BADGE */
+    .warrior-tag { display:inline-flex; align-items:center; gap:6px; background:rgba(255,215,0,0.1); border:1px solid rgba(255,215,0,0.25); border-radius:999px; padding:4px 14px; font-size:0.68rem; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:var(--gold); margin-bottom:24px; }
+
+    /* TABS for which guide */
+    .guide-tabs { display:flex; gap:8px; margin-bottom:24px; }
+    .guide-tab { flex:1; background:var(--card); border:1px solid var(--border); border-radius:10px; padding:12px; text-align:center; cursor:pointer; transition:all 0.2s; }
+    .guide-tab.active { border-color:rgba(0,200,255,0.3); background:rgba(0,200,255,0.06); }
+    .guide-tab-icon { font-size:1.6rem; margin-bottom:4px; }
+    .guide-tab-label { font-size:0.7rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); }
+    .guide-tab.active .guide-tab-label { color:var(--blue); }
+
+    /* GUIDE SECTION */
+    .guide-section { display:none; }
+    .guide-section.show { display:block; }
+    .intro-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px; margin-bottom:20px; display:flex; gap:14px; }
+    .intro-icon { font-size:1.8rem; flex-shrink:0; }
+    .intro-text { font-family:'Inter',sans-serif; font-size:0.85rem; color:var(--white); line-height:1.5; }
+    .intro-text strong { color:var(--blue); }
+
+    /* STEPS */
+    .step-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:14px; }
+    .step-header { display:flex; align-items:center; gap:14px; margin-bottom:12px; }
+    .step-num { width:36px; height:36px; border-radius:50%; background:rgba(0,200,255,0.1); border:1px solid rgba(0,200,255,0.3); display:flex; align-items:center; justify-content:center; font-family:'Bebas Neue',sans-serif; font-size:1.2rem; color:var(--blue); flex-shrink:0; }
+    .step-title { font-family:'Bebas Neue',sans-serif; font-size:1.15rem; letter-spacing:0.06em; }
+    .step-text { font-family:'Inter',sans-serif; font-size:0.85rem; color:var(--white); line-height:1.6; }
+
+    /* TUTORIAL LINK */
+    .tutorial-link { display:flex; align-items:center; gap:10px; background:rgba(255,0,0,0.06); border:1px solid rgba(255,0,0,0.2); border-radius:8px; padding:12px 14px; margin-bottom:20px; cursor:pointer; transition:all 0.2s; text-decoration:none; }
+    .tutorial-link:hover { background:rgba(255,0,0,0.1); }
+    .yt-icon { font-size:1.4rem; flex-shrink:0; }
+    .tutorial-link-text { font-size:0.82rem; font-weight:700; color:var(--white); }
+    .tutorial-link-sub { font-family:'Inter',sans-serif; font-size:0.7rem; color:var(--muted); }
+
+    /* ETIQUETTE CARD */
+    .etiquette-card { background:rgba(255,215,0,0.04); border:1px solid rgba(255,215,0,0.2); border-radius:12px; padding:20px; margin-top:20px; }
+    .etiquette-title { font-size:0.65rem; font-weight:700; letter-spacing:0.22em; text-transform:uppercase; color:var(--gold); margin-bottom:14px; }
+    .etiquette-row { display:flex; gap:12px; margin-bottom:14px; align-items:flex-start; }
+    .etiquette-row:last-child { margin-bottom:0; }
+    .etiquette-icon { font-size:1.3rem; flex-shrink:0; }
+    .etiquette-text { font-family:'Inter',sans-serif; font-size:0.85rem; color:var(--white); line-height:1.6; }
+    .etiquette-text strong { color:var(--gold); }
+
+    /* BELT RANKS */
+    .belt-grid { display:flex; flex-direction:column; gap:8px; margin-top:14px; }
+    .belt-row { display:flex; align-items:center; gap:12px; background:rgba(255,255,255,0.02); border-radius:8px; padding:10px 14px; }
+    .belt-swatch { width:40px; height:14px; border-radius:3px; flex-shrink:0; }
+    .belt-name { font-size:0.85rem; font-weight:700; }
+    .belt-desc { font-family:'Inter',sans-serif; font-size:0.72rem; color:var(--muted); margin-left:auto; }
+
+    /* UPSELL */
+    .upsell-section { background:rgba(255,215,0,0.04); border:1px solid rgba(255,215,0,0.15); border-radius:12px; padding:24px 20px; text-align:center; }
+    .upsell-icon { font-size:2.5rem; margin-bottom:12px; }
+    .upsell-title { font-family:'Bebas Neue',sans-serif; font-size:1.4rem; letter-spacing:0.06em; color:var(--gold); margin-bottom:8px; }
+    .upsell-text { font-family:'Inter',sans-serif; font-size:0.85rem; color:var(--muted); line-height:1.5; margin-bottom:16px; }
+    .upsell-btn { background:var(--gold); border:none; border-radius:8px; padding:12px 28px; color:#080b10; font-family:'Bebas Neue',sans-serif; font-size:1rem; letter-spacing:0.15em; cursor:pointer; }
+
+    /* BOTTOM NAV */
+    .bottom-nav { position:fixed; bottom:0; left:0; right:0; height:var(--nav-h); background:rgba(8,11,16,0.95); border-top:1px solid var(--border); backdrop-filter:blur(16px); display:flex; align-items:center; justify-content:space-around; z-index:100; padding:0 8px; }
+    .nav-item { display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; padding:8px 16px; border-radius:10px; flex:1; }
+    .nav-icon { font-size:1.3rem; }
+    .nav-label { font-size:0.58rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); }
+    .nav-item.active .nav-label { color:var(--blue); }
+  </style>
+</head>
+<body>
+<div class="bg-layer"></div>
+<div class="grid-lines"></div>
+
+<div class="scroll-wrap">
+
+  <div class="workout-header">
+    <a class="back-btn" href="library.html">←</a>
+    <div>
+      <div class="header-eyebrow">🎒 Reference Guide</div>
+      <div class="header-title">Gear & Etiquette</div>
+    </div>
+  </div>
+
+  <!-- WARRIOR CONTENT -->
+  <div id="warriorContent" style="display:none;">
+    <div class="warrior-tag">⚡ Warrior Exclusive</div>
+
+    <!-- TABS -->
+    <div class="guide-tabs" id="guideTabs">
+      <div class="guide-tab" id="tabWraps" onclick="showGuide('wraps')">
+        <div class="guide-tab-icon">🥊</div>
+        <div class="guide-tab-label">Hand Wraps</div>
+      </div>
+      <div class="guide-tab" id="tabGi" onclick="showGuide('gi')">
+        <div class="guide-tab-icon">🥋</div>
+        <div class="guide-tab-label">Gi & Belt</div>
+      </div>
+    </div>
+
+    <!-- HAND WRAPS GUIDE -->
+    <div class="guide-section" id="wrapsSection">
+      <div class="intro-card">
+        <div class="intro-icon">🥊</div>
+        <div class="intro-text"><strong>Why wrap your hands:</strong> Hand wraps protect the small bones and tendons in your hands and wrists, stabilize your wrist joint, and absorb impact. Never hit pads or a bag without them.</div>
+      </div>
+
+      <a class="tutorial-link" href="https://www.youtube.com/watch?v=8P64yPe9XJU" target="_blank">
+        <div class="yt-icon">▶️</div>
+        <div>
+          <div class="tutorial-link-text">How to Wrap Your Hands — Full Tutorial</div>
+          <div class="tutorial-link-sub">Step by step video guide</div>
+        </div>
+      </a>
+
+      <div class="step-card">
+        <div class="step-header">
+          <div class="step-num">1</div>
+          <div class="step-title">Secure the Thumb Loop</div>
+        </div>
+        <div class="step-text">Slide your thumb through the loop at the end of the wrap. Wrap around your wrist 2-3 times for support, starting from the outside of your wrist.</div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header">
+          <div class="step-num">2</div>
+          <div class="step-title">Cover the Hand</div>
+        </div>
+        <div class="step-text">Bring the wrap diagonally across the back of your hand to the base of your fingers. Wrap across your knuckles 2-3 times for padding — this is your main impact zone.</div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header">
+          <div class="step-num">3</div>
+          <div class="step-title">Wrap Each Finger</div>
+        </div>
+        <div class="step-text">Weave the wrap between each finger at the base, going around the thumb once for extra support. This keeps your fingers from spreading on impact.</div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header">
+          <div class="step-num">4</div>
+          <div class="step-title">Reinforce the Knuckles</div>
+        </div>
+        <div class="step-text">Return to the knuckles for 2-3 more passes — this is the most important padding layer. Make a fist while wrapping to ensure it's not too tight when you punch.</div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header">
+          <div class="step-num">5</div>
+          <div class="step-title">Finish at the Wrist</div>
+        </div>
+        <div class="step-text">Wrap any remaining length around the wrist and secure with the velcro closure. Check that you can make a full fist and your wrist feels supported but not numb.</div>
+      </div>
+    </div>
+
+    <!-- GI & BELT GUIDE -->
+    <div class="guide-section" id="giSection">
+      <div class="intro-card">
+        <div class="intro-icon">🥋</div>
+        <div class="intro-text"><strong>The gi and belt</strong> aren't just clothing — they carry centuries of tradition. Wearing them correctly and tying your belt properly is a sign of respect for the art, your training partners, and yourself.</div>
+      </div>
+
+      <a class="tutorial-link" href="https://www.youtube.com/watch?v=qPSI5K1c0xM" target="_blank">
+        <div class="yt-icon">▶️</div>
+        <div>
+          <div class="tutorial-link-text">How to Tie a Gi Belt — Square Knot</div>
+          <div class="tutorial-link-sub">The standard belt knot used across BJJ, Judo & Karate</div>
+        </div>
+      </a>
+
+      <div class="step-card">
+        <div class="step-header">
+          <div class="step-num">1</div>
+          <div class="step-title">Find Your Center</div>
+        </div>
+        <div class="step-text">Place the middle of the belt against your stomach. Wrap both ends around your back and bring them forward to the front.</div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header">
+          <div class="step-num">2</div>
+          <div class="step-title">Cross and Wrap Again</div>
+        </div>
+        <div class="step-text">Cross the ends and wrap around your waist a second time so both ends are even in length at the front.</div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header">
+          <div class="step-num">3</div>
+          <div class="step-title">Tie the Square Knot</div>
+        </div>
+        <div class="step-text">Cross the right end over the left and tuck it under all the wraps, pulling it through. Then cross that same end over again and tuck it through the loop to form a flat square knot — not a bow.</div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-header">
+          <div class="step-num">4</div>
+          <div class="step-title">Even It Out</div>
+        </div>
+        <div class="step-text">Pull both ends to tighten and adjust so they hang evenly. A properly tied belt stays flat and secure through an entire training session, even during scrambles.</div>
+      </div>
+
+      <!-- ETIQUETTE -->
+      <div class="etiquette-card">
+        <div class="etiquette-title">🙏 Gi Etiquette</div>
+        <div class="etiquette-row">
+          <div class="etiquette-icon">👘</div>
+          <div class="etiquette-text"><strong>Left side over right:</strong> When closing your gi jacket, the left side of the gi always goes on top of the right side. This convention is shared across BJJ, Judo, and Karate. Wrapping it the opposite way (right over left) is how garments are traditionally arranged for the deceased in many Asian cultures — getting it backwards is considered deeply disrespectful.</div>
+        </div>
+        <div class="etiquette-row">
+          <div class="etiquette-icon">🧼</div>
+          <div class="etiquette-text"><strong>Always train clean:</strong> Wash your gi after every session. A clean gi is a basic sign of respect to your training partners.</div>
+        </div>
+        <div class="etiquette-row">
+          <div class="etiquette-icon">🚫</div>
+          <div class="etiquette-text"><strong>Never step on the belt:</strong> Your belt represents your rank and training journey — treat it with care, don't toss it on the ground.</div>
+        </div>
+      </div>
+
+      <!-- BELT RANKS -->
+      <div class="etiquette-card">
+        <div class="etiquette-title">🎖️ BJJ Belt Progression</div>
+        <div class="belt-grid">
+          <div class="belt-row">
+            <div class="belt-swatch" style="background:#fff;"></div>
+            <div class="belt-name">White Belt</div>
+            <div class="belt-desc">Foundations</div>
+          </div>
+          <div class="belt-row">
+            <div class="belt-swatch" style="background:#1e3a8a;"></div>
+            <div class="belt-name">Blue Belt</div>
+            <div class="belt-desc">~2 years avg.</div>
+          </div>
+          <div class="belt-row">
+            <div class="belt-swatch" style="background:#5b21b6;"></div>
+            <div class="belt-name">Purple Belt</div>
+            <div class="belt-desc">~2 more years</div>
+          </div>
+          <div class="belt-row">
+            <div class="belt-swatch" style="background:#92400e;"></div>
+            <div class="belt-name">Brown Belt</div>
+            <div class="belt-desc">~1.5 more years</div>
+          </div>
+          <div class="belt-row">
+            <div class="belt-swatch" style="background:#000;"></div>
+            <div class="belt-name">Black Belt</div>
+            <div class="belt-desc">Avg. 10+ years total</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WANDERER UPSELL -->
+  <div id="wandererUpsell" class="upsell-section" style="display:none;">
+    <div class="upsell-icon">🎒</div>
+    <div class="upsell-title">Gear & Etiquette Guide</div>
+    <div class="upsell-text">Unlock step-by-step hand wrapping tutorials, gi tying guides, belt etiquette, and rank progression — everything you need to show up prepared and show respect to the art.</div>
+    <button class="upsell-btn" onclick="window.location.href='plans.html'">Upgrade to Warrior →</button>
+  </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="nav-item" onclick="window.location.href='dashboard.html'"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></div>
+  <div class="nav-item active"><div class="nav-icon">📚</div><div class="nav-label">Library</div></div>
+  <div class="nav-item" onclick="window.location.href='nutrition.html'"><div class="nav-icon">🥗</div><div class="nav-label">Nutrition</div></div>
+  <div class="nav-item" onclick="window.location.href='progress.html'"><div class="nav-icon">📈</div><div class="nav-label">Progress</div></div>
+  <div class="nav-item" onclick="window.location.href='profile.html'"><div class="nav-icon">👤</div><div class="nav-label">Profile</div></div>
+</div>
+
+<script>
+  const plan = sessionStorage.getItem('omniPlan') || 'wanderer';
+  const isWarrior = plan === 'warrior';
+  const arts = JSON.parse(sessionStorage.getItem('omniArts') || '[]');
+
+  const giArts = ['BJJ','Judo','Karate'];
+  const wrapArts = ['Boxing','Muay Thai','MMA','Kickboxing'];
+
+  const hasGiArt = arts.some(a => giArts.includes(a));
+  const hasWrapArt = arts.some(a => wrapArts.includes(a));
+
+  if (isWarrior) {
+    document.getElementById('warriorContent').style.display = 'block';
+
+    // Decide default tab and which tabs to show
+    let defaultTab = 'wraps';
+    if (hasWrapArt && hasGiArt) {
+      defaultTab = 'wraps';
+    } else if (hasGiArt && !hasWrapArt) {
+      defaultTab = 'gi';
+    } else if (!hasWrapArt && !hasGiArt) {
+      // No relevant arts selected - show both anyway
+      defaultTab = 'wraps';
+    }
+    showGuide(defaultTab);
+  } else {
+    document.getElementById('wandererUpsell').style.display = 'block';
+  }
+
+  function showGuide(type) {
+    document.getElementById('wrapsSection').classList.remove('show');
+    document.getElementById('giSection').classList.remove('show');
+    document.getElementById('tabWraps').classList.remove('active');
+    document.getElementById('tabGi').classList.remove('active');
+
+    if (type === 'wraps') {
+      document.getElementById('wrapsSection').classList.add('show');
+      document.getElementById('tabWraps').classList.add('active');
+    } else {
+      document.getElementById('giSection').classList.add('show');
+      document.getElementById('tabGi').classList.add('active');
+    }
+  }
+</script>
+</body>
+</html>
