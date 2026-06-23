@@ -616,12 +616,18 @@
     return 'bjj_beginner_a.html';
   }
 
+  function getWrestlingFile() {
+    if (goal === 'cut') return 'wrestling_beginner_c.html';
+    if (goal === 'bulk') return 'wrestling_beginner_b.html';
+    return 'wrestling_beginner_a.html';
+  }
+
   const featuredWorkouts = {
     'Boxing':    { title:'Boxing Beginner Session', duration:'35 Min', level:'Beginner', type:'Striking', file: getBoxingFile() },
     'Muay Thai': { title:'Muay Thai Beginner Session', duration:'35 Min', level:'Beginner', type:'Striking', file: getMTFile() },
     'MMA':       { title:'Full MMA Conditioning', duration:'45 Min', level:'Intermediate', type:'Strength & Cardio', file:'' },
     'BJJ':       { title:'BJJ Beginner Session', duration:'30 Min', level:'Beginner', type:'Grappling', file: getBJJFile() },
-    'Wrestling': { title:'Wrestling Takedown Drills', duration:'30 Min', level:'Intermediate', type:'Grappling', file:'' },
+    'Wrestling': { title:'Wrestling Beginner Session', duration:'30 Min', level:'Beginner', type:'Grappling', file: getWrestlingFile() },
     'Judo':      { title:'Judo Throw Techniques', duration:'40 Min', level:'Beginner', type:'Technique', file:'' },
     'Karate':    { title:'Karate Kata & Power', duration:'35 Min', level:'Beginner', type:'Technique', file:'' },
     'Kung Fu':   { title:'Kung Fu Flow & Strikes', duration:'40 Min', level:'Intermediate', type:'Technique', file:'' },

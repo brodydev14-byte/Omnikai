@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Omnikai – Wrestling: Technique Focus</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root { --bg:#080b10; --blue:#00c8ff; --white:#f0f4f8; --muted:#5a6a7a; --border:rgba(0,200,255,0.15); --card:rgba(255,255,255,0.03); --green:#00ff88; --accent:#d97706; --nav-h:72px; }
+    html,body { min-height:100%; background:var(--bg); color:var(--white); font-family:'Rajdhani',sans-serif; overflow-x:hidden; }
+    .bg-layer { position:fixed; inset:0; z-index:0; background:radial-gradient(ellipse 70% 40% at 50% 10%, rgba(217,119,6,0.05) 0%, transparent 70%), var(--bg); }
+    .grid-lines { position:fixed; inset:0; z-index:0; background-image:linear-gradient(rgba(0,200,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,200,255,0.025) 1px,transparent 1px); background-size:48px 48px; }
+    .scroll-wrap { position:relative; z-index:1; min-height:100vh; padding:24px 20px calc(var(--nav-h) + 24px); max-width:600px; margin:0 auto; }
+    .workout-header { display:flex; align-items:center; gap:14px; margin-bottom:28px; }
+    .back-btn { width:38px; height:38px; background:var(--card); border:1px solid var(--border); border-radius:8px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:1rem; text-decoration:none; color:var(--white); }
+    .header-eyebrow { font-size:0.65rem; font-weight:700; letter-spacing:0.22em; text-transform:uppercase; color:var(--accent); margin-bottom:2px; }
+    .header-title { font-family:'Bebas Neue',sans-serif; font-size:1.8rem; letter-spacing:0.06em; line-height:1; }
+    .level-badge { background:rgba(217,119,6,0.1); border:1px solid rgba(217,119,6,0.25); border-radius:999px; padding:3px 12px; font-size:0.68rem; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:var(--accent); white-space:nowrap; }
+    .cultural-card { background:rgba(217,119,6,0.05); border:1px solid rgba(217,119,6,0.2); border-radius:12px; padding:16px 18px; margin-bottom:24px; display:flex; gap:14px; }
+    .cultural-icon { font-size:1.6rem; flex-shrink:0; }
+    .cultural-text { font-family:'Inter',sans-serif; font-size:0.83rem; color:var(--white); line-height:1.5; }
+    .cultural-text strong { color:var(--accent); }
+    .section { margin-bottom:20px; }
+    .section-header { font-size:0.65rem; font-weight:700; letter-spacing:0.22em; text-transform:uppercase; color:var(--muted); margin-bottom:10px; }
+    .drill-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:24px 20px; margin-bottom:12px; }
+    .drill-card.completed { border-color:var(--green); background:rgba(0,255,136,0.03); }
+    .drill-name { font-family:'Bebas Neue',sans-serif; font-size:1.3rem; letter-spacing:0.06em; line-height:1; margin-bottom:6px; }
+    .drill-meta { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+    .meta-chip { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); border-radius:999px; padding:4px 12px; font-size:0.7rem; font-weight:600; color:var(--muted); }
+    .meta-chip.highlight { border-color:rgba(217,119,6,0.25); color:var(--accent); background:rgba(217,119,6,0.06); }
+    .drill-status { width:32px; height:32px; border-radius:50%; border:2px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:0.9rem; flex-shrink:0; cursor:pointer; }
+    .drill-status.done { background:var(--green); border-color:var(--green); color:#080b10; font-weight:900; }
+    .tips-wrap { display:flex; flex-direction:column; gap:12px; margin-bottom:16px; }
+    .tip-row { display:flex; align-items:flex-start; gap:10px; font-family:'Inter',sans-serif; font-size:0.82rem; color:var(--white); line-height:1.5; }
+    .tip-dot { width:6px; height:6px; border-radius:50%; background:var(--accent); flex-shrink:0; margin-top:5px; }
+    .tutorial-link { display:flex; align-items:center; gap:10px; background:rgba(255,0,0,0.06); border:1px solid rgba(255,0,0,0.2); border-radius:8px; padding:12px 14px; margin-bottom:16px; cursor:pointer; transition:all 0.2s; text-decoration:none; }
+    .tutorial-link:hover { background:rgba(255,0,0,0.1); }
+    .yt-icon { font-size:1.4rem; flex-shrink:0; }
+    .tutorial-link-text { font-size:0.82rem; font-weight:700; color:var(--white); }
+    .tutorial-link-sub { font-family:'Inter',sans-serif; font-size:0.7rem; color:var(--muted); }
+    .timer-wrap { background:rgba(0,0,0,0.3); border-radius:10px; padding:16px; margin-top:4px; text-align:center; }
+    .timer-display { font-family:'Bebas Neue',sans-serif; font-size:3rem; letter-spacing:0.1em; color:var(--accent); line-height:1; }
+    .timer-label { font-size:0.68rem; font-weight:600; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); margin-bottom:8px; }
+    .timer-set-info { font-size:0.78rem; font-weight:700; color:var(--muted); margin-bottom:10px; }
+    .timer-set-info span { color:var(--white); }
+    .timer-btns { display:flex; gap:8px; justify-content:center; }
+    .timer-btn { padding:10px 24px; border-radius:7px; border:none; font-family:'Bebas Neue',sans-serif; font-size:0.95rem; letter-spacing:0.15em; cursor:pointer; }
+    .timer-btn.start { background:var(--accent); color:#fff; }
+    .timer-btn.reset { background:rgba(255,255,255,0.06); border:1px solid var(--border); color:var(--muted); }
+    .rep-counter { background:rgba(0,0,0,0.3); border-radius:10px; padding:16px; margin-top:4px; text-align:center; }
+    .rep-display { font-family:'Bebas Neue',sans-serif; font-size:3rem; color:var(--accent); line-height:1; margin-bottom:10px; }
+    .rep-btns { display:flex; gap:8px; justify-content:center; }
+    .rep-btn { padding:12px 28px; border-radius:7px; border:none; font-family:'Bebas Neue',sans-serif; font-size:1.4rem; cursor:pointer; }
+    .rep-btn.minus { background:rgba(255,255,255,0.06); border:1px solid var(--border); color:var(--muted); }
+    .rep-btn.plus { background:var(--accent); color:#fff; }
+    .rep-label { font-size:0.68rem; font-weight:600; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); margin-bottom:8px; }
+    .cooldown-list { display:flex; flex-direction:column; gap:10px; }
+    .cooldown-item { display:flex; align-items:center; gap:12px; background:var(--card); border:1px solid var(--border); border-radius:8px; padding:12px 14px; font-size:0.88rem; font-weight:600; }
+    .cooldown-icon { font-size:1.2rem; flex-shrink:0; }
+    .complete-btn { width:100%; background:var(--accent); border:none; border-radius:10px; padding:16px; color:#fff; font-family:'Bebas Neue',sans-serif; font-size:1.1rem; letter-spacing:0.18em; cursor:pointer; transition:all 0.2s; margin-top:8px; }
+    .complete-btn:hover { opacity:0.85; transform:translateY(-1px); }
+    .bottom-nav { position:fixed; bottom:0; left:0; right:0; height:var(--nav-h); background:rgba(8,11,16,0.95); border-top:1px solid var(--border); backdrop-filter:blur(16px); display:flex; align-items:center; justify-content:space-around; z-index:100; padding:0 8px; }
+    .nav-item { display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; padding:8px 16px; border-radius:10px; flex:1; }
+    .nav-icon { font-size:1.3rem; }
+    .nav-label { font-size:0.58rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); }
+    .nav-item.active .nav-label { color:var(--blue); }
+  </style>
+</head>
+<body>
+<div class="bg-layer"></div>
+<div class="grid-lines"></div>
+<div class="scroll-wrap">
+  <div class="workout-header">
+    <a class="back-btn" href="library.html">←</a>
+    <div>
+      <div class="header-eyebrow">🤼 Wrestling · Technique Focus</div>
+      <div class="header-title">Beginner Session A</div>
+    </div>
+    <div class="level-badge">Technique</div>
+  </div>
+
+  <div class="cultural-card">
+    <div class="cultural-icon">🏆</div>
+    <div class="cultural-text"><strong>Wrestling is the backbone of MMA:</strong> Every elite MMA fighter has a strong wrestling base. The ability to control where the fight happens — standing or on the ground — is the single biggest advantage in combat sports. Solo drilling builds the reflexes that make this automatic.</div>
+  </div>
+
+  <!-- WARMUP -->
+  <div class="section">
+    <div class="section-header">🔥 Warm Up</div>
+    <div class="drill-card" id="warmup-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div class="drill-name">Athletic Movement Prep</div>
+        <div class="drill-status" id="warmupStatus" onclick="completeDrill('warmup')">○</div>
+      </div>
+      <div class="drill-meta"><div class="meta-chip highlight">3 Minutes</div></div>
+      <div class="tips-wrap">
+        <div class="tip-row"><div class="tip-dot"></div>Hip circles — 10 each direction, wrestling is all hips</div>
+        <div class="tip-row"><div class="tip-dot"></div>Ankle circles — 10 each direction, ankles take a beating in wrestling</div>
+        <div class="tip-row"><div class="tip-dot"></div>Leg swings — 15 forward/back and 15 side/side each leg</div>
+        <div class="tip-row"><div class="tip-dot"></div>10 slow bodyweight squats — activating the legs before drilling</div>
+      </div>
+      <div class="timer-wrap">
+        <div class="timer-label">Warm Up</div>
+        <div class="timer-display" id="warmupTimer">3:00</div>
+        <div class="timer-btns">
+          <button class="timer-btn start" onclick="startTimer('warmup',180)">Start</button>
+          <button class="timer-btn reset" onclick="resetTimer('warmup',180)">Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WRESTLING STANCE -->
+  <div class="section">
+    <div class="section-header">🤼 Drill 1 — Wrestling Stance & Movement</div>
+    <div class="drill-card" id="stance-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div class="drill-name">Wrestling Stance & Footwork</div>
+        <div class="drill-status" id="stanceStatus" onclick="completeDrill('stance')">○</div>
+      </div>
+      <div class="drill-meta">
+        <div class="meta-chip highlight">3 Minutes</div>
+        <div class="meta-chip">Movement only</div>
+      </div>
+      <a class="tutorial-link" href="https://www.youtube.com/watch?v=sYHLPHrFZJQ" target="_blank">
+        <div class="yt-icon">▶️</div>
+        <div>
+          <div class="tutorial-link-text">Wrestling Stance & Basic Footwork</div>
+          <div class="tutorial-link-sub">Different from boxing — lower and wider</div>
+        </div>
+      </a>
+      <div class="tips-wrap">
+        <div class="tip-row"><div class="tip-dot"></div><strong>Low base:</strong> Knees bent, hips low — much lower than a boxing stance. Your hips should feel like you're about to sit down</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Staggered feet:</strong> One foot forward, weight even on both feet — ready to shoot or sprawl in any direction</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Hands forward:</strong> Hands up and forward — ready to underhook, post or tie up</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Circle and pressure:</strong> Move around in your stance — circle left, circle right, pressure forward and pull back</div>
+      </div>
+      <div class="timer-wrap">
+        <div class="timer-label">Stance Timer</div>
+        <div class="timer-display" id="stanceTimer">3:00</div>
+        <div class="timer-btns">
+          <button class="timer-btn start" onclick="startTimer('stance',180)">Start</button>
+          <button class="timer-btn reset" onclick="resetTimer('stance',180)">Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEVEL CHANGES -->
+  <div class="section">
+    <div class="section-header">🤼 Drill 2 — Level Changes</div>
+    <div class="drill-card" id="level-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div class="drill-name">Level Changes</div>
+        <div class="drill-status" id="levelStatus" onclick="completeDrill('level')">○</div>
+      </div>
+      <div class="drill-meta">
+        <div class="meta-chip highlight">3 Sets</div>
+        <div class="meta-chip highlight" id="levelReps">10 reps</div>
+        <div class="meta-chip">20 sec rest</div>
+      </div>
+      <div class="tips-wrap">
+        <div class="tip-row"><div class="tip-dot"></div><strong>Drop your level:</strong> From your stance, drop your hips straight down by bending your knees deeper — don't lean forward</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Stand back up:</strong> Drive back up through your heels to full stance height</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Stay square:</strong> Your shoulders stay square and your back stays relatively upright — this isn't a forward lean, it's a vertical drop</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Why it matters:</strong> Level changes are the setup for EVERY takedown — you drop your level to get under your opponent's center of gravity. Without a sharp level change, shots are easy to defend</div>
+      </div>
+      <div class="rep-counter">
+        <div class="rep-label">Rep Counter</div>
+        <div class="rep-display" id="levelCount">0</div>
+        <div class="rep-btns">
+          <button class="rep-btn minus" onclick="changeRep('level',-1)">−</button>
+          <button class="rep-btn plus" onclick="changeRep('level',1)">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PENETRATION STEP -->
+  <div class="section">
+    <div class="section-header">🤼 Drill 3 — Penetration Step (The Shot)</div>
+    <div class="drill-card" id="shot-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div class="drill-name">Penetration Step</div>
+        <div class="drill-status" id="shotStatus" onclick="completeDrill('shot')">○</div>
+      </div>
+      <div class="drill-meta">
+        <div class="meta-chip highlight">3 Sets</div>
+        <div class="meta-chip highlight" id="shotReps">8 each side</div>
+        <div class="meta-chip">30 sec rest</div>
+      </div>
+      <a class="tutorial-link" href="https://www.youtube.com/watch?v=C3wE5HwBQxs" target="_blank">
+        <div class="yt-icon">▶️</div>
+        <div>
+          <div class="tutorial-link-text">Wrestling Penetration Step — Solo Drill</div>
+          <div class="tutorial-link-sub">The foundation of every takedown</div>
+        </div>
+      </a>
+      <div class="tips-wrap">
+        <div class="tip-row"><div class="tip-dot"></div><strong>From your stance:</strong> Drop your level first, then drive your lead knee toward the mat between your opponent's feet</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Knee to the mat:</strong> Your lead knee drives forward and down — this is the "shot" position</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Back knee up:</strong> Your trailing knee comes up behind you — you're in a lunge position with lead knee on the mat</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Head on the outside:</strong> Head goes to the outside of the imaginary opponent — not straight into their chest</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Drive through:</strong> Once in shot position, drive your hips through by standing up — this is the finish of the double leg</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Why it matters:</strong> This is THE fundamental wrestling movement. Every takedown in wrestling, BJJ and MMA starts with some variation of this step</div>
+      </div>
+      <div class="rep-counter">
+        <div class="rep-label">Rep Counter (Each Side)</div>
+        <div class="rep-display" id="shotCount">0</div>
+        <div class="rep-btns">
+          <button class="rep-btn minus" onclick="changeRep('shot',-1)">−</button>
+          <button class="rep-btn plus" onclick="changeRep('shot',1)">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SINGLE LEG SETUP -->
+  <div class="section">
+    <div class="section-header">🤼 Drill 4 — Single Leg Setup</div>
+    <div class="drill-card" id="single-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div class="drill-name">Single Leg Entry</div>
+        <div class="drill-status" id="singleStatus" onclick="completeDrill('single')">○</div>
+      </div>
+      <div class="drill-meta">
+        <div class="meta-chip highlight">3 Sets</div>
+        <div class="meta-chip highlight" id="singleReps">8 each side</div>
+        <div class="meta-chip">30 sec rest</div>
+      </div>
+      <div class="tips-wrap">
+        <div class="tip-row"><div class="tip-dot"></div><strong>Same setup as double leg:</strong> Level change, penetration step — but this time you only grab one leg</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Inside leg:</strong> Your lead leg drives to the inside of the imaginary opponent's lead leg — scoop under it</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Head outside:</strong> Head goes to the outside of their hip — controls their balance</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Why it matters:</strong> The single leg is often easier to hit than the double leg because it requires less penetration — knowing both gives you more options in live situations</div>
+      </div>
+      <div class="rep-counter">
+        <div class="rep-label">Rep Counter (Each Side)</div>
+        <div class="rep-display" id="singleCount">0</div>
+        <div class="rep-btns">
+          <button class="rep-btn minus" onclick="changeRep('single',-1)">−</button>
+          <button class="rep-btn plus" onclick="changeRep('single',1)">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COOLDOWN -->
+  <div class="section">
+    <div class="section-header">🧘 Cool Down</div>
+    <div class="drill-card" id="cooldown-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div class="drill-name">Stretch & Recover</div>
+        <div class="drill-status" id="cooldownStatus" onclick="completeDrill('cooldown')">○</div>
+      </div>
+      <div class="cooldown-list">
+        <div class="cooldown-item"><div class="cooldown-icon">🦵</div>Hip flexor lunge stretch — 30 sec each side, essential for shooting</div>
+        <div class="cooldown-item"><div class="cooldown-icon">🤸</div>Quad stretch — 30 sec each leg</div>
+        <div class="cooldown-item"><div class="cooldown-icon">🧘</div>Seated hamstring stretch — 30 sec each leg</div>
+        <div class="cooldown-item"><div class="cooldown-icon">🌀</div>Hip circles — 10 each direction</div>
+      </div>
+    </div>
+  </div>
+
+  <button class="complete-btn" onclick="completeSession()">✓ Session A Complete!</button>
+</div>
+
+<div class="bottom-nav">
+  <div class="nav-item" onclick="window.location.href='dashboard.html'"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></div>
+  <div class="nav-item active"><div class="nav-icon">📚</div><div class="nav-label">Library</div></div>
+  <div class="nav-item" onclick="window.location.href='nutrition.html'"><div class="nav-icon">🥗</div><div class="nav-label">Nutrition</div></div>
+  <div class="nav-item" onclick="window.location.href='progress.html'"><div class="nav-icon">📈</div><div class="nav-label">Progress</div></div>
+  <div class="nav-item" onclick="window.location.href='profile.html'"><div class="nav-icon">👤</div><div class="nav-label">Profile</div></div>
+</div>
+
+<script>
+  const bodyData = JSON.parse(sessionStorage.getItem('omniBody') || '{}');
+  const weight = parseFloat(bodyData.weight) || 160;
+  const unit = bodyData.unit || 'imperial';
+  const weightLbs = unit === 'metric' ? weight * 2.205 : weight;
+  const isHeavy = weightLbs > 200;
+  const isMid = weightLbs > 160 && weightLbs <= 200;
+  document.getElementById('levelReps').textContent = (isHeavy ? 8 : isMid ? 10 : 12) + ' reps';
+  document.getElementById('shotReps').textContent = (isHeavy ? 6 : isMid ? 8 : 10) + ' each side';
+  document.getElementById('singleReps').textContent = (isHeavy ? 6 : isMid ? 8 : 10) + ' each side';
+  const timers = {};
+  const repCounts = { level:0, shot:0, single:0 };
+  function formatTime(s) { const m=Math.floor(s/60); const sec=s%60; return `${m}:${sec.toString().padStart(2,'0')}`; }
+  function startTimer(id, seconds) { if(timers[id]) clearInterval(timers[id]); let r=seconds; timers[id]=setInterval(()=>{ r--; document.getElementById(`${id}Timer`).textContent=formatTime(r); if(r<=0){clearInterval(timers[id]);document.getElementById(`${id}Timer`).textContent='DONE!';}},1000); }
+  function resetTimer(id, seconds) { if(timers[id]) clearInterval(timers[id]); document.getElementById(`${id}Timer`).textContent=formatTime(seconds); }
+  function changeRep(id, delta) { repCounts[id]=Math.max(0,repCounts[id]+delta); document.getElementById(`${id}Count`).textContent=repCounts[id]; }
+  function completeDrill(id) { const s=document.getElementById(`${id}Status`); const c=document.getElementById(`${id}-card`); if(s){s.textContent='✓';s.classList.add('done');} if(c) c.classList.add('completed'); }
+  function completeSession() { const count=parseInt(sessionStorage.getItem('omniWorkouts')||'0')+1; sessionStorage.setItem('omniWorkouts',count); alert('🤼 Session A Complete! Level changes and penetration steps — the foundation of every takedown. Keep drilling!'); window.location.href='dashboard.html'; }
+</script>
+</body>
+</html>

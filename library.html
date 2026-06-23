@@ -266,6 +266,17 @@
     return 'Session A — Technique Focus';
   }
 
+  function getWrestlingSession() {
+    if (goal === 'cut') return 'wrestling_beginner_c.html';
+    if (goal === 'bulk') return 'wrestling_beginner_b.html';
+    return 'wrestling_beginner_a.html';
+  }
+  function getWrestlingSessionName() {
+    if (goal === 'cut') return 'Session C — Conditioning Focus';
+    if (goal === 'bulk') return 'Session B — Power Focus';
+    return 'Session A — Technique Focus';
+  }
+
   // Workout database
   const workoutDB = {
     'Boxing': [
@@ -297,8 +308,11 @@
       { id:'bjj_adv_submissions', name:'Submission Chains', level:'advanced', duration:'40 min', focus:'Combat', file:'', available:false, locked:!isWarrior },
     ],
     'Wrestling': [
-      { id:'wr_beg_sprawl', name:'Sprawl & Level Change', level:'beginner', duration:'20 min', focus:'Defense', file:'', available:false, comingSoon:true },
-      { id:'wr_beg_core', name:'Anti-Rotation Core Training', level:'beginner', duration:'25 min', focus:'Strength', file:'', available:false, comingSoon:true },
+      { id:'wr_rec', name:`⭐ Recommended: ${getWrestlingSessionName()}`, level:'beginner', duration:'30 min', focus:'Personalized', file:getWrestlingSession(), available:true },
+      { id:'wr_beg_a', name:'Session A — Technique Focus', level:'beginner', duration:'30 min', focus:'Technique', file:'wrestling_beginner_a.html', available:true },
+      { id:'wr_beg_b', name:'Session B — Power Focus', level:'beginner', duration:'30 min', focus:'Power', file:'wrestling_beginner_b.html', available:true },
+      { id:'wr_beg_c', name:'Session C — Conditioning Focus', level:'beginner', duration:'35 min', focus:'Cardio', file:'wrestling_beginner_c.html', available:true },
+      { id:'wr_beg_d', name:'Session D — No Equipment', level:'beginner', duration:'30 min', focus:'Solo Drilling', file:'wrestling_beginner_d.html', available:true },
       { id:'wr_int_shots', name:'Takedown Shot Drills', level:'intermediate', duration:'30 min', focus:'Offense', file:'', available:false, locked:!isWarrior },
     ],
     'MMA': [
