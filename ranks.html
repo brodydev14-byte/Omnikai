@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Omnikai – Rank Progression</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --bg:#080b10; --blue:#00c8ff; --white:#f0f4f8; --muted:#5a6a7a;
+      --border:rgba(0,200,255,0.15); --card:rgba(255,255,255,0.03);
+      --gold:#ffd700; --gold-glow:rgba(255,215,0,0.2); --nav-h:72px;
+    }
+    html,body { min-height:100%; background:var(--bg); color:var(--white); font-family:'Rajdhani',sans-serif; overflow-x:hidden; }
+    .bg-layer { position:fixed; inset:0; z-index:0; background:radial-gradient(ellipse 60% 40% at 50% 10%, rgba(255,215,0,0.04) 0%, transparent 70%), var(--bg); }
+    .grid-lines { position:fixed; inset:0; z-index:0; background-image:linear-gradient(rgba(0,200,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,200,255,0.025) 1px,transparent 1px); background-size:48px 48px; }
+    .scroll-wrap { position:relative; z-index:1; min-height:100vh; padding:24px 20px calc(var(--nav-h) + 24px); max-width:600px; margin:0 auto; }
+
+    /* HEADER */
+    .page-header { display:flex; align-items:center; gap:14px; margin-bottom:28px; }
+    .back-btn { width:38px; height:38px; background:var(--card); border:1px solid var(--border); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:1rem; text-decoration:none; color:var(--white); flex-shrink:0; }
+    .header-eyebrow { font-size:0.65rem; font-weight:700; letter-spacing:0.22em; text-transform:uppercase; color:var(--gold); margin-bottom:2px; }
+    .header-title { font-family:'Bebas Neue',sans-serif; font-size:1.8rem; letter-spacing:0.06em; line-height:1; }
+
+    /* CURRENT RANK HERO */
+    .rank-hero { background:linear-gradient(135deg, rgba(255,215,0,0.08) 0%, rgba(255,150,0,0.04) 100%); border:1px solid rgba(255,215,0,0.25); border-radius:16px; padding:24px 20px; margin-bottom:24px; text-align:center; }
+    .rank-hero-art { font-size:0.65rem; font-weight:700; letter-spacing:0.22em; text-transform:uppercase; color:var(--gold); margin-bottom:8px; }
+    .rank-hero-icon { font-size:3rem; margin-bottom:8px; }
+    .rank-hero-name { font-family:'Bebas Neue',sans-serif; font-size:2.4rem; letter-spacing:0.1em; color:var(--gold); line-height:1; margin-bottom:4px; text-shadow:0 0 20px var(--gold-glow); }
+    .rank-hero-sub { font-family:'Inter',sans-serif; font-size:0.8rem; color:var(--muted); margin-bottom:16px; }
+    .xp-wrap { margin-top:4px; }
+    .xp-header { display:flex; justify-content:space-between; margin-bottom:6px; }
+    .xp-label { font-size:0.62rem; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:var(--muted); }
+    .xp-count { font-family:'Bebas Neue',sans-serif; font-size:0.9rem; color:var(--gold); }
+    .xp-track { height:8px; background:rgba(255,255,255,0.06); border-radius:999px; overflow:hidden; }
+    .xp-fill { height:100%; border-radius:999px; background:linear-gradient(90deg,#ffd700,#ffaa00); box-shadow:0 0 10px rgba(255,215,0,0.4); transition:width 0.8s cubic-bezier(0.4,0,0.2,1); }
+
+    /* ART SELECTOR TABS */
+    .art-tabs { display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; margin-bottom:20px; scrollbar-width:none; }
+    .art-tabs::-webkit-scrollbar { display:none; }
+    .art-tab { flex-shrink:0; background:var(--card); border:1px solid var(--border); border-radius:999px; padding:6px 14px; font-size:0.72rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); cursor:pointer; transition:all 0.2s; white-space:nowrap; }
+    .art-tab.active { background:rgba(255,215,0,0.1); border-color:rgba(255,215,0,0.3); color:var(--gold); }
+
+    /* SECTION LABEL */
+    .section-label { font-size:0.65rem; font-weight:700; letter-spacing:0.22em; text-transform:uppercase; color:var(--muted); margin-bottom:12px; }
+
+    /* RANK LADDER */
+    .rank-ladder { display:flex; flex-direction:column; gap:0; margin-bottom:28px; }
+    .rank-item { display:flex; align-items:center; gap:14px; padding:16px 18px; background:var(--card); border:1px solid var(--border); position:relative; transition:all 0.2s; }
+    .rank-item:first-child { border-radius:12px 12px 0 0; }
+    .rank-item:last-child { border-radius:0 0 12px 12px; }
+    .rank-item:not(:last-child) { border-bottom:none; }
+    .rank-item.unlocked { background:rgba(255,215,0,0.04); border-color:rgba(255,215,0,0.2); }
+    .rank-item.current { background:rgba(255,215,0,0.08); border-color:rgba(255,215,0,0.4); box-shadow:0 0 20px rgba(255,215,0,0.08) inset; }
+    .rank-item.locked { opacity:0.4; }
+
+    /* CONNECTOR LINE */
+    .rank-connector { position:absolute; left:32px; bottom:-1px; width:2px; height:1px; background:rgba(255,215,0,0.15); z-index:1; }
+
+    .rank-num { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Bebas Neue',sans-serif; font-size:1rem; flex-shrink:0; border:2px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.04); color:var(--muted); }
+    .rank-item.unlocked .rank-num { border-color:rgba(255,215,0,0.3); background:rgba(255,215,0,0.1); color:var(--gold); }
+    .rank-item.current .rank-num { border-color:var(--gold); background:rgba(255,215,0,0.2); color:var(--gold); box-shadow:0 0 10px var(--gold-glow); }
+    .rank-info { flex:1; }
+    .rank-name-text { font-family:'Bebas Neue',sans-serif; font-size:1.2rem; letter-spacing:0.08em; line-height:1; margin-bottom:2px; }
+    .rank-item.current .rank-name-text { color:var(--gold); }
+    .rank-req { font-family:'Inter',sans-serif; font-size:0.75rem; color:var(--muted); }
+    .rank-item.unlocked .rank-req { color:rgba(255,215,0,0.6); }
+    .rank-status { font-size:1.2rem; flex-shrink:0; }
+    .current-tag { background:var(--gold); color:#080b10; font-size:0.55rem; font-weight:900; letter-spacing:0.15em; text-transform:uppercase; padding:2px 8px; border-radius:999px; margin-left:8px; vertical-align:middle; }
+
+    /* ALL ARTS OVERVIEW */
+    .arts-overview { display:flex; flex-direction:column; gap:10px; margin-bottom:24px; }
+    .art-overview-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:14px 16px; display:flex; align-items:center; gap:12px; }
+    .art-ov-icon { font-size:1.4rem; flex-shrink:0; }
+    .art-ov-info { flex:1; }
+    .art-ov-name { font-size:0.78rem; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; margin-bottom:4px; }
+    .art-ov-rank { font-family:'Bebas Neue',sans-serif; font-size:1rem; letter-spacing:0.06em; color:var(--gold); }
+    .art-ov-bar-track { height:3px; background:rgba(255,255,255,0.06); border-radius:999px; overflow:hidden; margin-top:5px; }
+    .art-ov-bar-fill { height:100%; border-radius:999px; background:linear-gradient(90deg,#ffd700,#ffaa00); }
+
+    /* BOTTOM NAV */
+    .bottom-nav { position:fixed; bottom:0; left:0; right:0; height:var(--nav-h); background:rgba(8,11,16,0.95); border-top:1px solid var(--border); backdrop-filter:blur(16px); display:flex; align-items:center; justify-content:space-around; z-index:100; padding:0 8px; }
+    .nav-item { display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; padding:8px 16px; border-radius:10px; flex:1; }
+    .nav-icon { font-size:1.3rem; }
+    .nav-label { font-size:0.58rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); }
+    .nav-item.active .nav-label { color:var(--blue); }
+  </style>
+</head>
+<body>
+<div class="bg-layer"></div>
+<div class="grid-lines"></div>
+<div class="scroll-wrap">
+
+  <div class="page-header">
+    <a class="back-btn" href="dashboard.html">←</a>
+    <div>
+      <div class="header-eyebrow">⚔️ Your Journey</div>
+      <div class="header-title">Rank Progression</div>
+    </div>
+  </div>
+
+  <!-- CURRENT RANK HERO -->
+  <div class="rank-hero">
+    <div class="rank-hero-art" id="heroArtName">Boxing</div>
+    <div class="rank-hero-icon" id="heroIcon">🥊</div>
+    <div class="rank-hero-name" id="heroRankName">Newcomer</div>
+    <div class="rank-hero-sub" id="heroSub">Complete workouts to rank up</div>
+    <div class="xp-wrap">
+      <div class="xp-header">
+        <div class="xp-label">Progress to next rank</div>
+        <div class="xp-count" id="xpCount">0 / 5 XP</div>
+      </div>
+      <div class="xp-track">
+        <div class="xp-fill" id="xpFill" style="width:0%"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ART SELECTOR -->
+  <div class="art-tabs" id="artTabs"></div>
+
+  <!-- RANK LADDER -->
+  <div class="section-label">🏆 Rank Ladder</div>
+  <div class="rank-ladder" id="rankLadder"></div>
+
+  <!-- ALL ARTS OVERVIEW -->
+  <div class="section-label">📊 All Arts Overview</div>
+  <div class="arts-overview" id="artsOverview"></div>
+
+</div>
+
+<div class="bottom-nav">
+  <div class="nav-item" onclick="window.location.href='dashboard.html'"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></div>
+  <div class="nav-item" onclick="window.location.href='library.html'"><div class="nav-icon">📚</div><div class="nav-label">Library</div></div>
+  <div class="nav-item" onclick="window.location.href='nutrition.html'"><div class="nav-icon">🥗</div><div class="nav-label">Nutrition</div></div>
+  <div class="nav-item" onclick="window.location.href='progress.html'"><div class="nav-icon">📈</div><div class="nav-label">Progress</div></div>
+  <div class="nav-item" onclick="window.location.href='profile.html'"><div class="nav-icon">👤</div><div class="nav-label">Profile</div></div>
+</div>
+
+<script>
+  const arts = JSON.parse(sessionStorage.getItem('omniArts') || '["Boxing"]');
+  const totalWorkouts = parseInt(sessionStorage.getItem('omniWorkouts') || localStorage.getItem('omniWorkouts') || '0');
+
+  const RANKS = {
+    'Boxing':    [
+      { name:'Newcomer',   req:0,  desc:'Just stepped into the gym' },
+      { name:'Amateur',    req:5,  desc:'Learned the basic stance and punches' },
+      { name:'Contender',  req:10, desc:'Developing power and combinations' },
+      { name:'Prospect',   req:20, desc:'Ready for serious competition prep' },
+      { name:'Champion',   req:35, desc:'Elite boxing conditioning and technique' },
+    ],
+    'Muay Thai': [
+      { name:'Newcomer',       req:0,  desc:'First steps into the art of eight limbs' },
+      { name:'White Prajioud', req:5,  desc:'Learning stance, teep and basic strikes' },
+      { name:'Student',        req:10, desc:'Adding kicks, knees and elbows to the arsenal' },
+      { name:'Nak Muay',       req:20, desc:'Flowing combinations with all eight weapons' },
+      { name:'Warrior',        req:35, desc:'True Muay Thai fighter conditioning' },
+    ],
+    'BJJ': [
+      { name:'Newcomer',    req:0,  desc:'First time on the mats' },
+      { name:'White Belt',  req:5,  desc:'Building hip escapes and basic survival' },
+      { name:'Blue Belt',   req:10, desc:'Developing guard, sweeps and submissions' },
+      { name:'Purple Belt', req:20, desc:'Advanced technique and transitions' },
+      { name:'Brown Belt',  req:35, desc:'Near-black belt refinement and teaching' },
+    ],
+    'Wrestling': [
+      { name:'Newcomer',   req:0,  desc:'Learning the wrestling stance' },
+      { name:'Rookie',     req:5,  desc:'Drilling level changes and penetration steps' },
+      { name:'Technician', req:10, desc:'Sharp shots and scramble awareness' },
+      { name:'Dominator',  req:20, desc:'Controlling where the fight happens' },
+      { name:'Champion',   req:35, desc:'Olympic-level wrestling conditioning' },
+    ],
+    'MMA': [
+      { name:'Newcomer',   req:0,  desc:'Learning to mix striking and grappling' },
+      { name:'Fighter',    req:5,  desc:'Basic strike-to-takedown transitions' },
+      { name:'Veteran',    req:10, desc:'Comfortable in all positions and ranges' },
+      { name:'Contender',  req:20, desc:'Complete MMA game with no obvious gaps' },
+      { name:'Champion',   req:35, desc:'Elite MMA conditioning and IQ' },
+    ],
+    'Judo': [
+      { name:'Newcomer',    req:0,  desc:'Learning to fall safely — ukemi first' },
+      { name:'White Belt',  req:5,  desc:'Basic throws and breakfall fluency' },
+      { name:'Yellow Belt', req:10, desc:'Kuzushi and entry timing developing' },
+      { name:'Orange Belt', req:20, desc:'Throw combinations and mat work' },
+      { name:'Brown Belt',  req:35, desc:'Competition-ready Judo with consistent throws' },
+    ],
+    'Karate': [
+      { name:'Newcomer',    req:0,  desc:'Learning the basics of kihon' },
+      { name:'White Belt',  req:5,  desc:'Kihon strikes and basic kata' },
+      { name:'Yellow Belt', req:10, desc:'Power generation and kata fluency' },
+      { name:'Green Belt',  req:20, desc:'Advanced kata and kumite fundamentals' },
+      { name:'Brown Belt',  req:35, desc:'Elite karate with powerful, precise technique' },
+    ],
+    'Taekwondo': [
+      { name:'Newcomer',    req:0,  desc:'Learning TKD stance and basic kicks' },
+      { name:'White Belt',  req:5,  desc:'Drilling front kicks and roundhouses' },
+      { name:'Yellow Belt', req:10, desc:'Adding back kicks and spinning techniques' },
+      { name:'Green Belt',  req:20, desc:'High kicks with speed and precision' },
+      { name:'Blue Belt',   req:35, desc:'Competition-ready TKD fighter' },
+    ],
+    'Kung Fu': [
+      { name:'Newcomer',    req:0,  desc:'First steps into the way of kung fu' },
+      { name:'Student',     req:5,  desc:'Learning horse stance and basic forms' },
+      { name:'Apprentice',  req:10, desc:'Developing power and form fluency' },
+      { name:'Disciple',    req:20, desc:'Advanced forms with internal power' },
+      { name:'Master',      req:35, desc:'Complete mastery of movement and power' },
+    ],
+    'Krav Maga': [
+      { name:'Newcomer',     req:0,  desc:'Learning situational awareness basics' },
+      { name:'Civilian',     req:5,  desc:'Basic defense strikes and escape techniques' },
+      { name:'Practitioner', req:10, desc:'Fluid responses under stress scenarios' },
+      { name:'Operator',     req:20, desc:'Military-grade reaction speed and aggression' },
+      { name:'Expert',       req:35, desc:'Complete Krav Maga combat capability' },
+    ],
+  };
+
+  const ART_ICONS = {
+    'Boxing':'🥊','Muay Thai':'🦵','BJJ':'🥋','Wrestling':'🤼','MMA':'⚡',
+    'Judo':'👘','Karate':'🦶','Taekwondo':'🦵','Kung Fu':'🐉','Krav Maga':'🛡️',
+  };
+
+  function getRankIndex(art) {
+    const rankList = RANKS[art] || RANKS['Boxing'];
+    let idx = 0;
+    for (let i = 0; i < rankList.length; i++) {
+      if (totalWorkouts >= rankList[i].req) idx = i;
+      else break;
+    }
+    return idx;
+  }
+
+  function getXPProgress(art) {
+    const rankList = RANKS[art] || RANKS['Boxing'];
+    const idx = getRankIndex(art);
+    const currentReq = rankList[idx].req;
+    const nextReq = idx < rankList.length - 1 ? rankList[idx + 1].req : currentReq + 5;
+    const progress = totalWorkouts - currentReq;
+    const needed = nextReq - currentReq;
+    return { progress, needed, pct: Math.min((progress / needed) * 100, 100) };
+  }
+
+  let currentArt = arts[0] || 'Boxing';
+
+  function renderHero(art) {
+    const rankList = RANKS[art] || RANKS['Boxing'];
+    const idx = getRankIndex(art);
+    const rank = rankList[idx];
+    const xp = getXPProgress(art);
+    const isMax = idx === rankList.length - 1;
+
+    document.getElementById('heroArtName').textContent = ART_ICONS[art] + ' ' + art;
+    document.getElementById('heroIcon').textContent = ART_ICONS[art] || '🥋';
+    document.getElementById('heroRankName').textContent = rank.name;
+    document.getElementById('heroSub').textContent = rank.desc;
+    document.getElementById('xpFill').style.width = xp.pct + '%';
+
+    if (isMax) {
+      document.getElementById('xpCount').textContent = 'MAX RANK ACHIEVED';
+    } else {
+      const nextRank = rankList[idx + 1];
+      document.getElementById('xpCount').textContent = xp.progress + ' / ' + xp.needed + ' workouts → ' + nextRank.name;
+    }
+  }
+
+  function renderLadder(art) {
+    const rankList = RANKS[art] || RANKS['Boxing'];
+    const idx = getRankIndex(art);
+    const ladder = document.getElementById('rankLadder');
+    ladder.innerHTML = '';
+
+    rankList.forEach((rank, i) => {
+      const isUnlocked = i < idx;
+      const isCurrent = i === idx;
+      const isLocked = i > idx;
+
+      const item = document.createElement('div');
+      item.className = 'rank-item' + (isUnlocked ? ' unlocked' : '') + (isCurrent ? ' current' : '') + (isLocked ? ' locked' : '');
+
+      const statusIcon = isUnlocked ? '✅' : isCurrent ? '⭐' : '🔒';
+
+      item.innerHTML = `
+        <div class="rank-num">${i + 1}</div>
+        <div class="rank-info">
+          <div class="rank-name-text">${rank.name}${isCurrent ? '<span class="current-tag">Current</span>' : ''}</div>
+          <div class="rank-req">${rank.req === 0 ? 'Starting rank' : rank.req + ' workouts to unlock'} · ${rank.desc}</div>
+        </div>
+        <div class="rank-status">${statusIcon}</div>
+      `;
+      ladder.appendChild(item);
+    });
+  }
+
+  function renderArtsOverview() {
+    const container = document.getElementById('artsOverview');
+    container.innerHTML = '';
+    arts.forEach(art => {
+      const rankList = RANKS[art] || RANKS['Boxing'];
+      const idx = getRankIndex(art);
+      const rank = rankList[idx];
+      const xp = getXPProgress(art);
+
+      const card = document.createElement('div');
+      card.className = 'art-overview-card';
+      card.style.cursor = 'pointer';
+      card.onclick = () => switchArt(art);
+      card.innerHTML = `
+        <div class="art-ov-icon">${ART_ICONS[art] || '🥋'}</div>
+        <div class="art-ov-info">
+          <div class="art-ov-name">${art}</div>
+          <div class="art-ov-rank">${rank.name}</div>
+          <div class="art-ov-bar-track">
+            <div class="art-ov-bar-fill" style="width:${xp.pct}%"></div>
+          </div>
+        </div>
+        <div style="color:var(--gold);font-size:1.1rem;flex-shrink:0;">→</div>
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  function renderTabs() {
+    const tabsEl = document.getElementById('artTabs');
+    tabsEl.innerHTML = '';
+    arts.forEach(art => {
+      const tab = document.createElement('div');
+      tab.className = 'art-tab' + (art === currentArt ? ' active' : '');
+      tab.textContent = ART_ICONS[art] + ' ' + art;
+      tab.onclick = () => switchArt(art);
+      tabsEl.appendChild(tab);
+    });
+  }
+
+  function switchArt(art) {
+    currentArt = art;
+    renderHero(art);
+    renderLadder(art);
+    renderTabs();
+    // Animate XP fill
+    setTimeout(() => {
+      const xp = getXPProgress(art);
+      document.getElementById('xpFill').style.width = xp.pct + '%';
+    }, 50);
+  }
+
+  // Init
+  renderHero(currentArt);
+  renderLadder(currentArt);
+  renderArtsOverview();
+  renderTabs();
+
+  // Animate bars after paint
+  setTimeout(() => {
+    const xp = getXPProgress(currentArt);
+    document.getElementById('xpFill').style.width = xp.pct + '%';
+  }, 100);
+</script>
+</body>
+</html>
