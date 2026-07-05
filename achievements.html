@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Omnikai – Achievements</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --bg:#080b10; --blue:#00c8ff; --white:#f0f4f8; --muted:#5a6a7a;
+      --border:rgba(0,200,255,0.15); --card:rgba(255,255,255,0.03);
+      --gold:#ffd700; --nav-h:72px;
+    }
+    html,body { min-height:100%; background:var(--bg); color:var(--white); font-family:'Rajdhani',sans-serif; overflow-x:hidden; }
+    .bg-layer { position:fixed; inset:0; z-index:0; background:radial-gradient(ellipse 60% 40% at 50% 10%, rgba(255,215,0,0.03) 0%, transparent 70%), var(--bg); }
+    .grid-lines { position:fixed; inset:0; z-index:0; background-image:linear-gradient(rgba(0,200,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,200,255,0.025) 1px,transparent 1px); background-size:48px 48px; }
+    .scroll-wrap { position:relative; z-index:1; min-height:100vh; padding:24px 20px calc(var(--nav-h) + 24px); max-width:600px; margin:0 auto; }
+
+    /* HEADER */
+    .page-header { display:flex; align-items:center; gap:14px; margin-bottom:24px; }
+    .back-btn { width:38px; height:38px; background:var(--card); border:1px solid var(--border); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:1rem; text-decoration:none; color:var(--white); flex-shrink:0; }
+    .header-eyebrow { font-size:0.65rem; font-weight:700; letter-spacing:0.22em; text-transform:uppercase; color:var(--gold); margin-bottom:2px; }
+    .header-title { font-family:'Bebas Neue',sans-serif; font-size:1.8rem; letter-spacing:0.06em; line-height:1; }
+
+    /* OVERALL PROGRESS */
+    .overall-card { background:linear-gradient(135deg,rgba(255,215,0,0.07) 0%,rgba(255,150,0,0.03) 100%); border:1px solid rgba(255,215,0,0.2); border-radius:14px; padding:20px; margin-bottom:24px; text-align:center; }
+    .overall-nums { font-family:'Bebas Neue',sans-serif; font-size:3rem; color:var(--gold); line-height:1; letter-spacing:0.06em; }
+    .overall-label { font-size:0.65rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:rgba(255,215,0,0.6); margin-bottom:16px; }
+    .overall-track { height:8px; background:rgba(255,255,255,0.06); border-radius:999px; overflow:hidden; margin-bottom:8px; }
+    .overall-fill { height:100%; border-radius:999px; background:linear-gradient(90deg,#ffd700,#ffaa00); box-shadow:0 0 10px rgba(255,215,0,0.3); transition:width 1s cubic-bezier(0.4,0,0.2,1); }
+    .overall-sub { font-family:'Inter',sans-serif; font-size:0.75rem; color:var(--muted); }
+
+    /* CATEGORY FILTER */
+    .cat-tabs { display:flex; gap:6px; overflow-x:auto; padding-bottom:4px; margin-bottom:20px; scrollbar-width:none; }
+    .cat-tabs::-webkit-scrollbar { display:none; }
+    .cat-tab { flex-shrink:0; background:var(--card); border:1px solid var(--border); border-radius:999px; padding:6px 14px; font-size:0.7rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); cursor:pointer; transition:all 0.2s; }
+    .cat-tab.active { background:rgba(255,215,0,0.1); border-color:rgba(255,215,0,0.3); color:var(--gold); }
+
+    /* SECTION LABEL */
+    .section-label { font-size:0.65rem; font-weight:700; letter-spacing:0.22em; text-transform:uppercase; color:var(--muted); margin-bottom:12px; margin-top:4px; }
+
+    /* ACHIEVEMENT GRID */
+    .ach-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px; }
+
+    /* ACHIEVEMENT CARD */
+    .ach-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px 14px; display:flex; flex-direction:column; align-items:center; text-align:center; position:relative; transition:all 0.2s; }
+    .ach-card.unlocked { border-color:rgba(255,215,0,0.3); background:rgba(255,215,0,0.04); }
+    .ach-card.unlocked::after { content:''; position:absolute; inset:0; border-radius:12px; box-shadow:0 0 16px rgba(255,215,0,0.06) inset; pointer-events:none; }
+    .ach-card.locked { opacity:0.45; }
+    .ach-card.rare.unlocked { border-color:rgba(139,92,246,0.5); background:rgba(139,92,246,0.06); }
+    .ach-card.rare.unlocked::after { box-shadow:0 0 20px rgba(139,92,246,0.08) inset; }
+
+    .ach-icon { font-size:2rem; margin-bottom:8px; position:relative; }
+    .ach-icon.locked-icon { filter:grayscale(1); opacity:0.5; }
+    .lock-overlay { position:absolute; bottom:-4px; right:-4px; font-size:0.8rem; }
+
+    .ach-name { font-family:'Bebas Neue',sans-serif; font-size:0.95rem; letter-spacing:0.06em; line-height:1.1; margin-bottom:5px; }
+    .ach-card.unlocked .ach-name { color:var(--gold); }
+    .ach-card.rare.unlocked .ach-name { color:#a78bfa; }
+
+    .ach-desc { font-family:'Inter',sans-serif; font-size:0.68rem; color:var(--muted); line-height:1.4; margin-bottom:8px; }
+
+    .ach-status { font-size:0.62rem; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; }
+    .ach-status.done { color:rgba(255,215,0,0.7); }
+    .ach-status.locked { color:var(--muted); }
+    .ach-status.rare-done { color:#a78bfa; }
+
+    .ach-progress-wrap { width:100%; margin-top:6px; }
+    .ach-progress-track { height:3px; background:rgba(255,255,255,0.06); border-radius:999px; overflow:hidden; }
+    .ach-progress-fill { height:100%; border-radius:999px; background:rgba(255,215,0,0.5); transition:width 0.8s ease; }
+
+    /* NEW BADGE INDICATOR */
+    .new-dot { position:absolute; top:10px; right:10px; width:8px; height:8px; background:var(--gold); border-radius:50%; box-shadow:0 0 6px rgba(255,215,0,0.6); animation:pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+
+    /* CELEBRATON BANNER */
+    .celebrate-banner { position:fixed; top:0; left:0; right:0; z-index:200; background:linear-gradient(135deg,#ffd700,#ffaa00); color:#080b10; padding:16px 20px; display:none; align-items:center; gap:12px; box-shadow:0 4px 20px rgba(255,215,0,0.3); }
+    .celebrate-banner.show { display:flex; }
+    .celebrate-icon { font-size:1.8rem; flex-shrink:0; }
+    .celebrate-text { flex:1; }
+    .celebrate-title { font-family:'Bebas Neue',sans-serif; font-size:1.1rem; letter-spacing:0.06em; }
+    .celebrate-sub { font-size:0.72rem; font-weight:600; opacity:0.7; }
+
+    /* BOTTOM NAV */
+    .bottom-nav { position:fixed; bottom:0; left:0; right:0; height:var(--nav-h); background:rgba(8,11,16,0.95); border-top:1px solid var(--border); backdrop-filter:blur(16px); display:flex; align-items:center; justify-content:space-around; z-index:100; padding:0 8px; }
+    .nav-item { display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; padding:8px 16px; border-radius:10px; flex:1; }
+    .nav-icon { font-size:1.3rem; }
+    .nav-label { font-size:0.58rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); }
+    .nav-item.active .nav-label { color:var(--blue); }
+  </style>
+</head>
+<body>
+<div class="bg-layer"></div>
+<div class="grid-lines"></div>
+
+<!-- CELEBRATION BANNER -->
+<div class="celebrate-banner" id="celebrateBanner">
+  <div class="celebrate-icon" id="celebrateIcon">🏆</div>
+  <div class="celebrate-text">
+    <div class="celebrate-title" id="celebrateTitle">Achievement Unlocked!</div>
+    <div class="celebrate-sub" id="celebrateSub">Keep going!</div>
+  </div>
+  <div style="font-size:1.2rem;cursor:pointer;" onclick="document.getElementById('celebrateBanner').classList.remove('show')">✕</div>
+</div>
+
+<div class="scroll-wrap">
+
+  <div class="page-header">
+    <a class="back-btn" href="profile.html">←</a>
+    <div>
+      <div class="header-eyebrow">🏆 Hall of Fame</div>
+      <div class="header-title">Achievements</div>
+    </div>
+  </div>
+
+  <!-- OVERALL PROGRESS -->
+  <div class="overall-card">
+    <div class="overall-nums" id="overallNums">0 / 0</div>
+    <div class="overall-label">Achievements Unlocked</div>
+    <div class="overall-track">
+      <div class="overall-fill" id="overallFill" style="width:0%"></div>
+    </div>
+    <div class="overall-sub" id="overallSub">Start training to unlock achievements</div>
+  </div>
+
+  <!-- CATEGORY FILTER -->
+  <div class="cat-tabs" id="catTabs">
+    <div class="cat-tab active" onclick="filterCat('all',this)">All</div>
+    <div class="cat-tab" onclick="filterCat('grind',this)">🏋️ Grind</div>
+    <div class="cat-tab" onclick="filterCat('discipline',this)">🔥 Discipline</div>
+    <div class="cat-tab" onclick="filterCat('strength',this)">💪 Strength</div>
+    <div class="cat-tab" onclick="filterCat('explorer',this)">🥋 Explorer</div>
+    <div class="cat-tab" onclick="filterCat('nutrition',this)">🥗 Nutrition</div>
+    <div class="cat-tab" onclick="filterCat('elite',this)">⚡ Elite</div>
+  </div>
+
+  <!-- ACHIEVEMENTS CONTAINER -->
+  <div id="achContainer"></div>
+
+</div>
+
+<div class="bottom-nav">
+  <div class="nav-item" onclick="window.location.href='dashboard.html'"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></div>
+  <div class="nav-item" onclick="window.location.href='library.html'"><div class="nav-icon">📚</div><div class="nav-label">Library</div></div>
+  <div class="nav-item" onclick="window.location.href='nutrition.html'"><div class="nav-icon">🥗</div><div class="nav-label">Nutrition</div></div>
+  <div class="nav-item" onclick="window.location.href='progress.html'"><div class="nav-icon">📈</div><div class="nav-label">Progress</div></div>
+  <div class="nav-item active" onclick="window.location.href='profile.html'"><div class="nav-icon">👤</div><div class="nav-label">Profile</div></div>
+</div>
+
+<script>
+  // ── LOAD DATA ──
+  const totalWorkouts = parseInt(sessionStorage.getItem('omniWorkouts') || localStorage.getItem('omniWorkouts') || '0');
+  const streak = parseInt(localStorage.getItem('omniStreak') || '1');
+  const prData = JSON.parse(localStorage.getItem('omniPRs') || '{}');
+  const totalPRs = Object.values(prData).filter(p => p && p.weight).length;
+  const arts = JSON.parse(sessionStorage.getItem('omniArts') || '[]');
+  const plan = sessionStorage.getItem('omniPlan') || 'wanderer';
+  const history = JSON.parse(localStorage.getItem('omniHistory') || '[]');
+
+  // Count nutrition days logged in last 30 days
+  let nutritionDays = 0;
+  for (let i = 0; i < 30; i++) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const key = 'omniFood_' + d.toISOString().split('T')[0];
+    if (localStorage.getItem(key)) nutritionDays++;
+  }
+
+  // Check if conditioning program was visited
+  const visitedConditioning = localStorage.getItem('omniVisitedConditioning') === 'true';
+
+  // ── ACHIEVEMENT DEFINITIONS ──
+  const ACHIEVEMENTS = [
+    // 🏋️ GRIND
+    { id:'first_workout', cat:'grind', icon:'🥊', name:'First Blood', desc:'Complete your very first workout', rare:false,
+      check: () => totalWorkouts >= 1, progress: () => ({ cur: Math.min(totalWorkouts,1), max:1 }) },
+    { id:'workouts_5', cat:'grind', icon:'💥', name:'Getting Serious', desc:'Complete 5 workouts', rare:false,
+      check: () => totalWorkouts >= 5, progress: () => ({ cur: Math.min(totalWorkouts,5), max:5 }) },
+    { id:'workouts_10', cat:'grind', icon:'🔟', name:'Ten Deep', desc:'Complete 10 workouts', rare:false,
+      check: () => totalWorkouts >= 10, progress: () => ({ cur: Math.min(totalWorkouts,10), max:10 }) },
+    { id:'workouts_25', cat:'grind', icon:'⚡', name:'Relentless', desc:'Complete 25 workouts', rare:false,
+      check: () => totalWorkouts >= 25, progress: () => ({ cur: Math.min(totalWorkouts,25), max:25 }) },
+    { id:'workouts_50', cat:'grind', icon:'🏅', name:'Half Century', desc:'Complete 50 workouts', rare:false,
+      check: () => totalWorkouts >= 50, progress: () => ({ cur: Math.min(totalWorkouts,50), max:50 }) },
+    { id:'workouts_100', cat:'grind', icon:'💯', name:'Century', desc:'Complete 100 workouts — elite territory', rare:true,
+      check: () => totalWorkouts >= 100, progress: () => ({ cur: Math.min(totalWorkouts,100), max:100 }) },
+
+    // 🔥 DISCIPLINE
+    { id:'streak_3', cat:'discipline', icon:'🔥', name:'On Fire', desc:'Train 3 days in a row', rare:false,
+      check: () => streak >= 3, progress: () => ({ cur: Math.min(streak,3), max:3 }) },
+    { id:'streak_7', cat:'discipline', icon:'📅', name:'Full Week', desc:'7-day training streak', rare:false,
+      check: () => streak >= 7, progress: () => ({ cur: Math.min(streak,7), max:7 }) },
+    { id:'streak_14', cat:'discipline', icon:'🗓️', name:'Two Weeks Strong', desc:'14 consecutive training days', rare:false,
+      check: () => streak >= 14, progress: () => ({ cur: Math.min(streak,14), max:14 }) },
+    { id:'streak_30', cat:'discipline', icon:'👑', name:'Iron Discipline', desc:'30-day training streak — legendary', rare:true,
+      check: () => streak >= 30, progress: () => ({ cur: Math.min(streak,30), max:30 }) },
+
+    // 💪 STRENGTH
+    { id:'first_pr', cat:'strength', icon:'🏋️', name:'First PR', desc:'Log your very first personal record', rare:false,
+      check: () => totalPRs >= 1, progress: () => ({ cur: Math.min(totalPRs,1), max:1 }) },
+    { id:'pr_5', cat:'strength', icon:'📈', name:'Getting Stronger', desc:'Log 5 personal records', rare:false,
+      check: () => totalPRs >= 5, progress: () => ({ cur: Math.min(totalPRs,5), max:5 }) },
+    { id:'pr_10', cat:'strength', icon:'💪', name:'PR Machine', desc:'Log 10 personal records', rare:false,
+      check: () => totalPRs >= 10, progress: () => ({ cur: Math.min(totalPRs,10), max:10 }) },
+    { id:'pr_20', cat:'strength', icon:'🦾', name:'Unbreakable', desc:'Log 20 personal records across all exercises', rare:true,
+      check: () => totalPRs >= 20, progress: () => ({ cur: Math.min(totalPRs,20), max:20 }) },
+
+    // 🥋 EXPLORER
+    { id:'first_art', cat:'explorer', icon:'🎯', name:'Chosen Path', desc:'Select your first martial art', rare:false,
+      check: () => arts.length >= 1, progress: () => ({ cur: Math.min(arts.length,1), max:1 }) },
+    { id:'arts_3', cat:'explorer', icon:'🌍', name:'Well Rounded', desc:'Train in 3 different martial arts', rare:false,
+      check: () => arts.length >= 3, progress: () => ({ cur: Math.min(arts.length,3), max:3 }) },
+    { id:'arts_5', cat:'explorer', icon:'🥷', name:'Combat Scholar', desc:'Train in 5 different martial arts', rare:false,
+      check: () => arts.length >= 5, progress: () => ({ cur: Math.min(arts.length,5), max:5 }) },
+    { id:'arts_all', cat:'explorer', icon:'🌐', name:'Omnikai', desc:'Train in all 10 martial arts', rare:true,
+      check: () => arts.length >= 10, progress: () => ({ cur: Math.min(arts.length,10), max:10 }) },
+    { id:'conditioning_program', cat:'explorer', icon:'🔥', name:'Fighter Mentality', desc:'Open a fighter conditioning program', rare:false,
+      check: () => visitedConditioning, progress: () => ({ cur: visitedConditioning ? 1:0, max:1 }) },
+    { id:'warrior_plan', cat:'explorer', icon:'⚔️', name:'Warrior', desc:'Upgrade to the Warrior plan', rare:false,
+      check: () => plan === 'warrior', progress: () => ({ cur: plan==='warrior'?1:0, max:1 }) },
+
+    // 🥗 NUTRITION
+    { id:'first_log', cat:'nutrition', icon:'🥗', name:'Eating Smart', desc:'Log your first meal', rare:false,
+      check: () => nutritionDays >= 1, progress: () => ({ cur: Math.min(nutritionDays,1), max:1 }) },
+    { id:'nutrition_3', cat:'nutrition', icon:'🥦', name:'Consistent', desc:'Log food for 3 days', rare:false,
+      check: () => nutritionDays >= 3, progress: () => ({ cur: Math.min(nutritionDays,3), max:3 }) },
+    { id:'nutrition_7', cat:'nutrition', icon:'📊', name:'Macro Tracker', desc:'Log food for 7 different days', rare:false,
+      check: () => nutritionDays >= 7, progress: () => ({ cur: Math.min(nutritionDays,7), max:7 }) },
+    { id:'nutrition_30', cat:'nutrition', icon:'🌟', name:'Dialled In', desc:'Log food for 30 days — discipline in the kitchen', rare:true,
+      check: () => nutritionDays >= 30, progress: () => ({ cur: Math.min(nutritionDays,30), max:30 }) },
+
+    // ⚡ ELITE
+    { id:'elite_all_cats', cat:'elite', icon:'🏆', name:'Complete Fighter', desc:'Unlock at least one achievement in every category', rare:true,
+      check: () => {
+        const cats = ['grind','discipline','strength','explorer','nutrition'];
+        return cats.every(cat => ACHIEVEMENTS.filter(a=>a.cat===cat).some(a=>a.check()));
+      },
+      progress: () => {
+        const cats = ['grind','discipline','strength','explorer','nutrition'];
+        const done = cats.filter(cat => ACHIEVEMENTS.filter(a=>a.cat===cat).some(a=>a.check())).length;
+        return { cur: done, max: cats.length };
+      }
+    },
+    { id:'elite_50_workouts_pr', cat:'elite', icon:'👹', name:'Beast Mode', desc:'50 workouts AND 10 PRs', rare:true,
+      check: () => totalWorkouts >= 50 && totalPRs >= 10,
+      progress: () => ({ cur: Math.min(totalWorkouts,50) + Math.min(totalPRs,10), max:60 }) },
+    { id:'elite_streak_workouts', cat:'elite', icon:'⚡', name:'Unstoppable', desc:'30-day streak AND 50 workouts', rare:true,
+      check: () => streak >= 30 && totalWorkouts >= 50,
+      progress: () => ({ cur: Math.min(streak,30) + Math.min(totalWorkouts,50), max:80 }) },
+  ];
+
+  // ── CHECK NEWLY UNLOCKED ──
+  const prevUnlocked = JSON.parse(localStorage.getItem('omniAchievements') || '[]');
+  const nowUnlocked = ACHIEVEMENTS.filter(a => a.check()).map(a => a.id);
+  const newlyUnlocked = nowUnlocked.filter(id => !prevUnlocked.includes(id));
+  localStorage.setItem('omniAchievements', JSON.stringify(nowUnlocked));
+
+  // Show celebration for newest unlocked
+  if (newlyUnlocked.length > 0) {
+    const newest = ACHIEVEMENTS.find(a => a.id === newlyUnlocked[newlyUnlocked.length - 1]);
+    if (newest) {
+      document.getElementById('celebrateIcon').textContent = newest.icon;
+      document.getElementById('celebrateTitle').textContent = 'Achievement Unlocked: ' + newest.name;
+      document.getElementById('celebrateSub').textContent = newest.desc;
+      document.getElementById('celebrateBanner').classList.add('show');
+      setTimeout(() => document.getElementById('celebrateBanner').classList.remove('show'), 5000);
+    }
+  }
+
+  // ── OVERALL PROGRESS ──
+  const totalCount = ACHIEVEMENTS.length;
+  const unlockedCount = nowUnlocked.length;
+  const overallPct = Math.round((unlockedCount / totalCount) * 100);
+  document.getElementById('overallNums').textContent = unlockedCount + ' / ' + totalCount;
+  setTimeout(() => { document.getElementById('overallFill').style.width = overallPct + '%'; }, 100);
+  const remaining = totalCount - unlockedCount;
+  document.getElementById('overallSub').textContent = remaining > 0
+    ? remaining + ' achievement' + (remaining > 1 ? 's' : '') + ' still to unlock — keep grinding'
+    : '🏆 All achievements unlocked — you are a legend!';
+
+  // ── RENDER ACHIEVEMENTS ──
+  const CATEGORY_LABELS = {
+    grind: '🏋️ Grind — Workout Milestones',
+    discipline: '🔥 Discipline — Streak Milestones',
+    strength: '💪 Strength — PR Milestones',
+    explorer: '🥋 Explorer — Art & Discovery',
+    nutrition: '🥗 Nutrition — Consistency',
+    elite: '⚡ Elite — Rare Achievements',
+  };
+
+  let currentCat = 'all';
+
+  function renderAchievements(cat) {
+    const container = document.getElementById('achContainer');
+    container.innerHTML = '';
+
+    const categories = cat === 'all'
+      ? ['grind','discipline','strength','explorer','nutrition','elite']
+      : [cat];
+
+    categories.forEach(c => {
+      const catAchs = ACHIEVEMENTS.filter(a => a.cat === c);
+      if (catAchs.length === 0) return;
+
+      const label = document.createElement('div');
+      label.className = 'section-label';
+      label.textContent = CATEGORY_LABELS[c];
+      container.appendChild(label);
+
+      const grid = document.createElement('div');
+      grid.className = 'ach-grid';
+
+      catAchs.forEach(ach => {
+        const unlocked = ach.check();
+        const isNew = newlyUnlocked.includes(ach.id);
+        const prog = ach.progress();
+
+        const card = document.createElement('div');
+        card.className = 'ach-card' + (unlocked ? ' unlocked' : ' locked') + (ach.rare ? ' rare' : '');
+
+        const pct = Math.round((prog.cur / prog.max) * 100);
+
+        card.innerHTML = `
+          ${isNew ? '<div class="new-dot"></div>' : ''}
+          <div class="ach-icon ${unlocked ? '' : 'locked-icon'}">
+            ${ach.icon}
+            ${!unlocked ? '<div class="lock-overlay">🔒</div>' : ''}
+          </div>
+          <div class="ach-name">${ach.name}</div>
+          <div class="ach-desc">${ach.desc}</div>
+          ${!unlocked && prog.max > 1 ? `
+            <div class="ach-progress-wrap">
+              <div class="ach-progress-track">
+                <div class="ach-progress-fill" style="width:${pct}%"></div>
+              </div>
+              <div style="font-size:0.6rem;color:var(--muted);margin-top:3px;font-family:'Inter',sans-serif;">${prog.cur} / ${prog.max}</div>
+            </div>
+          ` : ''}
+          <div class="ach-status ${unlocked ? (ach.rare ? 'rare-done' : 'done') : 'locked'}">
+            ${unlocked ? (ach.rare ? '★ Rare Unlocked' : '✓ Unlocked') : (prog.max === 1 ? 'Locked' : pct + '% complete')}
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+
+      container.appendChild(grid);
+    });
+
+    // Animate progress fills
+    setTimeout(() => {
+      document.querySelectorAll('.ach-progress-fill').forEach(el => {
+        const w = el.style.width;
+        el.style.width = '0%';
+        setTimeout(() => { el.style.width = w; }, 50);
+      });
+    }, 50);
+  }
+
+  function filterCat(cat, el) {
+    currentCat = cat;
+    document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    renderAchievements(cat);
+  }
+
+  // Initial render
+  renderAchievements('all');
+
+  // Mark conditioning as visited if coming from there
+  // (set this flag when conditioning page is opened — handled via localStorage)
+</script>
+</body>
+</html>
