@@ -291,7 +291,21 @@
   function resetTimer(id, seconds) { if(timers[id]) clearInterval(timers[id]); document.getElementById(`${id}Timer`).textContent=formatTime(seconds); }
   function changeRep(id, delta) { repCounts[id]=Math.max(0,repCounts[id]+delta); document.getElementById(`${id}Count`).textContent=repCounts[id]; }
   function completeDrill(id) { const s=document.getElementById(`${id}Status`); const c=document.getElementById(`${id}-card`); if(s){s.textContent='✓';s.classList.add('done');} if(c) c.classList.add('completed'); }
-  function completeSession() { const count=parseInt(sessionStorage.getItem('omniWorkouts')||'0')+1; sessionStorage.setItem('omniWorkouts',count); alert('🤼 Session A Complete! Level changes and penetration steps — the foundation of every takedown. Keep drilling!'); window.location.href='dashboard.html'; }
+  function completeSession() { const count=parseInt(sessionStorage.getItem('omniWorkouts')||'0')+1; sessionStorage.setItem('omniWorkouts',count)
+    // Update streak and last workout date
+    const today = new Date().toISOString().split('T')[0];
+    const lastDate = localStorage.getItem('omniLastWorkoutDate') || '';
+    let streak = parseInt(localStorage.getItem('omniStreak') || '0');
+    if (lastDate !== today) {
+      const last = lastDate ? new Date(lastDate) : null;
+      const now = new Date(today);
+      const diffDays = last ? Math.round((now - last) / (1000 * 60 * 60 * 24)) : 999;
+      streak = diffDays === 1 ? streak + 1 : 1;
+      localStorage.setItem('omniStreak', streak.toString());
+      localStorage.setItem('omniLastWorkoutDate', today);
+    }
+    localStorage.setItem('omniWorkouts', count.toString());
+; alert('🤼 Session A Complete! Level changes and penetration steps — the foundation of every takedown. Keep drilling!'); window.location.href='dashboard.html'; }
 </script>
 </body>
 </html>

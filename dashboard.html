@@ -765,7 +765,33 @@
   const explosive = Math.min(Math.round(((totalWorkouts * 0.6) + (totalPRs * 2)) / 40 * 100), 100);
   const grapplingArts = arts.filter(a => ['BJJ','Wrestling','Judo','MMA'].includes(a)).length;
   const mobility = Math.min(10 + (grapplingArts * 15) + Math.round(totalWorkouts * 0.8), 100);
-  const savedStreak = parseInt(localStorage.getItem('omniStreak') || '1');
+  // ── STREAK CALCULATION ──
+  // Run this on every dashboard load to keep streak accurate
+  function calcStreak() {
+    const today = new Date().toISOString().split('T')[0];
+    const lastDate = localStorage.getItem('omniLastWorkoutDate') || '';
+    let streak = parseInt(localStorage.getItem('omniStreak') || '0');
+
+    if (!lastDate) return streak; // no workouts yet
+
+    const last = new Date(lastDate);
+    const now = new Date(today);
+    const diffDays = Math.round((now - last) / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) {
+      // Already trained today — streak stays
+      return streak;
+    } else if (diffDays === 1) {
+      // Trained yesterday — streak still alive
+      return streak;
+    } else {
+      // Missed a day — reset streak
+      localStorage.setItem('omniStreak', '0');
+      return 0;
+    }
+  }
+
+  const savedStreak = calcStreak();
   const discipline = Math.min(Math.round((savedStreak / 30) * 100), 100);
   const today = new Date().toISOString().split('T')[0];
   let nutritionDays = 0;

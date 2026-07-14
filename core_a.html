@@ -399,6 +399,29 @@
   function completeSession() {
     const count = parseInt(sessionStorage.getItem('omniWorkouts')||'0') + 1;
     sessionStorage.setItem('omniWorkouts', count);
+    // Update streak and last workout date
+    const today = new Date().toISOString().split('T')[0];
+    const lastDate = localStorage.getItem('omniLastWorkoutDate') || '';
+    let streak = parseInt(localStorage.getItem('omniStreak') || '0');
+    if (lastDate === today) {
+      // Already trained today — don't double count
+    } else {
+      const last = lastDate ? new Date(lastDate) : null;
+      const now = new Date(today);
+      const diffDays = last ? Math.round((now - last) / (1000 * 60 * 60 * 24)) : 999;
+      if (diffDays === 1) {
+        streak += 1;
+      } else if (diffDays > 1) {
+        streak = 1; // reset but count today
+      } else {
+        streak = Math.max(streak, 1);
+      }
+      localStorage.setItem('omniStreak', streak.toString());
+      localStorage.setItem('omniLastWorkoutDate', today);
+    }
+    // Also sync workout count to localStorage
+    localStorage.setItem('omniWorkouts', count.toString());
+
     alert('💪 Core Session A Complete! Your stability is your foundation. Come back tomorrow for Session B!');
     window.location.href = 'dashboard.html';
   }
