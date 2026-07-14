@@ -702,7 +702,7 @@
   const primaryArt = arts[0] || 'Boxing';
   const artColor = ART_COLORS[primaryArt] || ART_COLORS['Boxing'];
 
-  // Apply art color to hero card
+  // Apply art color to hero card (base — rank glow applied after rankIndex is calculated below)
   const hero = document.getElementById('dashHero');
   hero.style.background = `linear-gradient(135deg, rgba(${artColor.rgb},0.1) 0%, rgba(${artColor.rgb},0.03) 60%, transparent 100%)`;
   hero.style.border = `1px solid rgba(${artColor.rgb},0.22)`;
@@ -738,6 +738,16 @@
   const isMaxRank = rankIndex === rankList.length - 1;
   const nextRank = isMaxRank ? null : rankList[rankIndex + 1];
   document.getElementById('heroRankName').textContent = currentRank;
+
+  // ── RANK-SCALED GLOW — higher rank = more intense ──
+  const glowIntensity =  [0.08, 0.13, 0.18, 0.25, 0.35][rankIndex] || 0.08;
+  const borderIntensity = [0.18, 0.24, 0.30, 0.38, 0.50][rankIndex] || 0.18;
+  const outerGlow =       [0.08, 0.12, 0.18, 0.26, 0.38][rankIndex] || 0.08;
+  const glowSize =        [20,   28,   38,   50,   65  ][rankIndex] || 20;
+  hero.style.background = `linear-gradient(135deg, rgba(${artColor.rgb},${glowIntensity}) 0%, rgba(${artColor.rgb},0.03) 60%, transparent 100%)`;
+  hero.style.border = `1px solid rgba(${artColor.rgb},${borderIntensity})`;
+  hero.style.boxShadow = `0 0 ${glowSize}px rgba(${artColor.rgb},${outerGlow}), 0 0 ${glowSize * 2}px rgba(${artColor.rgb},${outerGlow * 0.3}) inset`;
+  document.getElementById('heroGlow').style.opacity = glowIntensity.toString();
 
   // ── XP BAR ──
   const XP_PER_RANK = 5;
