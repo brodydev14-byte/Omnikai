@@ -467,22 +467,40 @@
 
   <div class="content">
 
-    <!-- WELCOME + RANK -->
-    <div class="welcome" style="margin-bottom:16px;">
-      <div class="welcome-sub">Good to see you back</div>
-      <div class="welcome-name">WELCOME, <span id="userName">WARRIOR</span></div>
-      <div id="rankBadge" class="rank-badge" style="margin-top:10px;cursor:pointer;" onclick="window.location.href='ranks.html'">
-        <span class="rank-icon">🥊</span>
-        <span class="rank-label">Current Rank</span>
-        <span class="rank-name" id="rankName">Newcomer</span>
+    <!-- HERO SECTION -->
+    <div id="dashHero" style="border-radius:16px;padding:24px 20px;margin-bottom:20px;position:relative;overflow:hidden;animation:fadeUp 0.5s ease both;">
+      <!-- art color glow -->
+      <div id="heroGlow" style="position:absolute;top:-40px;right:-40px;width:180px;height:180px;border-radius:50%;opacity:0.12;pointer-events:none;"></div>
+
+      <!-- greeting row -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="font-size:0.65rem;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--muted);" id="heroGreeting">Good to see you back</div>
+        <div id="artChip" style="display:flex;align-items:center;gap:6px;border-radius:999px;padding:3px 12px;font-size:0.65rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;"></div>
       </div>
+
+      <!-- name -->
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:0.06em;line-height:1;color:var(--muted);margin-bottom:2px;">FIGHTER</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:2.8rem;letter-spacing:0.06em;line-height:1;margin-bottom:14px;" id="heroName">WARRIOR</div>
+
+      <!-- big rank display -->
+      <div style="margin-bottom:14px;cursor:pointer;" onclick="window.location.href='ranks.html'">
+        <div style="font-size:0.6rem;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:4px;opacity:0.6;" id="heroRankLabel">Current Rank</div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="font-size:1.8rem;" id="heroArtIcon">🥊</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:0.08em;line-height:1;" id="heroRankName">Newcomer</div>
+          <div style="font-size:0.8rem;margin-left:auto;opacity:0.5;">→</div>
+        </div>
+      </div>
+
+      <!-- motivational line -->
+      <div style="font-family:'Inter',sans-serif;font-size:0.8rem;line-height:1.5;opacity:0.7;" id="heroMotivation">Complete your first workout to start your journey.</div>
     </div>
 
     <!-- XP BAR -->
     <div class="xp-wrap">
       <div class="xp-header">
-        <div class="xp-label">⚡ XP Progress</div>
-        <div class="xp-count" id="xpCount">0 / 100 XP</div>
+        <div class="xp-label">⚡ XP to next rank</div>
+        <div class="xp-count" id="xpCount">0 / 5 XP</div>
       </div>
       <div class="xp-track">
         <div class="xp-fill" id="xpFill" style="width:0%"></div>
@@ -491,7 +509,7 @@
 
     <!-- WARRIOR STAT SHEET -->
     <div class="stat-sheet">
-      <div class="stat-sheet-title">⚔️ Warrior Stats</div>
+      <div class="stat-sheet-title" id="statSheetTitle">⚔️ Warrior Stats</div>
       <div class="stat-rows">
         <div class="stat-row-item">
           <div class="stat-row-label">Strength</div>
@@ -661,8 +679,44 @@
   const weightLbs = unit === 'metric' ? weight * 2.205 : weight;
 
   // Set name
-  document.getElementById('userName').textContent = name.toUpperCase();
+  document.getElementById('heroName').textContent = name.toUpperCase();
   document.getElementById('avatarInitial').textContent = name.charAt(0).toUpperCase();
+
+  // ── ART COLOR MAP ──
+  const ART_COLORS = {
+    'Boxing':    { hex:'#00c8ff', rgb:'0,200,255',   label:'Boxer' },
+    'Muay Thai': { hex:'#f59e0b', rgb:'245,158,11',  label:'Nak Muay' },
+    'BJJ':       { hex:'#059669', rgb:'5,150,105',   label:'Grappler' },
+    'Wrestling': { hex:'#dc2626', rgb:'220,38,38',   label:'Wrestler' },
+    'MMA':       { hex:'#8b5cf6', rgb:'139,92,246',  label:'Fighter' },
+    'Judo':      { hex:'#d97706', rgb:'217,119,6',   label:'Judoka' },
+    'Karate':    { hex:'#ef4444', rgb:'239,68,68',   label:'Karateka' },
+    'Taekwondo': { hex:'#7c3aed', rgb:'124,58,237',  label:'Taekwondoin' },
+    'Kung Fu':   { hex:'#10b981', rgb:'16,185,129',  label:'Kung Fu Artist' },
+    'Krav Maga': { hex:'#0d9488', rgb:'13,148,136',  label:'Operator' },
+  };
+  const ART_ICONS = {
+    'Boxing':'🥊','Muay Thai':'🦵','BJJ':'🥋','Wrestling':'🤼','MMA':'⚡',
+    'Judo':'👘','Karate':'🦶','Taekwondo':'🦵','Kung Fu':'🐉','Krav Maga':'🛡️',
+  };
+  const primaryArt = arts[0] || 'Boxing';
+  const artColor = ART_COLORS[primaryArt] || ART_COLORS['Boxing'];
+
+  // Apply art color to hero card
+  const hero = document.getElementById('dashHero');
+  hero.style.background = `linear-gradient(135deg, rgba(${artColor.rgb},0.1) 0%, rgba(${artColor.rgb},0.03) 60%, transparent 100%)`;
+  hero.style.border = `1px solid rgba(${artColor.rgb},0.22)`;
+  document.getElementById('heroGlow').style.background = `radial-gradient(circle, rgba(${artColor.rgb},1) 0%, transparent 70%)`;
+  document.getElementById('heroGreeting').style.color = artColor.hex;
+  document.getElementById('artChip').textContent = (ART_ICONS[primaryArt] || '🥋') + ' ' + primaryArt;
+  document.getElementById('artChip').style.cssText += `background:rgba(${artColor.rgb},0.1);border:1px solid rgba(${artColor.rgb},0.25);color:${artColor.hex};`;
+  document.getElementById('heroArtIcon').textContent = ART_ICONS[primaryArt] || '🥋';
+  document.getElementById('heroRankLabel').textContent = artColor.label + ' Rank';
+  document.getElementById('heroRankName').style.color = artColor.hex;
+
+  // XP bar color matches art
+  document.getElementById('xpFill').style.background = `linear-gradient(90deg, ${artColor.hex}, ${artColor.hex}99)`;
+  document.getElementById('xpCount').style.color = artColor.hex;
 
   // ── RANK SYSTEM ──
   const RANKS = {
@@ -677,56 +731,43 @@
     'Kung Fu':   ['Newcomer','Student','Apprentice','Disciple','Master'],
     'Krav Maga': ['Newcomer','Civilian','Practitioner','Operator','Expert'],
   };
-  const RANK_ICONS = {
-    'Boxing':'🥊','Muay Thai':'🦵','BJJ':'🥋','Wrestling':'🤼','MMA':'⚡',
-    'Judo':'👘','Karate':'🦶','Taekwondo':'🦵','Kung Fu':'🐉','Krav Maga':'🛡️',
-  };
   const totalWorkouts = parseInt(sessionStorage.getItem('omniWorkouts') || localStorage.getItem('omniWorkouts') || '0');
-  const primaryArt = arts[0] || 'Boxing';
   const rankList = RANKS[primaryArt] || RANKS['Boxing'];
   const rankIndex = Math.min(Math.floor(totalWorkouts / 5), rankList.length - 1);
   const currentRank = rankList[rankIndex];
-  document.getElementById('rankName').textContent = currentRank;
-  document.getElementById('rankBadge').querySelector('.rank-icon').textContent = RANK_ICONS[primaryArt] || '🥋';
+  const isMaxRank = rankIndex === rankList.length - 1;
+  const nextRank = isMaxRank ? null : rankList[rankIndex + 1];
+  document.getElementById('heroRankName').textContent = currentRank;
 
   // ── XP BAR ──
   const XP_PER_RANK = 5;
   const xpIntoRank = totalWorkouts % XP_PER_RANK;
-  const xpPct = (xpIntoRank / XP_PER_RANK) * 100;
+  const xpPct = isMaxRank ? 100 : (xpIntoRank / XP_PER_RANK) * 100;
   const xpToNext = XP_PER_RANK - xpIntoRank;
-  document.getElementById('xpFill').style.width = xpPct + '%';
-  document.getElementById('xpCount').textContent = xpIntoRank + ' / ' + XP_PER_RANK + ' XP' + (rankIndex < rankList.length - 1 ? ' → ' + rankList[Math.min(rankIndex+1, rankList.length-1)] : ' — Max Rank!');
-  // animate after paint
+  document.getElementById('xpCount').textContent = isMaxRank ? 'MAX RANK' : xpIntoRank + ' / ' + XP_PER_RANK + ' XP' + (nextRank ? ' → ' + nextRank : '');
   setTimeout(() => { document.getElementById('xpFill').style.width = xpPct + '%'; }, 100);
 
   // ── WARRIOR STATS ──
-  // Each stat is derived from real data
   const prData = JSON.parse(localStorage.getItem('omniPRs') || '{}');
   const totalPRs = Object.values(prData).filter(p => p && p.weight).length;
-
-  // Strength: driven by PR count (max 100 at 20 PRs)
   const strength = Math.min(Math.round((totalPRs / 20) * 100), 100);
-  // Endurance: driven by total workouts (max 100 at 50 workouts)
   const endurance = Math.min(Math.round((totalWorkouts / 50) * 100), 100);
-  // Explosiveness: mix of workouts + PRs
   const explosive = Math.min(Math.round(((totalWorkouts * 0.6) + (totalPRs * 2)) / 40 * 100), 100);
-  // Mobility: based on arts selected (grappling arts boost this)
   const grapplingArts = arts.filter(a => ['BJJ','Wrestling','Judo','MMA'].includes(a)).length;
   const mobility = Math.min(10 + (grapplingArts * 15) + Math.round(totalWorkouts * 0.8), 100);
-  // Discipline: streak-based (max 100 at 30-day streak)
   const savedStreak = parseInt(localStorage.getItem('omniStreak') || '1');
   const discipline = Math.min(Math.round((savedStreak / 30) * 100), 100);
-  // Nutrition: based on food logs (days logged)
   const today = new Date().toISOString().split('T')[0];
   let nutritionDays = 0;
   for (let i = 0; i < 30; i++) {
     const d = new Date(); d.setDate(d.getDate() - i);
-    const key = 'omniFood_' + d.toISOString().split('T')[0];
-    if (localStorage.getItem(key)) nutritionDays++;
+    if (localStorage.getItem('omniFood_' + d.toISOString().split('T')[0])) nutritionDays++;
   }
   const nutrition = Math.min(Math.round((nutritionDays / 30) * 100), 100);
 
-  // Render stats
+  // Stat sheet personalized title
+  document.getElementById('statSheetTitle').textContent = '⚔️ ' + name.charAt(0).toUpperCase() + name.slice(1).toLowerCase() + "'s Stats";
+
   const statDefs = [
     { id:'Strength', val:strength },
     { id:'Endurance', val:endurance },
@@ -742,28 +783,37 @@
     });
   }, 150);
 
+  // ── MOTIVATIONAL LINE ──
+  function getMotivation() {
+    if (totalWorkouts === 0) return 'Complete your first workout to start your journey.';
+    if (isMaxRank) return `You've reached ${currentRank} — the highest rank. You are the standard.`;
+    if (nextRank && xpToNext === 1) return `One more workout and you unlock ${nextRank}. Go get it.`;
+    if (nextRank && xpToNext <= 2) return `${xpToNext} workouts away from ${nextRank}. Don't stop now.`;
+    if (savedStreak >= 7) return `${savedStreak}-day streak. That kind of discipline is rare.`;
+    if (savedStreak >= 3) return `${savedStreak} days in a row — keep the chain alive.`;
+    if (totalPRs > 0) return `${totalPRs} personal record${totalPRs > 1 ? 's' : ''} logged. You're getting stronger.`;
+    if (totalWorkouts >= 10) return `${totalWorkouts} sessions in. The habit is forming.`;
+    return `${xpToNext} workouts to unlock ${nextRank}. Let's move.`;
+  }
+  document.getElementById('heroMotivation').textContent = getMotivation();
+
   // ── SNAPSHOT ROW ──
   document.getElementById('snapStreak').textContent = savedStreak;
   document.getElementById('snapWorkouts').textContent = totalWorkouts;
   document.getElementById('snapPR').textContent = totalPRs;
-
-  // Calories today from nutrition localStorage
   const todayFood = JSON.parse(localStorage.getItem('omniFood_' + today) || '[]');
   const todayCals = todayFood.reduce((sum, f) => sum + (parseFloat(f.calories) || 0), 0);
   document.getElementById('snapCals').textContent = todayCals > 0 ? Math.round(todayCals) : '—';
 
   // ── WEEKLY PROGRESS ──
-  const GOAL_DAYS = 4; // 4 workouts per week goal
+  const GOAL_DAYS = 4;
   const dayNames = ['Su','Mo','Tu','We','Th','Fr','Sa'];
   const todayDow = new Date().getDay();
-  // Check which days this week had a workout logged
   const weekDots = document.getElementById('weeklyDays');
   let weeklyDone = 0;
   for (let i = 0; i < 7; i++) {
     const d = new Date();
     d.setDate(d.getDate() - todayDow + i);
-    const key = 'omniFood_' + d.toISOString().split('T')[0];
-    // Use nutrition log as proxy for active day (or workout history if available)
     const historyRaw = localStorage.getItem('omniHistory') || '[]';
     const history = JSON.parse(historyRaw);
     const dateStr = d.toISOString().split('T')[0];
