@@ -96,7 +96,7 @@
     /* ADD FOOD MODAL */
     .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.88); z-index:200; display:none; align-items:flex-end; justify-content:center; padding:0; }
     .modal-overlay.show { display:flex; }
-    .modal-box { background:#0d1117; border:1px solid var(--border); border-radius:16px 16px 0 0; padding:24px 20px; width:100%; max-width:600px; }
+    .modal-box { background:#0d1117; border:1px solid var(--border); border-radius:16px 16px 0 0; padding:24px 20px; width:100%; max-width:600px; max-height:92vh; overflow-y:auto; }
     .modal-title { font-family:'Bebas Neue',sans-serif; font-size:1.4rem; letter-spacing:0.06em; margin-bottom:16px; }
     .input-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
     .input-group { display:flex; flex-direction:column; gap:6px; }
@@ -104,6 +104,19 @@
     .input-label { font-size:0.62rem; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:var(--muted); }
     .food-input { background:rgba(255,255,255,0.04); border:1px solid var(--border); border-radius:8px; padding:10px 12px; color:var(--white); font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:600; outline:none; width:100%; transition:border-color 0.2s; }
     .food-input:focus { border-color:var(--blue); }
+    .food-search-wrap { position:relative; margin-bottom:10px; }
+    .food-search-input { width:100%; background:rgba(255,255,255,0.05); border:1px solid var(--border); border-radius:10px; padding:11px 14px 11px 36px; color:var(--white); font-family:'Rajdhani',sans-serif; font-size:0.95rem; font-weight:600; outline:none; }
+    .food-search-input:focus { border-color:var(--blue); }
+    .food-search-icon { position:absolute; left:12px; top:50%; transform:translateY(-50%); font-size:0.9rem; pointer-events:none; }
+    .food-results { display:flex; flex-direction:column; gap:4px; margin-bottom:12px; max-height:200px; overflow-y:auto; scrollbar-width:thin; }
+    .food-result-item { display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:10px 12px; cursor:pointer; transition:all 0.15s; }
+    .food-result-item:hover { border-color:rgba(0,200,255,0.3); background:rgba(0,200,255,0.04); }
+    .fri-icon { font-size:1.1rem; flex-shrink:0; }
+    .fri-info { flex:1; min-width:0; }
+    .fri-name { font-size:0.82rem; font-weight:700; color:var(--white); }
+    .fri-macros { font-family:'Inter',sans-serif; font-size:0.67rem; color:var(--muted); margin-top:1px; }
+    .fri-cal { font-family:'Bebas Neue',sans-serif; font-size:1rem; color:var(--blue); flex-shrink:0; }
+    .search-cat-label { font-size:0.58rem; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted); margin:8px 0 4px; padding-left:2px; }
     .quick-foods { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px; }
     .quick-food { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:999px; padding:4px 12px; font-size:0.72rem; font-weight:600; color:var(--muted); cursor:pointer; transition:all 0.2s; }
     .quick-food:hover { border-color:var(--blue); color:var(--blue); }
@@ -262,19 +275,20 @@
   <div class="modal-box">
     <div class="modal-title">+ Log Food</div>
 
-    <!-- QUICK FOODS -->
-    <div style="font-size:0.62rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Quick Add</div>
-    <div class="quick-foods">
-      <div class="quick-food" onclick="quickAdd('Chicken Breast (100g)',165,31,0,4)">🍗 Chicken</div>
-      <div class="quick-food" onclick="quickAdd('White Rice (100g)',130,2,28,0)">🍚 Rice</div>
-      <div class="quick-food" onclick="quickAdd('Eggs (2 large)',140,12,0,10)">🥚 Eggs x2</div>
-      <div class="quick-food" onclick="quickAdd('Whey Protein Shake',120,25,3,2)">🥤 Protein Shake</div>
-      <div class="quick-food" onclick="quickAdd('Banana',89,1,23,0)">🍌 Banana</div>
-      <div class="quick-food" onclick="quickAdd('Oatmeal (100g)',389,17,66,7)">🥣 Oats</div>
-      <div class="quick-food" onclick="quickAdd('Ground Beef (100g)',254,17,0,20)">🥩 Ground Beef</div>
-      <div class="quick-food" onclick="quickAdd('Sweet Potato (100g)',86,2,20,0)">🍠 Sweet Potato</div>
-      <div class="quick-food" onclick="quickAdd('Broccoli (100g)',34,3,7,0)">🥦 Broccoli</div>
-      <div class="quick-food" onclick="quickAdd('Whole Milk (250ml)',149,8,12,8)">🥛 Milk</div>
+    <!-- FOOD SEARCH -->
+    <div class="food-search-wrap">
+      <div class="food-search-icon">🔍</div>
+      <input class="food-search-input" id="foodSearchInput" placeholder="Search foods — chicken, rice, pizza..." oninput="searchFoods(this.value)" autocomplete="off"/>
+    </div>
+
+    <!-- SEARCH RESULTS -->
+    <div class="food-results" id="foodResults"></div>
+
+    <!-- DIVIDER -->
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+      <div style="flex:1;height:1px;background:rgba(255,255,255,0.06);"></div>
+      <div style="font-size:0.6rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);">Or enter manually</div>
+      <div style="flex:1;height:1px;background:rgba(255,255,255,0.06);"></div>
     </div>
 
     <div class="input-grid">
@@ -521,6 +535,146 @@
   function closeFoodModal() {
     document.getElementById('foodModal').classList.remove('show');
     ['foodName','foodCals','foodProtein','foodCarbs','foodFat'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('foodSearchInput').value = '';
+    document.getElementById('foodResults').innerHTML = '';
+  }
+
+  // ── FOOD DATABASE ──
+  const FOOD_DB = [
+    // 🥩 PROTEINS
+    { icon:'🍗', name:'Chicken Breast (100g)', cal:165, p:31, c:0, f:4, cat:'Protein' },
+    { icon:'🍗', name:'Chicken Thigh (100g)', cal:209, p:26, c:0, f:11, cat:'Protein' },
+    { icon:'🥩', name:'Ground Beef 80/20 (100g)', cal:254, p:17, c:0, f:20, cat:'Protein' },
+    { icon:'🥩', name:'Sirloin Steak (100g)', cal:207, p:26, c:0, f:11, cat:'Protein' },
+    { icon:'🐟', name:'Salmon (100g)', cal:208, p:20, c:0, f:13, cat:'Protein' },
+    { icon:'🐟', name:'Tuna in Water (1 can)', cal:109, p:25, c:0, f:1, cat:'Protein' },
+    { icon:'🍳', name:'Eggs (2 large)', cal:140, p:12, c:1, f:10, cat:'Protein' },
+    { icon:'🍳', name:'Egg Whites (3 large)', cal:51, p:11, c:0, f:0, cat:'Protein' },
+    { icon:'🦐', name:'Shrimp (100g)', cal:99, p:24, c:0, f:1, cat:'Protein' },
+    { icon:'🦃', name:'Ground Turkey (100g)', cal:170, p:22, c:0, f:9, cat:'Protein' },
+    { icon:'🥛', name:'Greek Yogurt (170g)', cal:100, p:17, c:6, f:0, cat:'Protein' },
+    { icon:'🧀', name:'Cottage Cheese (100g)', cal:98, p:11, c:3, f:4, cat:'Protein' },
+    { icon:'🥤', name:'Whey Protein Shake (1 scoop)', cal:120, p:25, c:3, f:2, cat:'Protein' },
+
+    // 🍚 CARBS
+    { icon:'🍚', name:'White Rice (100g cooked)', cal:130, p:2, c:28, f:0, cat:'Carbs' },
+    { icon:'🍚', name:'Brown Rice (100g cooked)', cal:112, p:2, c:24, f:1, cat:'Carbs' },
+    { icon:'🥣', name:'Oatmeal (100g dry)', cal:389, p:17, c:66, f:7, cat:'Carbs' },
+    { icon:'🍝', name:'Pasta (100g cooked)', cal:131, p:5, c:25, f:1, cat:'Carbs' },
+    { icon:'🍞', name:'White Bread (1 slice)', cal:79, p:3, c:15, f:1, cat:'Carbs' },
+    { icon:'🍞', name:'Whole Wheat Bread (1 slice)', cal:81, p:4, c:14, f:1, cat:'Carbs' },
+    { icon:'🍠', name:'Sweet Potato (medium)', cal:103, p:2, c:24, f:0, cat:'Carbs' },
+    { icon:'🥔', name:'White Potato (medium)', cal:161, p:4, c:37, f:0, cat:'Carbs' },
+    { icon:'🌽', name:'Corn Tortilla (1 medium)', cal:52, p:1, c:11, f:1, cat:'Carbs' },
+    { icon:'🥞', name:'Pancakes (2 medium)', cal:180, p:5, c:28, f:6, cat:'Carbs' },
+
+    // 🍌 FRUITS & VEG
+    { icon:'🍌', name:'Banana (medium)', cal:89, p:1, c:23, f:0, cat:'Fruits & Veg' },
+    { icon:'🍎', name:'Apple (medium)', cal:95, p:0, c:25, f:0, cat:'Fruits & Veg' },
+    { icon:'🍊', name:'Orange (medium)', cal:62, p:1, c:15, f:0, cat:'Fruits & Veg' },
+    { icon:'🥦', name:'Broccoli (100g)', cal:34, p:3, c:7, f:0, cat:'Fruits & Veg' },
+    { icon:'🥬', name:'Spinach (100g)', cal:23, p:3, c:4, f:0, cat:'Fruits & Veg' },
+    { icon:'🍇', name:'Grapes (100g)', cal:69, p:1, c:18, f:0, cat:'Fruits & Veg' },
+
+    // 🍕 MEALS
+    { icon:'🍕', name:'Pizza Slice (cheese, 1 slice)', cal:285, p:12, c:36, f:10, cat:'Meals' },
+    { icon:'🍕', name:'Pizza Slice (pepperoni, 1 slice)', cal:313, p:14, c:34, f:13, cat:'Meals' },
+    { icon:'🍝', name:'Spaghetti & Meat Sauce (1 cup)', cal:330, p:17, c:40, f:11, cat:'Meals' },
+    { icon:'🫕', name:'Lasagna (1 piece)', cal:336, p:19, c:32, f:14, cat:'Meals' },
+    { icon:'🌯', name:'Burrito (chicken, large)', cal:570, p:33, c:68, f:17, cat:'Meals' },
+    { icon:'🥪', name:'Sandwich (turkey, 6-inch)', cal:280, p:18, c:36, f:4, cat:'Meals' },
+    { icon:'🥪', name:'Sandwich (turkey, footlong)', cal:560, p:36, c:72, f:8, cat:'Meals' },
+    { icon:'🍜', name:'Ramen (1 pack)', cal:380, p:10, c:54, f:14, cat:'Meals' },
+    { icon:'🍛', name:'Stir Fry with Rice (1 cup)', cal:280, p:14, c:38, f:7, cat:'Meals' },
+    { icon:'🧀', name:'Mac and Cheese (1 cup)', cal:310, p:11, c:48, f:8, cat:'Meals' },
+    { icon:'🥣', name:'Bowl of Cereal (1 cup + milk)', cal:220, p:7, c:42, f:4, cat:'Meals' },
+    { icon:'🍳', name:'Breakfast Burrito (egg & cheese)', cal:450, p:22, c:40, f:22, cat:'Meals' },
+    { icon:'🍱', name:'Chipotle Burrito Bowl (chicken)', cal:665, p:51, c:70, f:18, cat:'Meals' },
+
+    // 🍔 FAST FOOD
+    { icon:'🍔', name:'Big Mac', cal:563, p:26, c:44, f:33, cat:'Fast Food' },
+    { icon:'🍔', name:'Cheeseburger (McD)', cal:300, p:15, c:32, f:13, cat:'Fast Food' },
+    { icon:'🍔', name:"Wendy's Single", cal:470, p:25, c:40, f:21, cat:'Fast Food' },
+    { icon:'🍗', name:"Chick-fil-A Sandwich", cal:440, p:28, c:40, f:19, cat:'Fast Food' },
+    { icon:'🍟', name:'French Fries (medium)', cal:320, p:4, c:44, f:15, cat:'Fast Food' },
+    { icon:'🌯', name:'Chipotle Chicken Burrito', cal:855, p:51, c:99, f:24, cat:'Fast Food' },
+    { icon:'🥪', name:'Subway Meatball Footlong', cal:1000, p:48, c:130, f:36, cat:'Fast Food' },
+    { icon:'🥪', name:'Subway Turkey Footlong', cal:560, p:36, c:72, f:8, cat:'Fast Food' },
+    { icon:'🍕', name:"Domino's Pepperoni Slice", cal:320, p:14, c:35, f:14, cat:'Fast Food' },
+    { icon:'🌮', name:'Taco Bell Crunchy Taco', cal:170, p:8, c:13, f:9, cat:'Fast Food' },
+    { icon:'🌮', name:'Taco Bell Burrito Supreme', cal:400, p:17, c:52, f:14, cat:'Fast Food' },
+
+    // 🍫 SNACKS
+    { icon:'🍩', name:'Honey Bun', cal:320, p:4, c:42, f:15, cat:'Snacks' },
+    { icon:'🍫', name:'Protein Bar (average)', cal:200, p:20, c:22, f:7, cat:'Snacks' },
+    { icon:'🥜', name:'Almonds (1 oz / 23 nuts)', cal:164, p:6, c:6, f:14, cat:'Snacks' },
+    { icon:'🥜', name:'Peanut Butter (2 tbsp)', cal:188, p:8, c:7, f:16, cat:'Snacks' },
+    { icon:'🍿', name:'Popcorn (3 cups)', cal:90, p:3, c:18, f:1, cat:'Snacks' },
+    { icon:'🍪', name:'Granola Bar', cal:193, p:4, c:29, f:7, cat:'Snacks' },
+    { icon:'🥔', name:'Chips (1 oz bag)', cal:152, p:2, c:15, f:10, cat:'Snacks' },
+    { icon:'🍫', name:'Chocolate Bar (1 oz)', cal:155, p:2, c:17, f:9, cat:'Snacks' },
+    { icon:'🍦', name:'Ice Cream (1 scoop)', cal:137, p:2, c:16, f:7, cat:'Snacks' },
+    { icon:'🧇', name:'Waffle (1 large)', cal:218, p:6, c:33, f:8, cat:'Snacks' },
+
+    // 🥛 DRINKS
+    { icon:'🥛', name:'Whole Milk (1 cup)', cal:149, p:8, c:12, f:8, cat:'Drinks' },
+    { icon:'🥛', name:'Skim Milk (1 cup)', cal:83, p:8, c:12, f:0, cat:'Drinks' },
+    { icon:'🍊', name:'Orange Juice (1 cup)', cal:112, p:2, c:26, f:0, cat:'Drinks' },
+    { icon:'🥤', name:'Gatorade (20 oz)', cal:140, p:0, c:36, f:0, cat:'Drinks' },
+    { icon:'🥤', name:'Soda / Cola (12 oz can)', cal:140, p:0, c:38, f:0, cat:'Drinks' },
+    { icon:'🍺', name:'Beer (12 oz can)', cal:154, p:1, c:13, f:0, cat:'Drinks' },
+    { icon:'🧃', name:'Apple Juice (1 cup)', cal:114, p:0, c:28, f:0, cat:'Drinks' },
+
+    // 🏋️ GYM / FITNESS FOODS
+    { icon:'🥛', name:'Chocolate Milk (1 cup)', cal:208, p:8, c:32, f:5, cat:'Gym Foods' },
+    { icon:'🍌', name:'Pre-Workout Banana', cal:89, p:1, c:23, f:0, cat:'Gym Foods' },
+    { icon:'🥤', name:'Mass Gainer Shake (1 serving)', cal:650, p:50, c:85, f:8, cat:'Gym Foods' },
+    { icon:'🧃', name:'BCAA Drink (1 serving)', cal:20, p:5, c:0, f:0, cat:'Gym Foods' },
+    { icon:'🧀', name:'Cottage Cheese before bed (1 cup)', cal:206, p:25, c:8, f:9, cat:'Gym Foods' },
+  ];
+
+  // Search function
+  function searchFoods(query) {
+    const resultsEl = document.getElementById('foodResults');
+    resultsEl.innerHTML = '';
+    if (!query || query.trim().length < 1) return;
+
+    const q = query.toLowerCase().trim();
+    const matches = FOOD_DB.filter(f =>
+      f.name.toLowerCase().includes(q) || f.cat.toLowerCase().includes(q)
+    ).slice(0, 12);
+
+    if (matches.length === 0) {
+      resultsEl.innerHTML = `<div style="font-family:'Inter',sans-serif;font-size:0.78rem;color:var(--muted);padding:10px 4px;">No results — use manual entry below or try a different search.</div>`;
+      return;
+    }
+
+    matches.forEach(food => {
+      const item = document.createElement('div');
+      item.className = 'food-result-item';
+      item.innerHTML = `
+        <div class="fri-icon">${food.icon}</div>
+        <div class="fri-info">
+          <div class="fri-name">${food.name}</div>
+          <div class="fri-macros">P: ${food.p}g · C: ${food.c}g · F: ${food.f}g</div>
+        </div>
+        <div class="fri-cal">${food.cal}</div>
+      `;
+      item.onclick = () => selectFood(food);
+      resultsEl.appendChild(item);
+    });
+  }
+
+  function selectFood(food) {
+    document.getElementById('foodName').value = food.name;
+    document.getElementById('foodCals').value = food.cal;
+    document.getElementById('foodProtein').value = food.p;
+    document.getElementById('foodCarbs').value = food.c;
+    document.getElementById('foodFat').value = food.f;
+    document.getElementById('foodResults').innerHTML = '';
+    document.getElementById('foodSearchInput').value = '';
+    // Scroll down to show the filled fields
+    document.getElementById('foodName').scrollIntoView({ behavior:'smooth', block:'nearest' });
   }
 
   function quickAdd(name, cals, protein, carbs, fat) {
