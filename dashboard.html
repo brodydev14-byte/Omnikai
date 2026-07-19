@@ -441,6 +441,26 @@
     .day-dot.done { background: var(--blue); box-shadow: 0 0 6px var(--blue-glow); }
     .day-dot.today { background: rgba(0,200,255,0.3); border: 1px solid var(--blue); }
 
+    /* WEEKLY CHALLENGES */
+    .challenges-wrap { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:18px 16px; margin-bottom:24px; animation:fadeUp 0.5s ease 0.14s both; }
+    .challenges-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+    .challenges-title { font-size:0.62rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); }
+    .challenges-xp { font-family:'Bebas Neue',sans-serif; font-size:0.9rem; color:var(--gold); }
+    .challenge-item { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+    .challenge-item:last-child { margin-bottom:0; }
+    .challenge-icon { font-size:1.2rem; flex-shrink:0; }
+    .challenge-info { flex:1; }
+    .challenge-name { font-size:0.82rem; font-weight:700; color:var(--white); margin-bottom:4px; }
+    .challenge-bar-wrap { height:4px; background:rgba(255,255,255,0.06); border-radius:999px; overflow:hidden; }
+    .challenge-bar { height:100%; border-radius:999px; background:linear-gradient(90deg,var(--blue),#00a8d4); transition:width 0.8s ease; }
+    .challenge-bar.complete { background:linear-gradient(90deg,var(--gold),#ffaa00); }
+    .challenge-pct { font-family:'Bebas Neue',sans-serif; font-size:0.85rem; color:var(--muted); flex-shrink:0; width:36px; text-align:right; }
+    .challenge-pct.done { color:var(--gold); }
+    .bonus-banner { background:linear-gradient(135deg,rgba(255,215,0,0.15),rgba(255,150,0,0.08)); border:1px solid rgba(255,215,0,0.35); border-radius:10px; padding:12px 14px; text-align:center; margin-top:12px; display:none; }
+    .bonus-banner.show { display:block; animation:fadeUp 0.4s ease; }
+    .bonus-text { font-family:'Bebas Neue',sans-serif; font-size:1.1rem; letter-spacing:0.1em; color:var(--gold); }
+    .bonus-sub { font-family:'Inter',sans-serif; font-size:0.72rem; color:rgba(255,215,0,0.7); margin-top:2px; }
+
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(12px); }
       to   { opacity: 1; transform: translateY(0); }
@@ -623,6 +643,20 @@
         <div class="tip-label">Tip of the Day</div>
         <div class="tip-text" id="tipText">Loading tip...</div>
         <div class="tip-art" id="tipArt"></div>
+      </div>
+    </div>
+
+    <!-- WEEKLY CHALLENGES -->
+    <div class="section-label">⚡ Weekly Challenges</div>
+    <div class="challenges-wrap">
+      <div class="challenges-header">
+        <div class="challenges-title">Complete all 3 for bonus XP</div>
+        <div class="challenges-xp" id="challengesXP">+3 XP Bonus</div>
+      </div>
+      <div id="challengesList"></div>
+      <div class="bonus-banner" id="bonusBanner">
+        <div class="bonus-text">🏆 +3 XP BONUS EARNED!</div>
+        <div class="bonus-sub">All challenges complete — bonus XP applied to your rank</div>
       </div>
     </div>
 
@@ -863,6 +897,120 @@
   }
   const weeklyPct = Math.round((weeklyDone / GOAL_DAYS) * 100);
   document.getElementById('weeklyPct').textContent = Math.min(weeklyPct, 100) + '% — ' + weeklyDone + '/' + GOAL_DAYS + ' days';
+
+  // ── WEEKLY CHALLENGES ──
+  // Get Monday of current week as key
+  function getWeekKey() {
+    const now = new Date();
+    const day = now.getDay();
+    const diff = now.getDate() - day + (day === 0 ? -6 : 1);
+    const monday = new Date(now.setDate(diff));
+    return monday.toISOString().split('T')[0];
+  }
+
+  const weekKey = getWeekKey();
+  const history = JSON.parse(localStorage.getItem('omniHistory') || '[]');
+
+  // Count workouts this week
+  function getWorkoutsThisWeek() {
+    const now = new Date();
+    const day = now.getDay();
+    const diff = now.getDate() - day + (day === 0 ? -6 : 1);
+    const monday = new Date();
+    monday.setDate(diff);
+    monday.setHours(0,0,0,0);
+    return history.filter(h => h && h.date && new Date(h.date) >= monday).length;
+  }
+
+  // Count nutrition days this week
+  function getNutritionDaysThisWeek() {
+    let count = 0;
+    for (let i = 0; i < 7; i++) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      if (localStorage.getItem('omniFood_' + d.toISOString().split('T')[0])) count++;
+    }
+    return count;
+  }
+
+  // Check if new PR logged this week
+  function getPRsThisWeek() {
+    const prData = JSON.parse(localStorage.getItem('omniPRs') || '{}');
+    const now = new Date();
+    const day = now.getDay();
+    const diff = now.getDate() - day + (day === 0 ? -6 : 1);
+    const monday = new Date();
+    monday.setDate(diff);
+    monday.setHours(0,0,0,0);
+    return Object.values(prData).filter(p => p && p.date && new Date(p.date) >= monday).length;
+  }
+
+  // Define challenges based on user's primary art and goal
+  const CHALLENGES = [
+    {
+      icon: '💪',
+      name: 'Complete 3 workouts this week',
+      cur: Math.min(getWorkoutsThisWeek(), 3),
+      max: 3,
+    },
+    {
+      icon: '🥗',
+      name: 'Log food for 3 days this week',
+      cur: Math.min(getNutritionDaysThisWeek(), 3),
+      max: 3,
+    },
+    {
+      icon: '🏆',
+      name: 'Set a new personal record',
+      cur: Math.min(getPRsThisWeek(), 1),
+      max: 1,
+    },
+  ];
+
+  // Check if bonus already claimed this week
+  const bonusClaimed = localStorage.getItem('omniChallengeBonus_' + weekKey) === 'true';
+  const allComplete = CHALLENGES.every(c => c.cur >= c.max);
+
+  // Apply bonus XP if all complete and not yet claimed
+  if (allComplete && !bonusClaimed) {
+    const currentWorkouts = parseInt(localStorage.getItem('omniWorkouts') || '0');
+    localStorage.setItem('omniWorkouts', (currentWorkouts + 3).toString());
+    localStorage.setItem('omniChallengeBonus_' + weekKey, 'true');
+  }
+
+  // Render challenges
+  const challengesList = document.getElementById('challengesList');
+  CHALLENGES.forEach(ch => {
+    const pct = Math.round((ch.cur / ch.max) * 100);
+    const done = ch.cur >= ch.max;
+    const item = document.createElement('div');
+    item.className = 'challenge-item';
+    item.innerHTML = `
+      <div class="challenge-icon">${ch.icon}</div>
+      <div class="challenge-info">
+        <div class="challenge-name">${ch.name}</div>
+        <div class="challenge-bar-wrap">
+          <div class="challenge-bar ${done ? 'complete' : ''}" style="width:0%" data-pct="${pct}"></div>
+        </div>
+      </div>
+      <div class="challenge-pct ${done ? 'done' : ''}">${done ? '✓' : ch.cur + '/' + ch.max}</div>
+    `;
+    challengesList.appendChild(item);
+  });
+
+  // Animate bars
+  setTimeout(() => {
+    document.querySelectorAll('.challenge-bar').forEach(bar => {
+      bar.style.width = bar.dataset.pct + '%';
+    });
+  }, 200);
+
+  // Show bonus banner if all complete
+  if (allComplete) {
+    document.getElementById('bonusBanner').classList.add('show');
+    document.getElementById('challengesXP').textContent = '✓ Bonus Claimed!';
+    document.getElementById('challengesXP').style.color = 'var(--green)';
+  }
 
   // ── RECENT PR ──
   const prEntries = Object.entries(prData).filter(([k, v]) => v && v.weight && v.date);
