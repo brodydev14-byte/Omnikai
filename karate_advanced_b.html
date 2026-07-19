@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Omnikai – Karate Advanced: Power Focus</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root { --bg:#080b10; --blue:#00c8ff; --white:#f0f4f8; --muted:#5a6a7a; --border:rgba(0,200,255,0.15); --card:rgba(255,255,255,0.03); --green:#00ff88; --gold:#ffd700; --accent:#ef4444; --nav-h:72px; }
+    html,body { min-height:100%; background:var(--bg); color:var(--white); font-family:'Rajdhani',sans-serif; overflow-x:hidden; }
+    .bg-layer { position:fixed; inset:0; z-index:0; background:radial-gradient(ellipse 70% 40% at 50% 10%, rgba(239,68,68,0.06) 0%, transparent 70%), var(--bg); }
+    .grid-lines { position:fixed; inset:0; z-index:0; background-image:linear-gradient(rgba(0,200,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,200,255,0.025) 1px,transparent 1px); background-size:48px 48px; }
+    .scroll-wrap { position:relative; z-index:1; min-height:100vh; padding:24px 20px calc(var(--nav-h) + 24px); max-width:600px; margin:0 auto; }
+    .workout-header { display:flex; align-items:center; gap:14px; margin-bottom:28px; }
+    .back-btn { width:38px; height:38px; background:var(--card); border:1px solid var(--border); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:1rem; text-decoration:none; color:var(--white); }
+    .header-eyebrow { font-size:0.65rem; font-weight:700; letter-spacing:0.22em; text-transform:uppercase; color:var(--accent); margin-bottom:2px; }
+    .header-title { font-family:'Bebas Neue',sans-serif; font-size:1.8rem; letter-spacing:0.06em; line-height:1; }
+    .level-badge { background:rgba(255,215,0,0.1); border:1px solid rgba(255,215,0,0.3); border-radius:999px; padding:3px 12px; font-size:0.68rem; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:var(--gold); white-space:nowrap; }
+    .elite-banner { background:linear-gradient(135deg,rgba(255,215,0,0.08),rgba(255,150,0,0.04)); border:1px solid rgba(255,215,0,0.25); border-radius:12px; padding:14px 16px; margin-bottom:24px; display:flex; align-items:center; gap:12px; }
+    .elite-banner-icon { font-size:1.6rem; flex-shrink:0; }
+    .elite-banner-text { font-family:'Inter',sans-serif; font-size:0.82rem; color:var(--white); line-height:1.5; }
+    .elite-banner-text strong { color:var(--gold); }
+    .section { margin-bottom:20px; }
+    .section-header { font-size:0.65rem; font-weight:700; letter-spacing:0.22em; text-transform:uppercase; color:var(--muted); margin-bottom:10px; }
+    .drill-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:24px 20px; margin-bottom:12px; }
+    .drill-card.completed { border-color:var(--green); background:rgba(0,255,136,0.03); }
+    .drill-name { font-family:'Bebas Neue',sans-serif; font-size:1.3rem; letter-spacing:0.06em; line-height:1; margin-bottom:6px; }
+    .drill-meta { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+    .meta-chip { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); border-radius:999px; padding:4px 12px; font-size:0.7rem; font-weight:600; color:var(--muted); }
+    .meta-chip.highlight { border-color:rgba(239,68,68,0.25); color:var(--accent); background:rgba(239,68,68,0.06); }
+    .drill-status { width:32px; height:32px; border-radius:50%; border:2px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:0.9rem; flex-shrink:0; cursor:pointer; }
+    .drill-status.done { background:var(--green); border-color:var(--green); color:#080b10; font-weight:900; }
+    .tips-wrap { display:flex; flex-direction:column; gap:12px; margin-bottom:16px; }
+    .tip-row { display:flex; align-items:flex-start; gap:10px; font-family:'Inter',sans-serif; font-size:0.82rem; color:var(--white); line-height:1.5; }
+    .tip-dot { width:6px; height:6px; border-radius:50%; background:var(--accent); flex-shrink:0; margin-top:5px; }
+    .timer-wrap { background:rgba(0,0,0,0.3); border-radius:10px; padding:16px; margin-top:4px; text-align:center; }
+    .timer-display { font-family:'Bebas Neue',sans-serif; font-size:3rem; color:var(--accent); line-height:1; }
+    .timer-label { font-size:0.68rem; font-weight:600; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); margin-bottom:8px; }
+    .timer-set-info { font-size:0.78rem; font-weight:700; color:var(--muted); margin-bottom:10px; }
+    .timer-set-info span { color:var(--white); }
+    .timer-btns { display:flex; gap:8px; justify-content:center; }
+    .timer-btn { padding:10px 24px; border-radius:7px; border:none; font-family:'Bebas Neue',sans-serif; font-size:0.95rem; letter-spacing:0.15em; cursor:pointer; }
+    .timer-btn.start { background:var(--accent); color:#fff; }
+    .timer-btn.reset { background:rgba(255,255,255,0.06); border:1px solid var(--border); color:var(--muted); }
+    .rep-counter { background:rgba(0,0,0,0.3); border-radius:10px; padding:16px; margin-top:4px; text-align:center; }
+    .rep-display { font-family:'Bebas Neue',sans-serif; font-size:3rem; color:var(--accent); line-height:1; margin-bottom:10px; }
+    .rep-btns { display:flex; gap:8px; justify-content:center; }
+    .rep-btn { padding:12px 28px; border-radius:7px; border:none; font-family:'Bebas Neue',sans-serif; font-size:1.4rem; cursor:pointer; }
+    .rep-btn.minus { background:rgba(255,255,255,0.06); border:1px solid var(--border); color:var(--muted); }
+    .rep-btn.plus { background:var(--accent); color:#fff; }
+    .rep-label { font-size:0.68rem; font-weight:600; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); margin-bottom:8px; }
+    .cooldown-list { display:flex; flex-direction:column; gap:10px; }
+    .cooldown-item { display:flex; align-items:center; gap:12px; background:var(--card); border:1px solid var(--border); border-radius:8px; padding:12px 14px; font-size:0.88rem; font-weight:600; }
+    .cooldown-icon { font-size:1.2rem; flex-shrink:0; }
+    .complete-btn { width:100%; background:linear-gradient(135deg,var(--gold),#ffaa00); border:none; border-radius:10px; padding:16px; color:#080b10; font-family:'Bebas Neue',sans-serif; font-size:1.1rem; letter-spacing:0.18em; cursor:pointer; transition:all 0.2s; margin-top:8px; font-weight:900; }
+    .complete-btn:hover { opacity:0.9; transform:translateY(-1px); }
+    .bottom-nav { position:fixed; bottom:0; left:0; right:0; height:var(--nav-h); background:rgba(8,11,16,0.95); border-top:1px solid var(--border); backdrop-filter:blur(16px); display:flex; align-items:center; justify-content:space-around; z-index:100; padding:0 8px; }
+    .nav-item { display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; padding:8px 16px; border-radius:10px; flex:1; }
+    .nav-icon { font-size:1.3rem; }
+    .nav-label { font-size:0.58rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); }
+    .nav-item.active .nav-label { color:var(--blue); }
+  </style>
+</head>
+<body>
+<div class="bg-layer"></div>
+<div class="grid-lines"></div>
+<div class="scroll-wrap">
+  <div class="workout-header">
+    <a class="back-btn" href="library.html">←</a>
+    <div>
+      <div class="header-eyebrow">🦶 Karate · Advanced · Power Focus</div>
+      <div class="header-title">Advanced Session B</div>
+    </div>
+    <div class="level-badge">🏆 Advanced</div>
+  </div>
+
+  <div class="elite-banner">
+    <div class="elite-banner-icon">🏆</div>
+    <div class="elite-banner-text"><strong>Elite Level — Warrior Exclusive.</strong> Advanced sessions are for athletes who have fully internalized beginner and intermediate foundations. Techniques are referenced without explanation — execution and volume are the focus.</div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">🔥 Warm Up</div>
+    <div class="drill-card" id="warmup-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div class="drill-name">Advanced Warm Up</div>
+        <div class="drill-status" id="warmupStatus" onclick="completeDrill('warmup')">○</div>
+      </div>
+      <div class="drill-meta"><div class="meta-chip highlight">5 Minutes</div><div class="meta-chip">Includes technique activation</div></div>
+      <div class="timer-wrap">
+        <div class="timer-label">Warm Up</div>
+        <div class="timer-display" id="warmupTimer">5:00</div>
+        <div class="timer-btns">
+          <button class="timer-btn start" onclick="startTimer('warmup',300)">Start</button>
+          <button class="timer-btn reset" onclick="resetTimer('warmup',300)">Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section"><div class="section-header">Elite Power Training</div><div class="drill-card" id="power-card"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;"><div class="drill-name">Maximum Output Power Session</div><div class="drill-status" id="powerStatus" onclick="completeDrill('power')">○</div></div><div class="drill-meta"><div class="meta-chip highlight">5 Sets</div><div class="meta-chip highlight">10 sec max / 20 sec rest</div></div><div class="tips-wrap"><div class="tip-row"><div class="tip-dot"></div><strong>Absolute maximum output:</strong> 10 seconds of everything you have — every technique at competition power and aggression</div><div class="tip-row"><div class="tip-dot"></div><strong>Full rest between sets:</strong> Power training requires full recovery — 20 seconds is not enough rest, but that is the point</div><div class="tip-row"><div class="tip-dot"></div><strong>This builds competition power:</strong> The ability to generate maximum force under fatigue is what wins fights</div></div><div class="timer-wrap"><div class="timer-label">Burst Timer</div><div class="timer-display" id="powerTimer">0:10</div><div class="timer-btns"><button class="timer-btn start" onclick="startTimer('power',10)">Start</button><button class="timer-btn reset" onclick="resetTimer('power',10)">Reset</button></div></div></div></div>
+  <div class="section"><div class="section-header">Explosive Combination Power</div><div class="drill-card" id="combo-card"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;"><div class="drill-name">Full Power Combination Rounds</div><div class="drill-status" id="comboStatus" onclick="completeDrill('combo')">○</div></div><div class="drill-meta"><div class="meta-chip highlight">4 Sets</div><div class="meta-chip highlight">2 min each</div><div class="meta-chip">60 sec rest</div></div><div class="tips-wrap"><div class="tip-row"><div class="tip-dot"></div>2 minutes of combinations thrown with fight-night power — not cardio pace, not technique pace, power pace — every technique designed to finish</div></div><div class="timer-wrap"><div class="timer-label">Timer</div><div class="timer-display" id="comboTimer">2:00</div><div class="timer-btns"><button class="timer-btn start" onclick="startTimer('combo',120)">Start</button><button class="timer-btn reset" onclick="resetTimer('combo',120)">Reset</button></div></div></div></div>
+
+  <div class="section">
+    <div class="section-header">🧘 Cool Down</div>
+    <div class="drill-card" id="cooldown-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div class="drill-name">Advanced Recovery</div>
+        <div class="drill-status" id="cooldownStatus" onclick="completeDrill('cooldown')">○</div>
+      </div>
+      <div class="cooldown-list">
+        <div class="cooldown-item"><div class="cooldown-icon">🤸</div>Full body stretch — 5 minutes minimum at advanced volume</div>
+        <div class="cooldown-item"><div class="cooldown-icon">🧘</div>Spinal decompression — child's pose 90 seconds</div>
+        <div class="cooldown-item"><div class="cooldown-icon">💭</div>Session review — identify one weakness to address next time</div>
+        <div class="cooldown-item"><div class="cooldown-icon">📝</div>Log your performance — advanced athletes track everything</div>
+      </div>
+    </div>
+  </div>
+
+  <button class="complete-btn" onclick="completeSession()">🏆 Karate Advanced Session B Complete!</button>
+</div>
+
+<div class="bottom-nav">
+  <div class="nav-item" onclick="window.location.href='dashboard.html'"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></div>
+  <div class="nav-item active"><div class="nav-icon">📚</div><div class="nav-label">Library</div></div>
+  <div class="nav-item" onclick="window.location.href='nutrition.html'"><div class="nav-icon">🥗</div><div class="nav-label">Nutrition</div></div>
+  <div class="nav-item" onclick="window.location.href='progress.html'"><div class="nav-icon">📈</div><div class="nav-label">Progress</div></div>
+  <div class="nav-item" onclick="window.location.href='profile.html'"><div class="nav-icon">👤</div><div class="nav-label">Profile</div></div>
+</div>
+
+<script>
+  const plan = sessionStorage.getItem('omniPlan') || 'wanderer';
+  if (plan !== 'warrior') {
+    document.querySelector('.scroll-wrap').innerHTML = `
+      <div style="padding:40px 20px;text-align:center;">
+        <div style="font-size:3rem;margin-bottom:16px;">🏆</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:0.06em;color:#ffd700;margin-bottom:8px;">Elite — Warrior Exclusive</div>
+        <div style="font-family:'Inter',sans-serif;font-size:0.85rem;color:var(--muted);margin-bottom:24px;line-height:1.6;">Advanced sessions are available to Warrior members only. This is the highest level content in Omnikai.</div>
+        <button onclick="window.location.href='plans.html'" style="background:#ffd700;border:none;border-radius:10px;padding:14px 28px;color:#080b10;font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:0.15em;cursor:pointer;">Upgrade to Warrior →</button>
+        <br/><br/>
+        <a href="library.html" style="color:var(--muted);font-size:0.8rem;">← Back to Library</a>
+      </div>
+    `;
+  }
+  const timers = {}; const repCounts = {};
+  function formatTime(s) { const m=Math.floor(s/60); const sec=s%60; return m+':'+sec.toString().padStart(2,'0'); }
+  function startTimer(id, seconds) { if(timers[id]) clearInterval(timers[id]); let r=seconds; timers[id]=setInterval(()=>{ r--; const el=document.getElementById(id+'Timer'); if(el) el.textContent=formatTime(r); if(r<=0){clearInterval(timers[id]);if(el) el.textContent='DONE!';}},1000); }
+  function resetTimer(id, seconds) { if(timers[id]) clearInterval(timers[id]); const el=document.getElementById(id+'Timer'); if(el) el.textContent=formatTime(seconds); }
+  function changeRep(id, delta) { repCounts[id]=(repCounts[id]||0)+delta; if(repCounts[id]<0)repCounts[id]=0; const el=document.getElementById(id+'Count'); if(el) el.textContent=repCounts[id]; }
+  function completeDrill(id) { const s=document.getElementById(id+'Status'); const c=document.getElementById(id+'-card'); if(s){s.textContent='✓';s.classList.add('done');} if(c) c.classList.add('completed'); }
+  function completeSession() {
+    const count=parseInt(sessionStorage.getItem('omniWorkouts')||'0')+1;
+    sessionStorage.setItem('omniWorkouts',count);
+    const today=new Date().toISOString().split('T')[0];
+    const lastDate=localStorage.getItem('omniLastWorkoutDate')||'';
+    let streak=parseInt(localStorage.getItem('omniStreak')||'0');
+    if(lastDate!==today){
+      const last=lastDate?new Date(lastDate):null;
+      const now=new Date(today);
+      const diff=last?Math.round((now-last)/(1000*60*60*24)):999;
+      streak=diff===1?streak+1:1;
+      localStorage.setItem('omniStreak',streak.toString());
+      localStorage.setItem('omniLastWorkoutDate',today);
+    }
+    localStorage.setItem('omniWorkouts',count.toString());
+    alert('🏆 Karate Advanced Session B Complete! Elite level work. You are building something rare.');
+    window.location.href='dashboard.html';
+  }
+</script>
+</body>
+</html>
