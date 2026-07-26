@@ -34,6 +34,9 @@
 
     /* SECTIONS */
     .section { margin-bottom:20px; }
+    .theme-btn { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:12px 8px; cursor:pointer; transition:all 0.2s; color:var(--muted); }
+    .theme-btn:hover { border-color:rgba(255,255,255,0.2); }
+    .theme-btn.active { border-color:var(--blue); background:rgba(0,200,255,0.06); color:var(--white); }
     .section-title { font-size:0.65rem; font-weight:700; letter-spacing:0.22em; text-transform:uppercase; color:var(--muted); margin-bottom:10px; }
     .info-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 16px; }
     .info-row { display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.04); }
@@ -154,6 +157,37 @@
     <div style="color:var(--gold);font-size:1.1rem;">→</div>
   </div>
 
+  <!-- THEME PICKER -->
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;">
+    <div style="font-size:0.62rem;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">🎨 App Theme</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;" id="themeGrid">
+      <div class="theme-btn" data-theme="blue" onclick="setTheme('blue')">
+        <div style="width:28px;height:28px;border-radius:50%;background:#00c8ff;margin:0 auto 6px;box-shadow:0 0 10px rgba(0,200,255,0.5);"></div>
+        <div style="font-size:0.68rem;font-weight:700;text-align:center;">Electric Blue</div>
+      </div>
+      <div class="theme-btn" data-theme="purple" onclick="setTheme('purple')">
+        <div style="width:28px;height:28px;border-radius:50%;background:#8b5cf6;margin:0 auto 6px;box-shadow:0 0 10px rgba(139,92,246,0.5);"></div>
+        <div style="font-size:0.68rem;font-weight:700;text-align:center;">Cyber Purple</div>
+      </div>
+      <div class="theme-btn" data-theme="green" onclick="setTheme('green')">
+        <div style="width:28px;height:28px;border-radius:50%;background:#10b981;margin:0 auto 6px;box-shadow:0 0 10px rgba(16,185,129,0.5);"></div>
+        <div style="font-size:0.68rem;font-weight:700;text-align:center;">Dragon Green</div>
+      </div>
+      <div class="theme-btn" data-theme="red" onclick="setTheme('red')">
+        <div style="width:28px;height:28px;border-radius:50%;background:#ef4444;margin:0 auto 6px;box-shadow:0 0 10px rgba(239,68,68,0.5);"></div>
+        <div style="font-size:0.68rem;font-weight:700;text-align:center;">Blood Red</div>
+      </div>
+      <div class="theme-btn" data-theme="midnight" onclick="setTheme('midnight')">
+        <div style="width:28px;height:28px;border-radius:50%;background:#ffffff;margin:0 auto 6px;box-shadow:0 0 10px rgba(255,255,255,0.3);"></div>
+        <div style="font-size:0.68rem;font-weight:700;text-align:center;">Midnight</div>
+      </div>
+      <div class="theme-btn" data-theme="gold" onclick="setTheme('gold')">
+        <div style="width:28px;height:28px;border-radius:50%;background:#ffd700;margin:0 auto 6px;box-shadow:0 0 10px rgba(255,215,0,0.5);"></div>
+        <div style="font-size:0.68rem;font-weight:700;text-align:center;">Gold</div>
+      </div>
+    </div>
+  </div>
+
   <div class="section">
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
       <button class="switch-btn" onclick="showConfirm('startover')">↺ Start Over</button>
@@ -244,6 +278,18 @@
       tag.textContent = m;
       musclesWrap.appendChild(tag);
     });
+  }
+
+  // Theme picker
+  const currentTheme = localStorage.getItem('omniTheme') || 'blue';
+  document.querySelectorAll('.theme-btn').forEach(btn => {
+    if (btn.dataset.theme === currentTheme) btn.classList.add('active');
+  });
+
+  function setTheme(theme) {
+    localStorage.setItem('omniTheme', theme);
+    // Reload to apply theme via theme.js
+    window.location.reload();
   }
 
   // Achievement preview
