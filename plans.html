@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script>
+(function(){
+  var t={'default':'#080b10','purple':'#0a0810','green':'#080f0a','red':'#0f0808','navy':'#07080f','black':'#000000'};
+  var bg=t[localStorage.getItem('omniTheme')]||'#080b10';
+  document.documentElement.style.setProperty('--bg',bg);
+  document.write('<style>html,body,.bg-layer{background:'+bg+' !important;background-color:'+bg+' !important;}</style>');
+})();
+</script>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Omnikai – Choose Your Path</title>
@@ -9,7 +17,7 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #080b10;
+      --bg:#080b10;
       --blue: #00c8ff;
       --blue-glow: rgba(0, 200, 255, 0.18);
       --blue-glow-strong: rgba(0, 200, 255, 0.35);

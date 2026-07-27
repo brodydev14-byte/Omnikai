@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script>
+(function(){
+  var t={'default':'#080b10','purple':'#0a0810','green':'#080f0a','red':'#0f0808','navy':'#07080f','black':'#000000'};
+  var bg=t[localStorage.getItem('omniTheme')]||'#080b10';
+  document.documentElement.style.setProperty('--bg',bg);
+  document.write('<style>html,body,.bg-layer{background:'+bg+' !important;background-color:'+bg+' !important;}</style>');
+})();
+</script>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Omnikai – Muay Thai Advanced: No Equipment</title>
