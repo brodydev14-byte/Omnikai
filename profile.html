@@ -257,14 +257,32 @@
   }
 
   // Theme picker
-  const currentTheme = localStorage.getItem('omniTheme') || 'blue';
-  document.querySelectorAll('.theme-btn').forEach(btn => {
-    if (btn.dataset.theme === currentTheme) btn.classList.add('active');
-  });
+  const THEMES = [
+    { id:'default', label:'Default', bg:'#080b10', border:'rgba(255,255,255,0.2)' },
+    { id:'purple',  label:'Dark Purple', bg:'#0a0810', border:'rgba(139,92,246,0.5)' },
+    { id:'green',   label:'Dark Green', bg:'#080f0a', border:'rgba(16,185,129,0.5)' },
+    { id:'red',     label:'Dark Red', bg:'#0f0808', border:'rgba(239,68,68,0.5)' },
+    { id:'navy',    label:'Deep Navy', bg:'#07080f', border:'rgba(0,200,255,0.5)' },
+    { id:'black',   label:'Pure Black', bg:'#000000', border:'rgba(255,255,255,0.2)' },
+  ];
+
+  const currentTheme = localStorage.getItem('omniTheme') || 'default';
+  const grid = document.getElementById('themeGrid');
+  if (grid) {
+    THEMES.forEach(t => {
+      const btn = document.createElement('div');
+      btn.className = 'theme-btn' + (t.id === currentTheme ? ' active' : '');
+      btn.innerHTML = `
+        <div style="width:28px;height:28px;border-radius:50%;background:${t.bg};border:2px solid ${t.border};margin:0 auto 6px;"></div>
+        <div style="font-size:0.65rem;font-weight:700;text-align:center;">${t.label}</div>
+      `;
+      btn.onclick = () => setTheme(t.id);
+      grid.appendChild(btn);
+    });
+  }
 
   function setTheme(theme) {
     localStorage.setItem('omniTheme', theme);
-    // Reload to apply theme via theme.js
     window.location.reload();
   }
 
