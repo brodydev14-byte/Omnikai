@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head><script>(function(){var m={"default":"rgba(0,200,255,0.05)","purple":"rgba(139,92,246,0.06)","green":"rgba(16,185,129,0.06)","red":"rgba(239,68,68,0.06)","navy":"rgba(0,100,255,0.07)","black":"rgba(255,255,255,0.03)"};var c=m[localStorage.getItem("omniTheme")]||"rgba(0,200,255,0.05)";var s=document.createElement("style");s.textContent=".bg-layer{background:radial-gradient(ellipse 70% 50% at 50% 10%,"+c+" 0%,transparent 70%),#080b10 !important;}";document.head?document.head.appendChild(s):document.addEventListener("DOMContentLoaded",function(){document.head.appendChild(s);});})();</script>
+<head>
 
   
   <meta charset="UTF-8"/>
@@ -29,12 +29,7 @@
     }
 
     /* BACKGROUND */
-    .bg-layer {
-      position: fixed; inset: 0; z-index: 0;
-      background:
-        radial-gradient(ellipse 70% 50% at 50% 30%, rgba(0,200,255,0.06) 0%, transparent 70%),
-        var(--bg);
-    }
+    .bg-layer { position:fixed; inset:0; z-index:0; background: radial-gradient(ellipse 70% 50% at 50% 10%, rgba(0,200,255,0.05) 0%, transparent 70%), #080b10; }
     .grid-lines {
       position: fixed; inset: 0; z-index: 0;
       background-image:
