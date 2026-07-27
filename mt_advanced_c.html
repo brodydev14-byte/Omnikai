@@ -1,14 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script>
+<script>
 (function(){
-  var t={'default':'#080b10','purple':'#0a0810','green':'#080f0a','red':'#0f0808','navy':'#07080f','black':'#000000'};
+  var t={'default':'#080b10','purple':'#0a0810','green':'#080f0a','red':'#0f0808','navy':'#07080f'};
   var bg=t[localStorage.getItem('omniTheme')]||'#080b10';
+  document.documentElement.style.background=bg;
   document.documentElement.style.setProperty('--bg',bg);
-  document.write('<style>html,body,.bg-layer{background:'+bg+' !important;background-color:'+bg+' !important;}</style>');
+  window.addEventListener('DOMContentLoaded',function(){
+    document.body.style.background=bg;
+    var el=document.querySelector('.bg-layer');
+    if(el){el.style.cssText+=';background:'+bg+' !important;background-color:'+bg+' !important;';}
+  });
 })();
 </script>
+  
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Omnikai – Muay Thai Advanced: Conditioning</title>
