@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head><script>(function(){var m={'default':'#080b10','purple':'#0a0810','green':'#080f0a','red':'#0f0808','navy':'#07080f'};var b=m[localStorage.getItem('omniTheme')]||'#080b10';document.documentElement.style.setProperty('--bg',b);document.documentElement.style.backgroundColor=b;document.addEventListener('DOMContentLoaded',function(){document.body.style.backgroundColor=b;var l=document.querySelector('.bg-layer');if(l)l.style.backgroundColor=b;});})();</script>
+<head><script>(function(){var m={"default":"#080b10","purple":"#0a0810","green":"#080f0a","red":"#0f0808","navy":"#07080f","black":"#000000"};var b=m[localStorage.getItem("omniTheme")]||"#080b10";var s=document.createElement("style");s.textContent=":root{--bg:"+b+" !important;}html,body{background:"+b+" !important;}";document.head?document.head.appendChild(s):document.addEventListener("DOMContentLoaded",function(){document.head.appendChild(s);});})();</script>
 
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -259,12 +259,12 @@
 
   // Theme picker
   const THEMES = [
-    { id:'default', label:'Default', bg:'#080b10', border:'rgba(255,255,255,0.2)' },
-    { id:'purple',  label:'Dark Purple', bg:'#0a0810', border:'rgba(139,92,246,0.5)' },
-    { id:'green',   label:'Dark Green', bg:'#080f0a', border:'rgba(16,185,129,0.5)' },
-    { id:'red',     label:'Dark Red', bg:'#0f0808', border:'rgba(239,68,68,0.5)' },
-    { id:'navy',    label:'Deep Navy', bg:'#07080f', border:'rgba(0,200,255,0.5)' },
-    { id:'black',   label:'Pure Black', bg:'#000000', border:'rgba(255,255,255,0.2)' },
+    { id:'default', label:'Default',    bg:'#080b10', swatch:'#080b10', border:'#ffffff' },
+    { id:'purple',  label:'Dark Purple', bg:'#0a0810', swatch:'#0a0810', border:'#8b5cf6' },
+    { id:'green',   label:'Dark Green',  bg:'#080f0a', swatch:'#080f0a', border:'#10b981' },
+    { id:'red',     label:'Dark Red',    bg:'#0f0808', swatch:'#0f0808', border:'#ef4444' },
+    { id:'navy',    label:'Deep Navy',   bg:'#07080f', swatch:'#07080f', border:'#00c8ff' },
+    { id:'black',   label:'Pure Black',  bg:'#000000', swatch:'#000000', border:'#ffffff' },
   ];
 
   const currentTheme = localStorage.getItem('omniTheme') || 'default';
@@ -274,8 +274,8 @@
       const btn = document.createElement('div');
       btn.className = 'theme-btn' + (t.id === currentTheme ? ' active' : '');
       btn.innerHTML = `
-        <div style="width:28px;height:28px;border-radius:50%;background:${t.bg};border:2px solid ${t.border};margin:0 auto 6px;"></div>
-        <div style="font-size:0.65rem;font-weight:700;text-align:center;">${t.label}</div>
+        <div style="width:28px;height:28px;border-radius:50%;background-color:${t.swatch};border:2px solid ${t.border};margin:0 auto 6px;display:block;"></div>
+        <div style="font-size:0.65rem;font-weight:700;text-align:center;color:var(--white);">${t.label}</div>
       `;
       btn.onclick = () => setTheme(t.id);
       grid.appendChild(btn);
