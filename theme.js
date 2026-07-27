@@ -9,8 +9,18 @@
   };
   const saved = localStorage.getItem('omniTheme') || 'default';
   const bg = themes[saved] || '#080b10';
-  // Only change the background - nothing else
-  const style = document.createElement('style');
-  style.textContent = `html { background-color: ${bg} !important; } body { background-color: ${bg} !important; } .bg-layer { background-color: ${bg} !important; }`;
-  document.head.appendChild(style);
+  
+  // Apply immediately to document
+  document.documentElement.style.backgroundColor = bg;
+  document.documentElement.style.setProperty('--bg', bg);
+  
+  // Also apply after DOM loads to catch .bg-layer
+  document.addEventListener('DOMContentLoaded', function() {
+    document.body.style.backgroundColor = bg;
+    const bgLayer = document.querySelector('.bg-layer');
+    if (bgLayer) {
+      bgLayer.style.backgroundColor = bg;
+      bgLayer.style.background = bg;
+    }
+  });
 })();
