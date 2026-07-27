@@ -1,19 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<script>
-(function(){
-  var t={'default':'#080b10','purple':'#0a0810','green':'#080f0a','red':'#0f0808','navy':'#07080f'};
-  var bg=t[localStorage.getItem('omniTheme')]||'#080b10';
-  document.documentElement.style.background=bg;
-  document.documentElement.style.setProperty('--bg',bg);
-  window.addEventListener('DOMContentLoaded',function(){
-    document.body.style.background=bg;
-    var el=document.querySelector('.bg-layer');
-    if(el){el.style.cssText+=';background:'+bg+' !important;background-color:'+bg+' !important;';}
-  });
-})();
-</script>
+<head><script>(function(){var m={'default':'#080b10','purple':'#0a0810','green':'#080f0a','red':'#0f0808','navy':'#07080f'};var b=m[localStorage.getItem('omniTheme')]||'#080b10';document.documentElement.style.setProperty('--bg',b);document.documentElement.style.backgroundColor=b;document.addEventListener('DOMContentLoaded',function(){document.body.style.backgroundColor=b;var l=document.querySelector('.bg-layer');if(l)l.style.backgroundColor=b;});})();</script>
+
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Omnikai – Profile</title>
