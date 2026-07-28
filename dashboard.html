@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Omnikai – Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:#080b10;
+      --bg2: #0d1117;
+      --blue: #00c8ff;
+      --blue-glow: rgba(0, 200, 255, 0.18);
+      --blue-glow-strong: rgba(0, 200, 255, 0.35);
+      --white: #f0f4f8;
+      --muted: #5a6a7a;
+      --border: rgba(0, 200, 255, 0.12);
+      --card: rgba(255,255,255,0.03);
+      --nav-h: 72px;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--white);
+      font-family: 'Rajdhani', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* BG */
+    .bg-layer { position:fixed; inset:0; z-index:0; background: radial-gradient(ellipse 80% 60% at 50% 10%, rgba(0,200,255,0.12) 0%, rgba(0,100,180,0.06) 40%, transparent 70%), #080b10; }
+    .grid-lines {
+      position: fixed; inset: 0; z-index: 0;
+      background-image:
+        linear-gradient(rgba(0,200,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,200,255,0.025) 1px, transparent 1px);
+      background-size: 48px 48px;
+    }
+
+    /* SCROLL CONTAINER */
+    .scroll-wrap {
+      position: relative; z-index: 1;
+      height: 100vh;
+      overflow-y: auto;
+      padding-bottom: calc(var(--nav-h) + 16px);
+      scrollbar-width: thin;
+      scrollbar-color: rgba(0,200,255,0.2) transparent;
+    }
+
+    /* TOP BAR */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 20px 0;
+      margin-bottom: 24px;
+    }
+
+    .logo-small {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .logo-small-icon {
+      width: 34px; height: 34px;
+      border: 1.5px solid var(--blue);
+      border-radius: 7px;
+      overflow: hidden;
+      box-shadow: 0 0 10px var(--blue-glow);
+    }
+    .logo-small-icon img { width: 100%; height: 100%; object-fit: cover; }
+    .logo-small-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.3rem;
+      letter-spacing: 0.12em;
+    }
+    .logo-small-name span { color: var(--blue); }
+
+    .topbar-right {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .streak-chip {
+      display: flex; align-items: center; gap: 5px;
+      background: rgba(255,150,0,0.1);
+      border: 1px solid rgba(255,150,0,0.25);
+      border-radius: 999px;
+      padding: 5px 12px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #ffaa00;
+    }
+    .avatar {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--blue), #0060aa);
+      border: 2px solid var(--blue);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem;
+      color: #080b10;
+      box-shadow: 0 0 10px var(--blue-glow);
+      cursor: pointer;
+    }
+
+    /* CONTENT */
+    .content { padding: 0 20px; }
+
+    /* WELCOME */
+    .welcome {
+      margin-bottom: 24px;
+      animation: fadeUp 0.5s ease both;
+    }
+    .welcome-sub {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 4px;
+    }
+    .welcome-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.4rem;
+      letter-spacing: 0.06em;
+      line-height: 1;
+    }
+    .welcome-name span { color: var(--blue); }
+
+    /* STATS ROW */
+    .stats-row {
+      display: flex; gap: 10px;
+      margin-bottom: 24px;
+      animation: fadeUp 0.5s ease 0.05s both;
+    }
+    .stat-chip {
+      flex: 1;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 10px;
+      text-align: center;
+    }
+    .stat-chip-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.6rem;
+      color: var(--blue);
+      line-height: 1;
+      text-shadow: 0 0 12px var(--blue-glow-strong);
+    }
+    .stat-chip-label {
+      font-size: 0.62rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    /* SECTION LABEL */
+    .section-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    /* FEATURED WORKOUT */
+    .featured-workout {
+      background: linear-gradient(135deg, rgba(0,200,255,0.08) 0%, rgba(0,50,100,0.12) 100%);
+      border: 1px solid var(--blue);
+      border-radius: 14px;
+      padding: 24px 20px;
+      margin-bottom: 24px;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      transition: box-shadow 0.2s;
+      animation: fadeUp 0.5s ease 0.1s both;
+      box-shadow: 0 0 30px rgba(0,200,255,0.08);
+    }
+    .featured-workout:hover { box-shadow: 0 0 40px rgba(0,200,255,0.15); }
+    .featured-workout::before {
+      content: '';
+      position: absolute;
+      top: 0; right: 0;
+      width: 120px; height: 120px;
+      background: radial-gradient(circle, rgba(0,200,255,0.12) 0%, transparent 70%);
+    }
+    .fw-tag {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: var(--blue);
+      color: #080b10;
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 999px;
+      margin-bottom: 12px;
+    }
+    .fw-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.8rem;
+      letter-spacing: 0.06em;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .fw-meta {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 300;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+    .fw-meta span {
+      color: var(--white);
+      font-weight: 500;
+      margin-right: 12px;
+    }
+    .fw-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--blue);
+      color: #080b10;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.9rem;
+      letter-spacing: 0.15em;
+      padding: 9px 20px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 0 16px var(--blue-glow-strong);
+      transition: all 0.2s;
+    }
+    .fw-btn:hover { background: #1ad4ff; box-shadow: 0 0 24px rgba(0,200,255,0.5); }
+
+    /* YOUR ARTS */
+    .arts-scroll {
+      display: flex; gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      margin-bottom: 24px;
+      scrollbar-width: none;
+      animation: fadeUp 0.5s ease 0.15s both;
+    }
+    .arts-scroll::-webkit-scrollbar { display: none; }
+
+    .art-pill {
+      flex-shrink: 0;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 18px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      min-width: 90px;
+    }
+    .art-pill:hover {
+      border-color: var(--blue);
+      background: rgba(0,200,255,0.06);
+      transform: translateY(-2px);
+    }
+    .art-pill-emoji { font-size: 1.5rem; margin-bottom: 5px; }
+    .art-pill-name {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--white);
+    }
+
+    /* DAILY TIP */
+    .tip-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 16px;
+      margin-bottom: 24px;
+      display: flex; gap: 14px; align-items: flex-start;
+      animation: fadeUp 0.5s ease 0.2s both;
+    }
+    .tip-icon {
+      font-size: 1.6rem;
+      flex-shrink: 0;
+    }
+    .tip-label {
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 4px;
+    }
+    .tip-text {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 400;
+      color: var(--white);
+      line-height: 1.5;
+    }
+    .tip-art {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 4px;
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* CHALLENGES */
+    .challenges {
+      margin-bottom: 24px;
+      animation: fadeUp 0.5s ease 0.25s both;
+    }
+    .challenge-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 10px;
+      display: flex; align-items: center; gap: 14px;
+    }
+    .challenge-icon {
+      font-size: 1.4rem;
+      flex-shrink: 0;
+    }
+    .challenge-info { flex: 1; }
+    .challenge-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .challenge-bar-wrap {
+      background: rgba(255,255,255,0.06);
+      border-radius: 999px;
+      height: 5px;
+      overflow: hidden;
+    }
+    .challenge-bar {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--blue), #1ad4ff);
+      box-shadow: 0 0 8px var(--blue-glow);
+      transition: width 0.6s ease;
+    }
+    .challenge-pct {
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--blue);
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+
+    /* BOTTOM NAV */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: var(--nav-h);
+      background: rgba(8,11,16,0.95);
+      border-top: 1px solid var(--border);
+      backdrop-filter: blur(16px);
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      z-index: 100;
+      padding: 0 8px;
+    }
+    .nav-item {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      padding: 8px 16px;
+      border-radius: 10px;
+      transition: all 0.2s;
+      flex: 1;
+    }
+    .nav-item:hover { background: rgba(0,200,255,0.06); }
+    .nav-item.active .nav-icon { color: var(--blue); filter: drop-shadow(0 0 6px var(--blue)); }
+    .nav-item.active .nav-label { color: var(--blue); }
+    .nav-icon { font-size: 1.3rem; transition: all 0.2s; }
+    .nav-label {
+      font-size: 0.58rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      transition: color 0.2s;
+    }
+
+    /* RANK BADGE */
+    .rank-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(255,215,0,0.08);
+      border: 1px solid rgba(255,215,0,0.25);
+      border-radius: 999px;
+      padding: 5px 14px;
+      margin-bottom: 6px;
+    }
+    .rank-icon { font-size: 1rem; }
+    .rank-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: #a0852a; }
+    .rank-name { font-family: 'Bebas Neue', sans-serif; font-size: 1rem; letter-spacing: 0.1em; color: #ffd700; }
+
+    /* XP BAR */
+    .xp-wrap { margin-bottom: 20px; animation: fadeUp 0.5s ease 0.05s both; }
+    .xp-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .xp-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }
+    .xp-count { font-family: 'Bebas Neue', sans-serif; font-size: 0.9rem; letter-spacing: 0.1em; color: #ffd700; }
+    .xp-track { height: 6px; background: rgba(255,255,255,0.06); border-radius: 999px; overflow: hidden; }
+    .xp-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #ffd700, #ffaa00); transition: width 0.8s cubic-bezier(0.4,0,0.2,1); box-shadow: 0 0 8px rgba(255,215,0,0.4); }
+
+    /* STAT SHEET */
+    .stat-sheet { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px 16px; margin-bottom: 20px; animation: fadeUp 0.5s ease 0.08s both; }
+    .stat-sheet-title { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+    .stat-rows { display: flex; flex-direction: column; gap: 10px; }
+    .stat-row-item { display: flex; align-items: center; gap: 10px; }
+    .stat-row-label { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); width: 88px; flex-shrink: 0; }
+    .stat-bar-track { flex: 1; height: 5px; background: rgba(255,255,255,0.06); border-radius: 999px; overflow: hidden; }
+    .stat-bar-fill { height: 100%; border-radius: 999px; transition: width 1s cubic-bezier(0.4,0,0.2,1); }
+    .stat-score { font-family: 'Bebas Neue', sans-serif; font-size: 0.95rem; width: 44px; text-align: right; flex-shrink: 0; }
+
+    /* SNAPSHOT ROW */
+    .snapshot-row { display: flex; gap: 8px; margin-bottom: 20px; animation: fadeUp 0.5s ease 0.1s both; }
+    .snap-chip { flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px 8px; text-align: center; }
+    .snap-icon { font-size: 1.1rem; margin-bottom: 3px; }
+    .snap-num { font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem; color: var(--blue); line-height: 1; }
+    .snap-label { font-size: 0.56rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-top: 2px; }
+
+    /* WEEKLY PROGRESS */
+    .weekly-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 24px; animation: fadeUp 0.5s ease 0.12s both; }
+    .weekly-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .weekly-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }
+    .weekly-pct { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; color: var(--blue); }
+    .weekly-days { display: flex; gap: 6px; }
+    .day-dot { flex: 1; height: 8px; border-radius: 999px; background: rgba(255,255,255,0.06); transition: background 0.3s; }
+    .day-dot.done { background: var(--blue); box-shadow: 0 0 6px var(--blue-glow); }
+    .day-dot.today { background: rgba(0,200,255,0.3); border: 1px solid var(--blue); }
+
+    /* WEEKLY CHALLENGES */
+    .challenges-wrap { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:18px 16px; margin-bottom:24px; animation:fadeUp 0.5s ease 0.14s both; }
+    .challenges-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+    .challenges-title { font-size:0.62rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); }
+    .challenges-xp { font-family:'Bebas Neue',sans-serif; font-size:0.9rem; color:var(--gold); }
+    .challenge-item { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+    .challenge-item:last-child { margin-bottom:0; }
+    .challenge-icon { font-size:1.2rem; flex-shrink:0; }
+    .challenge-info { flex:1; }
+    .challenge-name { font-size:0.82rem; font-weight:700; color:var(--white); margin-bottom:4px; }
+    .challenge-bar-wrap { height:4px; background:rgba(255,255,255,0.06); border-radius:999px; overflow:hidden; }
+    .challenge-bar { height:100%; border-radius:999px; background:linear-gradient(90deg,var(--blue),#00a8d4); transition:width 0.8s ease; }
+    .challenge-bar.complete { background:linear-gradient(90deg,var(--gold),#ffaa00); }
+    .challenge-pct { font-family:'Bebas Neue',sans-serif; font-size:0.85rem; color:var(--muted); flex-shrink:0; width:36px; text-align:right; }
+    .challenge-pct.done { color:var(--gold); }
+    .bonus-banner { background:linear-gradient(135deg,rgba(255,215,0,0.15),rgba(255,150,0,0.08)); border:1px solid rgba(255,215,0,0.35); border-radius:10px; padding:12px 14px; text-align:center; margin-top:12px; display:none; }
+    .bonus-banner.show { display:block; animation:fadeUp 0.4s ease; }
+    .bonus-text { font-family:'Bebas Neue',sans-serif; font-size:1.1rem; letter-spacing:0.1em; color:var(--gold); }
+    .bonus-sub { font-family:'Inter',sans-serif; font-size:0.72rem; color:rgba(255,215,0,0.7); margin-top:2px; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="bg-layer"></div>
+<div class="grid-lines"></div>
+
+<div class="scroll-wrap">
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="logo-small">
+      <div class="logo-small-icon"><img src="logo.png" alt="Omnikai"/></div>
+      <div class="logo-small-name">OMNI<span>KAI</span></div>
+    </div>
+    <div class="topbar-right">
+      <div class="streak-chip">🔥 <span id="streakNum">1</span> Day Streak</div>
+      <div class="avatar" id="avatarInitial">?</div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- HERO SECTION -->
+    <div id="dashHero" style="border-radius:16px;padding:24px 20px;margin-bottom:20px;position:relative;overflow:hidden;animation:fadeUp 0.5s ease both;">
+      <!-- art color glow -->
+      <div id="heroGlow" style="position:absolute;top:-40px;right:-40px;width:180px;height:180px;border-radius:50%;opacity:0.12;pointer-events:none;"></div>
+
+      <!-- greeting row -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="font-size:0.65rem;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--muted);" id="heroGreeting">Good to see you back</div>
+        <div id="artChip" style="display:flex;align-items:center;gap:6px;border-radius:999px;padding:3px 12px;font-size:0.65rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;"></div>
+      </div>
+
+      <!-- name -->
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:0.06em;line-height:1;color:var(--muted);margin-bottom:2px;">FIGHTER</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:2.8rem;letter-spacing:0.06em;line-height:1;margin-bottom:14px;" id="heroName">WARRIOR</div>
+
+      <!-- big rank display -->
+      <div style="margin-bottom:14px;cursor:pointer;" onclick="window.location.href='ranks.html'">
+        <div style="font-size:0.6rem;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:4px;opacity:0.6;" id="heroRankLabel">Current Rank</div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="font-size:1.8rem;" id="heroArtIcon">🥊</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:0.08em;line-height:1;" id="heroRankName">Newcomer</div>
+          <div style="font-size:0.8rem;margin-left:auto;opacity:0.5;">→</div>
+        </div>
+      </div>
+
+      <!-- motivational line -->
+      <div style="font-family:'Inter',sans-serif;font-size:0.8rem;line-height:1.5;opacity:0.7;" id="heroMotivation">Complete your first workout to start your journey.</div>
+    </div>
+
+    <!-- XP BAR -->
+    <div class="xp-wrap">
+      <div class="xp-header">
+        <div class="xp-label">⚡ XP to next rank</div>
+        <div class="xp-count" id="xpCount">0 / 5 XP</div>
+      </div>
+      <div class="xp-track">
+        <div class="xp-fill" id="xpFill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <!-- WARRIOR STAT SHEET -->
+    <div class="stat-sheet">
+      <div class="stat-sheet-title" id="statSheetTitle">⚔️ Warrior Stats</div>
+      <div class="stat-rows">
+        <div class="stat-row-item">
+          <div class="stat-row-label">Strength</div>
+          <div class="stat-bar-track"><div class="stat-bar-fill" id="barStrength" style="width:0%;background:#ef4444;"></div></div>
+          <div class="stat-score" id="statStrength" style="color:#ef4444;">0/100</div>
+        </div>
+        <div class="stat-row-item">
+          <div class="stat-row-label">Endurance</div>
+          <div class="stat-bar-track"><div class="stat-bar-fill" id="barEndurance" style="width:0%;background:#3b82f6;"></div></div>
+          <div class="stat-score" id="statEndurance" style="color:#3b82f6;">0/100</div>
+        </div>
+        <div class="stat-row-item">
+          <div class="stat-row-label">Explosiveness</div>
+          <div class="stat-bar-track"><div class="stat-bar-fill" id="barExplosive" style="width:0%;background:#f59e0b;"></div></div>
+          <div class="stat-score" id="statExplosive" style="color:#f59e0b;">0/100</div>
+        </div>
+        <div class="stat-row-item">
+          <div class="stat-row-label">Mobility</div>
+          <div class="stat-bar-track"><div class="stat-bar-fill" id="barMobility" style="width:0%;background:#10b981;"></div></div>
+          <div class="stat-score" id="statMobility" style="color:#10b981;">0/100</div>
+        </div>
+        <div class="stat-row-item">
+          <div class="stat-row-label">Discipline</div>
+          <div class="stat-bar-track"><div class="stat-bar-fill" id="barDiscipline" style="width:0%;background:#8b5cf6;"></div></div>
+          <div class="stat-score" id="statDiscipline" style="color:#8b5cf6;">0/100</div>
+        </div>
+        <div class="stat-row-item">
+          <div class="stat-row-label">Nutrition</div>
+          <div class="stat-bar-track"><div class="stat-bar-fill" id="barNutrition" style="width:0%;background:#06b6d4;"></div></div>
+          <div class="stat-score" id="statNutrition" style="color:#06b6d4;">0/100</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SNAPSHOT ROW -->
+    <div class="snapshot-row">
+      <div class="snap-chip">
+        <div class="snap-icon">🔥</div>
+        <div class="snap-num" id="snapStreak">0</div>
+        <div class="snap-label">Day Streak</div>
+      </div>
+      <div class="snap-chip">
+        <div class="snap-icon">💪</div>
+        <div class="snap-num" id="snapWorkouts">0</div>
+        <div class="snap-label">Workouts</div>
+      </div>
+      <div class="snap-chip">
+        <div class="snap-icon">🏆</div>
+        <div class="snap-num" id="snapPR">0</div>
+        <div class="snap-label">Total PRs</div>
+      </div>
+      <div class="snap-chip">
+        <div class="snap-icon">🥗</div>
+        <div class="snap-num" id="snapCals">—</div>
+        <div class="snap-label">Cal Today</div>
+      </div>
+    </div>
+
+    <!-- WEEKLY PROGRESS -->
+    <div class="weekly-wrap">
+      <div class="weekly-header">
+        <div class="weekly-label">📅 This Week</div>
+        <div class="weekly-pct" id="weeklyPct">0% Complete</div>
+      </div>
+      <div class="weekly-days" id="weeklyDays">
+        <!-- filled by JS -->
+      </div>
+    </div>
+
+    <!-- FEATURED WORKOUT -->
+    <div class="section-label">Today's Workout</div>
+    <div class="featured-workout" id="featuredWorkout" onclick="goToFeatured()" style="cursor:pointer;">
+      <div class="fw-tag">⚡ Featured</div>
+      <div class="fw-title" id="fwTitle">Loading...</div>
+      <div class="fw-meta">
+        <span id="fwDuration">—</span>
+        <span id="fwLevel">—</span>
+        <span id="fwType">—</span>
+      </div>
+      <button class="fw-btn">Start Workout →</button>
+    </div>
+
+    <!-- RECOMMENDED STRENGTH -->
+    <div id="strengthSection" style="display:none;">
+      <div class="section-label">💪 Recommended Strength Work</div>
+      <div id="strengthFeatured" style="background:rgba(255,255,255,0.03);border:1px solid rgba(0,200,255,0.2);border-radius:12px;padding:18px 16px;margin-bottom:12px;cursor:pointer;" onclick="goToStrength()">
+        <div style="font-size:0.62rem;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:#00c8ff;margin-bottom:6px;">⭐ TODAY'S FOCUS</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:0.06em;margin-bottom:8px;" id="strengthFeaturedTitle">Loading...</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;" id="strengthFeaturedMeta"></div>
+        <button style="background:#00c8ff;border:none;border-radius:7px;padding:10px 20px;color:#080b10;font-family:'Bebas Neue',sans-serif;font-size:0.9rem;letter-spacing:0.15em;cursor:pointer;">Start →</button>
+      </div>
+
+      <!-- ALSO GOOD FOR YOU -->
+      <div id="alsoGoodSection" style="display:none;">
+        <div style="font-size:0.62rem;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:#5a6a7a;margin-bottom:10px;">ALSO GOOD FOR YOU TODAY</div>
+        <div id="alsoGoodCards" style="display:flex;flex-direction:column;gap:10px;"></div>
+      </div>
+    </div>
+
+    <!-- YOUR ARTS -->
+    <div class="section-label">Your Martial Arts</div>
+    <div class="arts-scroll" id="artsScroll">
+      <!-- filled by JS -->
+    </div>
+
+    <!-- DAILY TIP -->
+    <div class="section-label">Daily Technique Tip</div>
+    <div class="tip-card" id="tipCard">
+      <div class="tip-icon" id="tipIcon">💡</div>
+      <div>
+        <div class="tip-label">Tip of the Day</div>
+        <div class="tip-text" id="tipText">Loading tip...</div>
+        <div class="tip-art" id="tipArt"></div>
+      </div>
+    </div>
+
+    <!-- WEEKLY CHALLENGES -->
+    <div class="section-label">⚡ Weekly Challenges</div>
+    <div class="challenges-wrap">
+      <div class="challenges-header">
+        <div class="challenges-title">Complete all 3 for bonus XP</div>
+        <div class="challenges-xp" id="challengesXP">+3 XP Bonus</div>
+      </div>
+      <div id="challengesList"></div>
+      <div class="bonus-banner" id="bonusBanner">
+        <div class="bonus-text">🏆 +3 XP BONUS EARNED!</div>
+        <div class="bonus-sub">All challenges complete — bonus XP applied to your rank</div>
+      </div>
+    </div>
+
+    <!-- RECENT PR -->
+    <div class="section-label">🏆 Recent PR</div>
+    <div id="recentPRCard" style="background:rgba(255,215,0,0.04);border:1px solid rgba(255,215,0,0.15);border-radius:12px;padding:16px 18px;margin-bottom:24px;display:flex;align-items:center;gap:14px;cursor:pointer;" onclick="window.location.href='progress.html'">
+      <div style="font-size:1.8rem;" id="prEmoji">🏆</div>
+      <div style="flex:1;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:0.06em;" id="prTitle">No PRs yet</div>
+        <div style="font-family:'Inter',sans-serif;font-size:0.72rem;color:var(--muted);margin-top:2px;" id="prSub">Complete a workout and log your first PR →</div>
+      </div>
+      <div style="color:#ffd700;font-size:1.1rem;">→</div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /scroll-wrap -->
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="nav-item active" onclick="setNav(this); window.location.href='dashboard.html'">
+    <div class="nav-icon">🏠</div>
+    <div class="nav-label">Home</div>
+  </div>
+  <div class="nav-item" onclick="setNav(this); window.location.href='library.html'">
+    <div class="nav-icon">📚</div>
+    <div class="nav-label">Library</div>
+  </div>
+  <div class="nav-item" onclick="window.location.href='nutrition.html'">
+    <div class="nav-icon">🥗</div>
+    <div class="nav-label">Nutrition</div>
+  </div>
+  <div class="nav-item" onclick="window.location.href='progress.html'">
+    <div class="nav-icon">📈</div>
+    <div class="nav-label">Progress</div>
+  </div>
+  <div class="nav-item" onclick="window.location.href='profile.html'">
+    <div class="nav-icon">👤</div>
+    <div class="nav-label">Profile</div>
+  </div>
+</div>
+
+<script>
+  const name = sessionStorage.getItem('omniName') || 'Warrior';
+  const arts = JSON.parse(sessionStorage.getItem('omniArts') || '["MMA","Boxing","Muay Thai"]');
+  const plan = sessionStorage.getItem('omniPlan') || 'wanderer';
+  const bodyData = JSON.parse(sessionStorage.getItem('omniBody') || '{}');
+  const equipment = JSON.parse(sessionStorage.getItem('omniEquipment') || '{}');
+  const gymAccess = sessionStorage.getItem('omniGymAccess') === 'true';
+  const isWarrior = plan === 'warrior';
+  const focusMuscles = bodyData.focusMuscles || [];
+  const goal = (bodyData.goal || 'perform').toLowerCase();
+  const weight = parseFloat(bodyData.weight) || 160;
+  const unit = bodyData.unit || 'imperial';
+  const weightLbs = unit === 'metric' ? weight * 2.205 : weight;
+
+  // Set name
+  document.getElementById('heroName').textContent = name.toUpperCase();
+  document.getElementById('avatarInitial').textContent = name.charAt(0).toUpperCase();
+
+  // ── ART COLOR MAP ──
+  const ART_COLORS = {
+    'Boxing':    { hex:'#00c8ff', rgb:'0,200,255',   label:'Boxer' },
+    'Muay Thai': { hex:'#f59e0b', rgb:'245,158,11',  label:'Nak Muay' },
+    'BJJ':       { hex:'#059669', rgb:'5,150,105',   label:'Grappler' },
+    'Wrestling': { hex:'#dc2626', rgb:'220,38,38',   label:'Wrestler' },
+    'MMA':       { hex:'#8b5cf6', rgb:'139,92,246',  label:'Fighter' },
+    'Judo':      { hex:'#d97706', rgb:'217,119,6',   label:'Judoka' },
+    'Karate':    { hex:'#ef4444', rgb:'239,68,68',   label:'Karateka' },
+    'Taekwondo': { hex:'#7c3aed', rgb:'124,58,237',  label:'Taekwondoin' },
+    'Kung Fu':   { hex:'#10b981', rgb:'16,185,129',  label:'Kung Fu Artist' },
+    'Krav Maga': { hex:'#0d9488', rgb:'13,148,136',  label:'Operator' },
+  };
+  const ART_ICONS = {
+    'Boxing':'🥊','Muay Thai':'🦵','BJJ':'🥋','Wrestling':'🤼','MMA':'⚡',
+    'Judo':'👘','Karate':'🦶','Taekwondo':'🦵','Kung Fu':'🐉','Krav Maga':'🛡️',
+  };
+  const primaryArt = arts[0] || 'Boxing';
+  const artColor = ART_COLORS[primaryArt] || ART_COLORS['Boxing'];
+
+  // Apply art color to hero card (base — rank glow applied after rankIndex is calculated below)
+  const hero = document.getElementById('dashHero');
+  hero.style.background = `linear-gradient(135deg, rgba(${artColor.rgb},0.1) 0%, rgba(${artColor.rgb},0.03) 60%, transparent 100%)`;
+  hero.style.border = `1px solid rgba(${artColor.rgb},0.22)`;
+  document.getElementById('heroGlow').style.background = `radial-gradient(circle, rgba(${artColor.rgb},1) 0%, transparent 70%)`;
+  document.getElementById('heroGreeting').style.color = artColor.hex;
+  document.getElementById('artChip').textContent = (ART_ICONS[primaryArt] || '🥋') + ' ' + primaryArt;
+  document.getElementById('artChip').style.cssText += `background:rgba(${artColor.rgb},0.1);border:1px solid rgba(${artColor.rgb},0.25);color:${artColor.hex};`;
+  document.getElementById('heroArtIcon').textContent = ART_ICONS[primaryArt] || '🥋';
+  document.getElementById('heroRankLabel').textContent = artColor.label + ' Rank';
+  document.getElementById('heroRankName').style.color = artColor.hex;
+
+  // XP bar color matches art
+  document.getElementById('xpFill').style.background = `linear-gradient(90deg, ${artColor.hex}, ${artColor.hex}99)`;
+  document.getElementById('xpCount').style.color = artColor.hex;
+
+  // ── RANK SYSTEM ──
+  const RANKS = {
+    'Boxing':    ['Newcomer','Amateur','Contender','Prospect','Champion'],
+    'Muay Thai': ['Newcomer','White Prajioud','Student','Nak Muay','Warrior'],
+    'BJJ':       ['Newcomer','White Belt','Blue Belt','Purple Belt','Brown Belt'],
+    'Wrestling': ['Newcomer','Rookie','Technician','Dominator','Champion'],
+    'MMA':       ['Newcomer','Fighter','Veteran','Contender','Champion'],
+    'Judo':      ['Newcomer','White Belt','Yellow Belt','Orange Belt','Brown Belt'],
+    'Karate':    ['Newcomer','White Belt','Yellow Belt','Green Belt','Brown Belt'],
+    'Taekwondo': ['Newcomer','White Belt','Yellow Belt','Green Belt','Blue Belt'],
+    'Kung Fu':   ['Newcomer','Student','Apprentice','Disciple','Master'],
+    'Krav Maga': ['Newcomer','Civilian','Practitioner','Operator','Expert'],
+  };
+  const totalWorkouts = parseInt(sessionStorage.getItem('omniWorkouts') || localStorage.getItem('omniWorkouts') || '0');
+  const rankList = RANKS[primaryArt] || RANKS['Boxing'];
+  const rankIndex = Math.min(Math.floor(totalWorkouts / 5), rankList.length - 1);
+  const currentRank = rankList[rankIndex];
+  const isMaxRank = rankIndex === rankList.length - 1;
+  const nextRank = isMaxRank ? null : rankList[rankIndex + 1];
+  document.getElementById('heroRankName').textContent = currentRank;
+
+  // ── RANK-SCALED GLOW — higher rank = more intense ──
+  const glowIntensity =  [0.08, 0.13, 0.18, 0.25, 0.35][rankIndex] || 0.08;
+  const borderIntensity = [0.18, 0.24, 0.30, 0.38, 0.50][rankIndex] || 0.18;
+  const outerGlow =       [0.08, 0.12, 0.18, 0.26, 0.38][rankIndex] || 0.08;
+  const glowSize =        [20,   28,   38,   50,   65  ][rankIndex] || 20;
+  hero.style.background = `linear-gradient(135deg, rgba(${artColor.rgb},${glowIntensity}) 0%, rgba(${artColor.rgb},0.03) 60%, transparent 100%)`;
+  hero.style.border = `1px solid rgba(${artColor.rgb},${borderIntensity})`;
+  hero.style.boxShadow = `0 0 ${glowSize}px rgba(${artColor.rgb},${outerGlow}), 0 0 ${glowSize * 2}px rgba(${artColor.rgb},${outerGlow * 0.3}) inset`;
+  document.getElementById('heroGlow').style.opacity = glowIntensity.toString();
+
+  // ── XP BAR ──
+  const XP_PER_RANK = 5;
+  const xpIntoRank = totalWorkouts % XP_PER_RANK;
+  const xpPct = isMaxRank ? 100 : (xpIntoRank / XP_PER_RANK) * 100;
+  const xpToNext = XP_PER_RANK - xpIntoRank;
+  document.getElementById('xpCount').textContent = isMaxRank ? 'MAX RANK' : xpIntoRank + ' / ' + XP_PER_RANK + ' XP' + (nextRank ? ' → ' + nextRank : '');
+  setTimeout(() => { document.getElementById('xpFill').style.width = xpPct + '%'; }, 100);
+
+  // ── WARRIOR STATS ──
+  const prData = JSON.parse(localStorage.getItem('omniPRs') || '{}');
+  const totalPRs = Object.values(prData).filter(p => p && p.weight).length;
+  const strength = Math.min(Math.round((totalPRs / 20) * 100), 100);
+  const endurance = Math.min(Math.round((totalWorkouts / 50) * 100), 100);
+  const explosive = Math.min(Math.round(((totalWorkouts * 0.6) + (totalPRs * 2)) / 40 * 100), 100);
+  const grapplingArts = arts.filter(a => ['BJJ','Wrestling','Judo','MMA'].includes(a)).length;
+  const mobility = Math.min(10 + (grapplingArts * 15) + Math.round(totalWorkouts * 0.8), 100);
+  // ── STREAK CALCULATION ──
+  // Run this on every dashboard load to keep streak accurate
+  function calcStreak() {
+    const today = new Date().toISOString().split('T')[0];
+    const lastDate = localStorage.getItem('omniLastWorkoutDate') || '';
+    let streak = parseInt(localStorage.getItem('omniStreak') || '0');
+
+    if (!lastDate) return streak; // no workouts yet
+
+    const last = new Date(lastDate);
+    const now = new Date(today);
+    const diffDays = Math.round((now - last) / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) {
+      // Already trained today — streak stays
+      return streak;
+    } else if (diffDays === 1) {
+      // Trained yesterday — streak still alive
+      return streak;
+    } else {
+      // Missed a day — reset streak
+      localStorage.setItem('omniStreak', '0');
+      return 0;
+    }
+  }
+
+  const savedStreak = calcStreak();
+  const discipline = Math.min(Math.round((savedStreak / 30) * 100), 100);
+  const today = new Date().toISOString().split('T')[0];
+  let nutritionDays = 0;
+  for (let i = 0; i < 30; i++) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    if (localStorage.getItem('omniFood_' + d.toISOString().split('T')[0])) nutritionDays++;
+  }
+  const nutrition = Math.min(Math.round((nutritionDays / 30) * 100), 100);
+
+  // Stat sheet personalized title
+  document.getElementById('statSheetTitle').textContent = '⚔️ ' + name.charAt(0).toUpperCase() + name.slice(1).toLowerCase() + "'s Stats";
+
+  const statDefs = [
+    { id:'Strength', val:strength },
+    { id:'Endurance', val:endurance },
+    { id:'Explosive', val:explosive },
+    { id:'Mobility', val:mobility },
+    { id:'Discipline', val:discipline },
+    { id:'Nutrition', val:nutrition },
+  ];
+  setTimeout(() => {
+    statDefs.forEach(s => {
+      document.getElementById('bar' + s.id).style.width = s.val + '%';
+      document.getElementById('stat' + s.id).textContent = s.val + '/100';
+    });
+  }, 150);
+
+  // ── MOTIVATIONAL LINE ──
+  function getMotivation() {
+    if (totalWorkouts === 0) return 'Complete your first workout to start your journey.';
+    if (isMaxRank) return `You've reached ${currentRank} — the highest rank. You are the standard.`;
+    if (nextRank && xpToNext === 1) return `One more workout and you unlock ${nextRank}. Go get it.`;
+    if (nextRank && xpToNext <= 2) return `${xpToNext} workouts away from ${nextRank}. Don't stop now.`;
+    if (savedStreak >= 7) return `${savedStreak}-day streak. That kind of discipline is rare.`;
+    if (savedStreak >= 3) return `${savedStreak} days in a row — keep the chain alive.`;
+    if (totalPRs > 0) return `${totalPRs} personal record${totalPRs > 1 ? 's' : ''} logged. You're getting stronger.`;
+    if (totalWorkouts >= 10) return `${totalWorkouts} sessions in. The habit is forming.`;
+    return `${xpToNext} workouts to unlock ${nextRank}. Let's move.`;
+  }
+  document.getElementById('heroMotivation').textContent = getMotivation();
+
+  // ── SNAPSHOT ROW ──
+  document.getElementById('snapStreak').textContent = savedStreak;
+  document.getElementById('snapWorkouts').textContent = totalWorkouts;
+  document.getElementById('snapPR').textContent = totalPRs;
+  const todayFood = JSON.parse(localStorage.getItem('omniFood_' + today) || '[]');
+  const todayCals = todayFood.reduce((sum, f) => sum + (parseFloat(f.calories) || 0), 0);
+  document.getElementById('snapCals').textContent = todayCals > 0 ? Math.round(todayCals) : '—';
+
+  // ── WEEKLY PROGRESS ──
+  const GOAL_DAYS = 4;
+  const dayNames = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+  const todayDow = new Date().getDay();
+  const weekDots = document.getElementById('weeklyDays');
+  let weeklyDone = 0;
+  for (let i = 0; i < 7; i++) {
+    const d = new Date();
+    d.setDate(d.getDate() - todayDow + i);
+    const historyRaw = localStorage.getItem('omniHistory') || '[]';
+    const history = JSON.parse(historyRaw);
+    const dateStr = d.toISOString().split('T')[0];
+    const didWorkout = history.some(h => h && h.date && h.date.startsWith(dateStr));
+
+    const dot = document.createElement('div');
+    dot.className = 'day-dot' + (didWorkout ? ' done' : '') + (i === todayDow ? ' today' : '');
+    dot.title = dayNames[i];
+    weekDots.appendChild(dot);
+    if (didWorkout) weeklyDone++;
+  }
+  const weeklyPct = Math.round((weeklyDone / GOAL_DAYS) * 100);
+  document.getElementById('weeklyPct').textContent = Math.min(weeklyPct, 100) + '% — ' + weeklyDone + '/' + GOAL_DAYS + ' days';
+
+  // ── WEEKLY CHALLENGES ──
+  // Get Monday of current week as key
+  function getWeekKey() {
+    const now = new Date();
+    const day = now.getDay();
+    const diff = now.getDate() - day + (day === 0 ? -6 : 1);
+    const monday = new Date(now.setDate(diff));
+    return monday.toISOString().split('T')[0];
+  }
+
+  const weekKey = getWeekKey();
+  const history = JSON.parse(localStorage.getItem('omniHistory') || '[]');
+
+  // Count workouts this week
+  function getWorkoutsThisWeek() {
+    const now = new Date();
+    const day = now.getDay();
+    const diff = now.getDate() - day + (day === 0 ? -6 : 1);
+    const monday = new Date();
+    monday.setDate(diff);
+    monday.setHours(0,0,0,0);
+    return history.filter(h => h && h.date && new Date(h.date) >= monday).length;
+  }
+
+  // Count nutrition days this week
+  function getNutritionDaysThisWeek() {
+    let count = 0;
+    for (let i = 0; i < 7; i++) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      if (localStorage.getItem('omniFood_' + d.toISOString().split('T')[0])) count++;
+    }
+    return count;
+  }
+
+  // Check if new PR logged this week
+  function getPRsThisWeek() {
+    const prData = JSON.parse(localStorage.getItem('omniPRs') || '{}');
+    const now = new Date();
+    const day = now.getDay();
+    const diff = now.getDate() - day + (day === 0 ? -6 : 1);
+    const monday = new Date();
+    monday.setDate(diff);
+    monday.setHours(0,0,0,0);
+    return Object.values(prData).filter(p => p && p.date && new Date(p.date) >= monday).length;
+  }
+
+  // Define challenges based on user's primary art and goal
+  const CHALLENGES = [
+    {
+      icon: '💪',
+      name: 'Complete 3 workouts this week',
+      cur: Math.min(getWorkoutsThisWeek(), 3),
+      max: 3,
+    },
+    {
+      icon: '🥗',
+      name: 'Log food for 3 days this week',
+      cur: Math.min(getNutritionDaysThisWeek(), 3),
+      max: 3,
+    },
+    {
+      icon: '🏆',
+      name: 'Set a new personal record',
+      cur: Math.min(getPRsThisWeek(), 1),
+      max: 1,
+    },
+  ];
+
+  // Check if bonus already claimed this week
+  const bonusClaimed = localStorage.getItem('omniChallengeBonus_' + weekKey) === 'true';
+  const allComplete = CHALLENGES.every(c => c.cur >= c.max);
+
+  // Apply bonus XP if all complete and not yet claimed
+  if (allComplete && !bonusClaimed) {
+    const currentWorkouts = parseInt(localStorage.getItem('omniWorkouts') || '0');
+    localStorage.setItem('omniWorkouts', (currentWorkouts + 3).toString());
+    localStorage.setItem('omniChallengeBonus_' + weekKey, 'true');
+  }
+
+  // Render challenges
+  const challengesList = document.getElementById('challengesList');
+  CHALLENGES.forEach(ch => {
+    const pct = Math.round((ch.cur / ch.max) * 100);
+    const done = ch.cur >= ch.max;
+    const item = document.createElement('div');
+    item.className = 'challenge-item';
+    item.innerHTML = `
+      <div class="challenge-icon">${ch.icon}</div>
+      <div class="challenge-info">
+        <div class="challenge-name">${ch.name}</div>
+        <div class="challenge-bar-wrap">
+          <div class="challenge-bar ${done ? 'complete' : ''}" style="width:0%" data-pct="${pct}"></div>
+        </div>
+      </div>
+      <div class="challenge-pct ${done ? 'done' : ''}">${done ? '✓' : ch.cur + '/' + ch.max}</div>
+    `;
+    challengesList.appendChild(item);
+  });
+
+  // Animate bars
+  setTimeout(() => {
+    document.querySelectorAll('.challenge-bar').forEach(bar => {
+      bar.style.width = bar.dataset.pct + '%';
+    });
+  }, 200);
+
+  // Show bonus banner if all complete
+  if (allComplete) {
+    document.getElementById('bonusBanner').classList.add('show');
+    document.getElementById('challengesXP').textContent = '✓ Bonus Claimed!';
+    document.getElementById('challengesXP').style.color = 'var(--green)';
+  }
+
+  // ── RECENT PR ──
+  const prEntries = Object.entries(prData).filter(([k, v]) => v && v.weight && v.date);
+  if (prEntries.length > 0) {
+    prEntries.sort((a, b) => new Date(b[1].date) - new Date(a[1].date));
+    const [exName, prVal] = prEntries[0];
+    document.getElementById('prTitle').textContent = exName + ' — ' + prVal.weight + (prVal.reps ? ' × ' + prVal.reps + ' reps' : '');
+    document.getElementById('prSub').textContent = 'Personal Record · ' + new Date(prVal.date).toLocaleDateString('en-US', {month:'short', day:'numeric'});
+    document.getElementById('prEmoji').textContent = '🏆';
+  }
+
+  // Streak chip in topbar
+  document.getElementById('streakNum').textContent = savedStreak;
+
+  // Art emojis map
+  const artEmojis = {
+    'MMA': '<span style="font-family:\'Bebas Neue\',sans-serif;font-size:1.3rem;color:#00c8ff;letter-spacing:0.1em;">MMA</span>',
+    'Muay Thai': '🦵', 'BJJ': '🥋', 'Boxing': '🥊',
+    'Wrestling': '🤼', 'Judo': '👘', 'Karate': '🦶', 'Kung Fu': '🐉',
+    'Krav Maga': '🛡️',
+    'Taekwondo': '<svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="3.5" r="2.5" fill="#00c8ff"/><line x1="10" y1="6" x2="10" y2="14" stroke="#00c8ff" stroke-width="1.8" stroke-linecap="round"/><line x1="10" y1="8" x2="5" y2="5" stroke="#00c8ff" stroke-width="1.6" stroke-linecap="round"/><line x1="10" y1="8" x2="14" y2="11" stroke="#00c8ff" stroke-width="1.6" stroke-linecap="round"/><line x1="10" y1="14" x2="7" y2="20" stroke="#00c8ff" stroke-width="1.8" stroke-linecap="round"/><line x1="10" y1="14" x2="16" y2="11" stroke="#00c8ff" stroke-width="1.8" stroke-linecap="round"/><line x1="16" y1="11" x2="24" y2="8" stroke="#00c8ff" stroke-width="1.8" stroke-linecap="round"/><line x1="24" y1="6" x2="27" y2="5" stroke="#00c8ff" stroke-width="1.2" stroke-linecap="round" opacity="0.6"/><line x1="24" y1="8" x2="27" y2="8" stroke="#00c8ff" stroke-width="1.2" stroke-linecap="round" opacity="0.6"/><line x1="24" y1="10" x2="27" y2="11" stroke="#00c8ff" stroke-width="1.2" stroke-linecap="round" opacity="0.6"/></svg>'
+  };
+
+  // Render arts
+  const artsScroll = document.getElementById('artsScroll');
+  arts.forEach(art => {
+    const div = document.createElement('div');
+    div.className = 'art-pill';
+    div.innerHTML = `<div class="art-pill-emoji">${artEmojis[art] || '🥋'}</div><div class="art-pill-name">${art}</div>`;
+    artsScroll.appendChild(div);
+  });
+
+  // ── FEATURED MARTIAL ARTS WORKOUT ──
+  // Separate martial arts equipment from strength equipment
+  const martialArtsGear = ['gloves','heavy_bag','shin_guards','mouth_guard','jump_rope',
+    'mt_gloves','mt_shin_guards','mt_heavy_bag','mt_jump_rope','mt_pads',
+    'mma_gloves','mma_bag','mma_bands','mma_rope','bjj_gi','bjj_no_gi',
+    'wr_headgear','judo_gi','karate_gi','tkd_gear'];
+  const hasMartialArtsEquip = martialArtsGear.some(k => equipment[k] === true);
+  const hasStrengthEquip = Object.keys(equipment).some(k => !martialArtsGear.includes(k) && equipment[k] === true);
+
+  function getBoxingFile() {
+    if (!hasMartialArtsEquip) return 'boxing_beginner_d.html';
+    if (goal === 'cut') return 'boxing_beginner_c.html';
+    if (goal === 'bulk') return 'boxing_beginner_b.html';
+    return 'boxing_beginner_a.html';
+  }
+
+  function getMTFile() {
+    if (!hasMartialArtsEquip) return 'mt_beginner_d.html';
+    if (goal === 'cut') return 'mt_beginner_c.html';
+    if (goal === 'bulk') return 'mt_beginner_b.html';
+    return 'mt_beginner_a.html';
+  }
+
+  function getBJJFile() {
+    if (goal === 'cut') return 'bjj_beginner_c.html';
+    if (goal === 'bulk') return 'bjj_beginner_b.html';
+    return 'bjj_beginner_a.html';
+  }
+
+  function getWrestlingFile() {
+    if (goal === 'cut') return 'wrestling_beginner_c.html';
+    if (goal === 'bulk') return 'wrestling_beginner_b.html';
+    return 'wrestling_beginner_a.html';
+  }
+  function getMMAFile() {
+    if (goal === 'cut') return 'mma_beginner_c.html';
+    if (goal === 'bulk') return 'mma_beginner_b.html';
+    return 'mma_beginner_a.html';
+  }
+  function getJudoFile() {
+    if (goal === 'cut') return 'judo_beginner_c.html';
+    if (goal === 'bulk') return 'judo_beginner_b.html';
+    return 'judo_beginner_a.html';
+  }
+  function getKarateFile() {
+    if (goal === 'cut') return 'karate_beginner_c.html';
+    if (goal === 'bulk') return 'karate_beginner_b.html';
+    return 'karate_beginner_a.html';
+  }
+  function getKungFuFile() {
+    if (goal === 'cut') return 'kung_fu_beginner_c.html';
+    if (goal === 'bulk') return 'kung_fu_beginner_b.html';
+    return 'kung_fu_beginner_a.html';
+  }
+  function getKravFile() {
+    if (goal === 'cut') return 'krav_maga_beginner_c.html';
+    if (goal === 'bulk') return 'krav_maga_beginner_b.html';
+    return 'krav_maga_beginner_a.html';
+  }
+  function getTKDFile() {
+    if (goal === 'cut') return 'taekwondo_beginner_c.html';
+    if (goal === 'bulk') return 'taekwondo_beginner_b.html';
+    return 'taekwondo_beginner_a.html';
+  }
+
+  const featuredWorkouts = {
+    'Boxing':    { title:'Boxing Beginner Session', duration:'35 Min', level:'Beginner', type:'Striking', file: getBoxingFile() },
+    'Muay Thai': { title:'Muay Thai Beginner Session', duration:'35 Min', level:'Beginner', type:'Striking', file: getMTFile() },
+    'MMA':       { title:'MMA Beginner Session', duration:'30 Min', level:'Beginner', type:'Combat', file: getMMAFile() },
+    'BJJ':       { title:'BJJ Beginner Session', duration:'30 Min', level:'Beginner', type:'Grappling', file: getBJJFile() },
+    'Wrestling': { title:'Wrestling Beginner Session', duration:'30 Min', level:'Beginner', type:'Grappling', file: getWrestlingFile() },
+    'Judo':      { title:'Judo Beginner Session', duration:'30 Min', level:'Beginner', type:'Grappling', file: getJudoFile() },
+    'Karate':    { title:'Karate Beginner Session', duration:'30 Min', level:'Beginner', type:'Striking', file: getKarateFile() },
+    'Kung Fu':   { title:'Kung Fu Beginner Session', duration:'30 Min', level:'Beginner', type:'Striking', file: getKungFuFile() },
+    'Krav Maga': { title:'Krav Maga Beginner Session', duration:'30 Min', level:'Beginner', type:'Combat', file: getKravFile() },
+    'Taekwondo': { title:'Taekwondo Beginner Session', duration:'30 Min', level:'Beginner', type:'Striking', file: getTKDFile() },
+  };
+
+  const featured = featuredWorkouts[arts[0]] || featuredWorkouts['MMA'];
+  document.getElementById('fwTitle').textContent = featured.title;
+  document.getElementById('fwDuration').textContent = '⏱ ' + featured.duration;
+  document.getElementById('fwLevel').textContent = '📊 ' + featured.level;
+  document.getElementById('fwType').textContent = '🏷 ' + featured.type;
+
+  function goToFeatured() {
+    if (featured.file) window.location.href = featured.file;
+    else window.location.href = 'library.html';
+  }
+
+  // ── STRENGTH RECOMMENDATIONS from body map ──
+  const muscleWorkouts = {
+    'Core / Abs':      { bodyweight:['core_a.html','core_b.html'], gym:['core_c.html'], labels:['Core A — Stability','Core B — Rotational','Core C — Gym ⚡'] },
+    'Shoulders':       { bodyweight:['shoulder_a.html','shoulder_b.html'], gym:['shoulder_c.html'], labels:['Shoulders A — Bodyweight','Shoulders B — Dumbbell','Shoulders C — Gym ⚡'] },
+    'Chest':           { bodyweight:['chest_a.html','chest_b.html'], gym:['chest_c.html'], labels:['Chest A — Bodyweight','Chest B — Dumbbell','Chest C — Gym ⚡'] },
+    'Lats':            { bodyweight:['lat_a.html','lat_b.html'], gym:['lat_c.html'], labels:['Lats A — Bodyweight','Lats B — Dumbbell','Lats C — Gym ⚡'] },
+    'Quads':           { bodyweight:['leg_a.html','leg_b.html'], gym:['leg_c.html'], labels:['Legs A — Bodyweight','Legs B — Dumbbell','Legs C — Gym ⚡'] },
+    'Hamstrings':      { bodyweight:['leg_a.html','leg_b.html'], gym:['leg_c.html'], labels:['Legs A — Bodyweight','Legs B — Dumbbell','Legs C — Gym ⚡'] },
+    'Glutes':          { bodyweight:['glute_a.html','glute_b.html'], gym:['glute_c.html'], labels:['Glutes A — Bodyweight','Glutes B — Dumbbell','Glutes C — Gym ⚡'] },
+    'Biceps':          { bodyweight:['biceps.html'], gym:['biceps.html'], labels:['Biceps Session'] },
+    'Triceps':         { bodyweight:['triceps.html'], gym:['triceps.html'], labels:['Triceps Session'] },
+    'Traps':           { bodyweight:['traps.html'], gym:['traps.html'], labels:['Traps Session'] },
+    'Rear Shoulders':  { bodyweight:['rear_shoulders.html'], gym:['rear_shoulders.html'], labels:['Rear Delt Session'] },
+    'Lower Back':      { bodyweight:['lower_back.html'], gym:['lower_back.html'], labels:['Lower Back Session'] },
+    'Hip Flexors':     { bodyweight:['hip_flexors.html'], gym:['hip_flexors.html'], labels:['Hip Flexor Session'] },
+    'Calves':          { bodyweight:['calves_standalone.html'], gym:['calves_standalone.html'], labels:['Calf Session'] },
+  };
+
+  function getWorkoutForMuscle(muscle) {
+    const data = muscleWorkouts[muscle];
+    if (!data) return null;
+    if (isWarrior && gymAccess && data.gym.length) {
+      return { file: data.gym[0], label: data.labels[data.labels.length - 1] };
+    }
+    return { file: data.bodyweight[0], label: data.labels[0] };
+  }
+
+  if (focusMuscles.length > 0) {
+    document.getElementById('strengthSection').style.display = 'block';
+
+    // Pick today's featured muscle based on day of week
+    const dayIndex = new Date().getDay(); // 0-6
+    const todayMuscle = focusMuscles[dayIndex % focusMuscles.length];
+    const todayWorkout = getWorkoutForMuscle(todayMuscle);
+
+    if (todayWorkout) {
+      document.getElementById('strengthFeaturedTitle').textContent = todayMuscle + ' — ' + todayWorkout.label;
+      const meta = document.getElementById('strengthFeaturedMeta');
+      meta.innerHTML = `
+        <span style="background:rgba(0,200,255,0.06);border:1px solid rgba(0,200,255,0.2);border-radius:999px;padding:3px 10px;font-size:0.68rem;font-weight:600;color:#00c8ff;">💪 Strength</span>
+        <span style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:999px;padding:3px 10px;font-size:0.68rem;font-weight:600;color:#5a6a7a;">${isWarrior && gymAccess ? '⚡ Warrior Gym' : '🏠 Bodyweight'}</span>
+      `;
+
+      window.currentStrengthFile = todayWorkout.file;
+    }
+
+    // Also good for you — remaining muscles
+    const otherMuscles = focusMuscles.filter(m => m !== todayMuscle).slice(0, 2);
+    if (otherMuscles.length > 0) {
+      document.getElementById('alsoGoodSection').style.display = 'block';
+      const container = document.getElementById('alsoGoodCards');
+      otherMuscles.forEach(muscle => {
+        const w = getWorkoutForMuscle(muscle);
+        if (!w) return;
+        const card = document.createElement('div');
+        card.style.cssText = 'background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;';
+        card.onclick = () => window.location.href = w.file;
+        card.innerHTML = `
+          <div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:0.06em;">${muscle}</div>
+            <div style="font-family:'Inter',sans-serif;font-size:0.72rem;color:#5a6a7a;margin-top:2px;">${w.label}</div>
+          </div>
+          <div style="color:#00c8ff;font-size:1.1rem;">→</div>
+        `;
+        container.appendChild(card);
+      });
+    }
+  }
+
+  function goToStrength() {
+    if (window.currentStrengthFile) window.location.href = window.currentStrengthFile;
+  }
+
+  // Daily tips
+  const tips = [
+    { text: "Keep your hands up at all times. Most strikes land because your guard dropped.", art: "Boxing", icon: "🥊" },
+    { text: "In BJJ, control the hips before going for a submission. Hip control = position control.", art: "BJJ", icon: "🥋" },
+    { text: "The teep (push kick) in Muay Thai is your best range-finder. Use it to create distance.", art: "Muay Thai", icon: "🦵" },
+    { text: "In wrestling, always level change before shooting for a takedown. Stay low!", art: "Wrestling", icon: "🤼" },
+    { text: "Kiai (the shout) in Karate isn't just noise — it tightens your core and adds power.", art: "Karate", icon: "🦶" },
+    { text: "In Judo, off-balance your opponent (Kuzushi) before attempting any throw.", art: "Judo", icon: "👘" },
+    { text: "MMA: Clinch work connects your striking and grappling — don't neglect it.", art: "MMA", icon: "💡" },
+    { text: "In Taekwondo, your back kick is your most powerful — drive through with your heel.", art: "Taekwondo", icon: "🦶" },
+    { text: "Krav Maga: Always scan your environment after neutralizing a threat.", art: "Krav Maga", icon: "🛡️" },
+    { text: "Kung Fu breathing: exhale sharply on strikes to maximize power and focus.", art: "Kung Fu", icon: "🐉" },
+  ];
+
+  const relevantTips = tips.filter(t => arts.includes(t.art));
+  const tip = relevantTips.length > 0
+    ? relevantTips[Math.floor(Math.random() * relevantTips.length)]
+    : tips[Math.floor(Math.random() * tips.length)];
+
+  document.getElementById('tipText').textContent = tip.text;
+  document.getElementById('tipArt').textContent = tip.art;
+  document.getElementById('tipIcon').textContent = tip.icon;
+
+  // Sync workout count back to localStorage
+  function saveToLocal() {
+    const saved = localStorage.getItem('omniData');
+    if (saved) {
+      try {
+        const data = JSON.parse(saved);
+        data.omniWorkouts = sessionStorage.getItem('omniWorkouts') || '0';
+        data.omniGymAccess = sessionStorage.getItem('omniGymAccess') || '';
+        localStorage.setItem('omniData', JSON.stringify(data));
+      } catch(e) {}
+    }
+  }
+  saveToLocal();
+
+  function setNav(el) {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    el.classList.add('active');
+  }
+</script>
+</body>
+</html>
