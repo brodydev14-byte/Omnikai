@@ -1,26 +1,16 @@
 (function() {
-  const themes = {
-    default: '#080b10',
-    purple:  '#0a0810',
-    green:   '#080f0a',
-    red:     '#0f0808',
-    navy:    '#07080f',
-    black:   '#000000',
+  var themes = {
+    default: 'rgba(0,200,255,0.12), rgba(0,100,180,0.06)',
+    red:     'rgba(239,68,68,0.12), rgba(180,30,30,0.06)',
+    green:   'rgba(16,185,129,0.12), rgba(10,120,80,0.06)',
+    purple:  'rgba(139,92,246,0.12), rgba(80,40,180,0.06)',
+    gold:    'rgba(255,215,0,0.10), rgba(180,140,0,0.05)',
   };
-  const saved = localStorage.getItem('omniTheme') || 'default';
-  const bg = themes[saved] || '#080b10';
-  
-  // Apply immediately to document
-  document.documentElement.style.backgroundColor = bg;
-  document.documentElement.style.setProperty('--bg', bg);
-  
-  // Also apply after DOM loads to catch .bg-layer
-  document.addEventListener('DOMContentLoaded', function() {
-    document.body.style.backgroundColor = bg;
-    const bgLayer = document.querySelector('.bg-layer');
-    if (bgLayer) {
-      bgLayer.style.backgroundColor = bg;
-      bgLayer.style.background = bg;
-    }
-  });
+
+  var saved = localStorage.getItem('omniTheme') || 'default';
+  var colors = themes[saved] || themes.default;
+
+  var style = document.createElement('style');
+  style.textContent = '.bg-layer { background: radial-gradient(ellipse 80% 60% at 50% 10%, ' + colors.split(',')[0] + ' 0%, ' + colors.split(',')[1] + ' 40%, transparent 70%), #080b10 !important; }';
+  document.head.appendChild(style);
 })();

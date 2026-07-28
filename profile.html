@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script src="theme.js"></script>
 
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -258,33 +259,32 @@
   }
 
   // Theme picker
+  // Theme picker
   const THEMES = [
-    { id:'default', label:'Default',    bg:'#080b10', swatch:'#080b10', border:'#ffffff' },
-    { id:'purple',  label:'Dark Purple', bg:'#0a0810', swatch:'#0a0810', border:'#8b5cf6' },
-    { id:'green',   label:'Dark Green',  bg:'#080f0a', swatch:'#080f0a', border:'#10b981' },
-    { id:'red',     label:'Dark Red',    bg:'#0f0808', swatch:'#0f0808', border:'#ef4444' },
-    { id:'navy',    label:'Deep Navy',   bg:'#07080f', swatch:'#07080f', border:'#00c8ff' },
-    { id:'black',   label:'Pure Black',  bg:'#000000', swatch:'#000000', border:'#ffffff' },
+    { id:'default', label:'Electric Blue', color:'#00c8ff' },
+    { id:'red',     label:'Blood Red',     color:'#ef4444' },
+    { id:'green',   label:'Dragon Green',  color:'#10b981' },
+    { id:'purple',  label:'Cyber Purple',  color:'#8b5cf6' },
+    { id:'gold',    label:'Gold',          color:'#ffd700' },
   ];
 
   const currentTheme = localStorage.getItem('omniTheme') || 'default';
   const grid = document.getElementById('themeGrid');
   if (grid) {
+    grid.innerHTML = '';
     THEMES.forEach(t => {
       const btn = document.createElement('div');
       btn.className = 'theme-btn' + (t.id === currentTheme ? ' active' : '');
       btn.innerHTML = `
-        <div style="width:28px;height:28px;border-radius:50%;background-color:${t.swatch};border:2px solid ${t.border};margin:0 auto 6px;display:block;"></div>
+        <div style="width:28px;height:28px;border-radius:50%;background:${t.color};border:2px solid ${t.color};margin:0 auto 6px;box-shadow:0 0 10px ${t.color}66;"></div>
         <div style="font-size:0.65rem;font-weight:700;text-align:center;color:var(--white);">${t.label}</div>
       `;
-      btn.onclick = () => setTheme(t.id);
+      btn.onclick = () => {
+        localStorage.setItem('omniTheme', t.id);
+        window.location.reload();
+      };
       grid.appendChild(btn);
     });
-  }
-
-  function setTheme(theme) {
-    localStorage.setItem('omniTheme', theme);
-    window.location.reload();
   }
 
   // Achievement preview
