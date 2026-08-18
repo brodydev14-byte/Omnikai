@@ -322,7 +322,10 @@
     localStorage.removeItem('omniData');
     sessionStorage.clear();
     if (currentAction === 'startover') {
-      window.location.href = 'plans.html';
+      // Clear all session and local storage then go to login
+      sessionStorage.clear();
+      localStorage.removeItem('omniData');
+      window.location.href = 'index.html';
     } else {
       window.location.href = 'index.html';
     }
