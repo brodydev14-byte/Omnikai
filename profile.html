@@ -2,6 +2,9 @@
 <html lang="en">
 <head>
   <script src="theme.js"></script>
+  <script src="omni-config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="omni-auth.js"></script>
 
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -318,17 +321,31 @@
     document.getElementById('confirmModal').classList.remove('show');
   }
 
-  function confirmAction() {
-    localStorage.removeItem('omniData');
-    sessionStorage.clear();
+  async function confirmAction() {
+    document.getElementById('modalConfirmBtn').disabled = true;
+
     if (currentAction === 'startover') {
-      sessionStorage.clear();
-      // Clear all localStorage keys related to Omnikai
+      // Wipe the profile but keep the account. Clear locally first, then push
+      // the empty state up so the reset survives to other devices.
+      localStorage.removeItem('omniData');
       Object.keys(localStorage).forEach(key => {
-        if (key.startsWith('omni')) localStorage.removeItem(key);
+        if (key.startsWith('omni') && key !== 'omniTheme') localStorage.removeItem(key);
       });
-      window.location.href = 'index.html';
+      sessionStorage.clear();
+
+      if (window.OmniAuth && OmniAuth.configured && OmniAuth.user()) {
+        await OmniAuth.save();
+      }
+      window.location.href = 'plans.html';
+      return;
+    }
+
+    // Switch account — end the session properly; signOut clears local data.
+    if (window.OmniAuth && OmniAuth.configured) {
+      await OmniAuth.signOut();
     } else {
+      sessionStorage.clear();
+      localStorage.removeItem('omniData');
       window.location.href = 'index.html';
     }
   }

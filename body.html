@@ -2,6 +2,9 @@
 <html lang="en">
 <head>
   <script src="theme.js"></script>
+  <script src="omni-config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="omni-auth.js"></script>
 
   
   <meta charset="UTF-8"/>
@@ -480,7 +483,12 @@
     };
     sessionStorage.setItem('omniBody', JSON.stringify(userData));
 
-    // Save everything to localStorage so it persists between sessions
+    // Mark onboarding done. This lives in sessionStorage so omni-auth.js
+    // syncs it to the account — otherwise the next sign-in on another
+    // device would send them back through onboarding.
+    sessionStorage.setItem('omniSetupComplete', 'true');
+
+    // Local cache so the app still works offline between sessions.
     const omniSave = {
       omniName: sessionStorage.getItem('omniName'),
       omniPlan: sessionStorage.getItem('omniPlan'),
