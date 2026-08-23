@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="theme.js"></script>
+  <script src="omni-config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="omni-auth.js"></script>
+
+  
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Omnikai – MMA: No Equipment</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root { --bg:#080b10; --blue:#00c8ff; --white:#f0f4f8; --muted:#5a6a7a; --border:rgba(0,200,255,0.15); --card:rgba(255,255,255,0.03); --green:#00ff88; --accent:#6366f1; --nav-h:72px; }
+    html,body { min-height:100%; background:var(--bg); color:var(--white); font-family:'Rajdhani',sans-serif; overflow-x:hidden; }
+    .bg-layer { position:fixed; inset:0; z-index:0; background: radial-gradient(ellipse 70% 50% at 50% 10%, rgba(0,200,255,0.05) 0%, transparent 70%), #080b10; }
+    .grid-lines { position:fixed; inset:0; z-index:0; background-image:linear-gradient(rgba(0,200,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,200,255,0.025) 1px,transparent 1px); background-size:48px 48px; }
+    .scroll-wrap { position:relative; z-index:1; min-height:100vh; padding:24px 20px calc(var(--nav-h) + 24px); max-width:600px; margin:0 auto; }
+    .workout-header { display:flex; align-items:center; gap:14px; margin-bottom:28px; }
+    .back-btn { width:38px; height:38px; background:var(--card); border:1px solid var(--border); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:1rem; text-decoration:none; color:var(--white); }
+    .header-eyebrow { font-size:0.65rem; font-weight:700; letter-spacing:0.22em; text-transform:uppercase; color:var(--accent); margin-bottom:2px; }
+    .header-title { font-family:'Bebas Neue',sans-serif; font-size:1.8rem; letter-spacing:0.06em; line-height:1; }
+    .level-badge { background:rgba(99,102,241,0.1); border:1px solid rgba(99,102,241,0.25); border-radius:999px; padding:3px 12px; font-size:0.68rem; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:var(--accent); white-space:nowrap; }
+    .blueprint-card { background:rgba(99,102,241,0.04); border:1px solid rgba(99,102,241,0.2); border-radius:12px; padding:20px; margin-bottom:24px; }
+    .blueprint-title { font-size:0.65rem; font-weight:700; letter-spacing:0.22em; text-transform:uppercase; color:var(--accent); margin-bottom:12px; }
+    .combo-numbers { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+    .combo-num { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:10px 8px; text-align:center; }
+    .num-badge { font-family:'Bebas Neue',sans-serif; font-size:1.4rem; color:var(--accent); line-height:1; }
+    .num-label { font-size:0.62rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); margin-top:3px; }
+    .section { margin-bottom:20px; }
+    .section-header { font-size:0.65rem; font-weight:700; letter-spacing:0.22em; text-transform:uppercase; color:var(--muted); margin-bottom:10px; }
+    .drill-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:24px 20px; margin-bottom:12px; }
+    .drill-card.completed { border-color:var(--green); background:rgba(0,255,136,0.03); }
+    .drill-name { font-family:'Bebas Neue',sans-serif; font-size:1.3rem; letter-spacing:0.06em; line-height:1; margin-bottom:6px; }
+    .drill-combo { display:inline-flex; align-items:center; gap:8px; background:rgba(99,102,241,0.08); border:1px solid rgba(99,102,241,0.2); border-radius:6px; padding:5px 12px; margin-bottom:10px; }
+    .combo-display { font-family:'Bebas Neue',sans-serif; font-size:1.2rem; letter-spacing:0.15em; color:var(--accent); }
+    .combo-name { font-size:0.75rem; font-weight:600; color:var(--muted); }
+    .drill-meta { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+    .meta-chip { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); border-radius:999px; padding:4px 12px; font-size:0.7rem; font-weight:600; color:var(--muted); }
+    .meta-chip.highlight { border-color:rgba(99,102,241,0.25); color:var(--accent); background:rgba(99,102,241,0.06); }
+    .drill-status { width:32px; height:32px; border-radius:50%; border:2px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:0.9rem; flex-shrink:0; cursor:pointer; }
+    .drill-status.done { background:var(--green); border-color:var(--green); color:#080b10; font-weight:900; }
+    .tips-wrap { display:flex; flex-direction:column; gap:12px; margin-bottom:16px; }
+    .tip-row { display:flex; align-items:flex-start; gap:10px; font-family:'Inter',sans-serif; font-size:0.82rem; color:var(--white); line-height:1.5; }
+    .tip-dot { width:6px; height:6px; border-radius:50%; background:var(--accent); flex-shrink:0; margin-top:5px; }
+    .timer-wrap { background:rgba(0,0,0,0.3); border-radius:10px; padding:16px; margin-top:4px; text-align:center; }
+    .timer-display { font-family:'Bebas Neue',sans-serif; font-size:3rem; color:var(--accent); line-height:1; }
+    .timer-label { font-size:0.68rem; font-weight:600; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); margin-bottom:8px; }
+    .timer-set-info { font-size:0.78rem; font-weight:700; color:var(--muted); margin-bottom:10px; }
+    .timer-set-info span { color:var(--white); }
+    .timer-btns { display:flex; gap:8px; justify-content:center; }
+    .timer-btn { padding:10px 24px; border-radius:7px; border:none; font-family:'Bebas Neue',sans-serif; font-size:0.95rem; letter-spacing:0.15em; cursor:pointer; }
+    .timer-btn.start { background:var(--accent); color:#fff; }
+    .timer-btn.reset { background:rgba(255,255,255,0.06); border:1px solid var(--border); color:var(--muted); }
+    .random-combo { font-family:'Bebas Neue',sans-serif; font-size:2.2rem; color:var(--accent); letter-spacing:0.2em; text-align:center; padding:16px; background:rgba(0,0,0,0.2); border-radius:8px; margin-bottom:8px; cursor:pointer; }
+    .random-hint { font-family:'Inter',sans-serif; font-size:0.72rem; color:var(--muted); text-align:center; margin-bottom:14px; }
+    .rep-counter { background:rgba(0,0,0,0.3); border-radius:10px; padding:16px; margin-top:4px; text-align:center; }
+    .rep-display { font-family:'Bebas Neue',sans-serif; font-size:3rem; color:var(--accent); line-height:1; margin-bottom:10px; }
+    .rep-btns { display:flex; gap:8px; justify-content:center; }
+    .rep-btn { padding:12px 28px; border-radius:7px; border:none; font-family:'Bebas Neue',sans-serif; font-size:1.4rem; cursor:pointer; }
+    .rep-btn.minus { background:rgba(255,255,255,0.06); border:1px solid var(--border); color:var(--muted); }
+    .rep-btn.plus { background:var(--accent); color:#fff; }
+    .rep-label { font-size:0.68rem; font-weight:600; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); margin-bottom:8px; }
+    .cooldown-list { display:flex; flex-direction:column; gap:10px; }
+    .cooldown-item { display:flex; align-items:center; gap:12px; background:var(--card); border:1px solid var(--border); border-radius:8px; padding:12px 14px; font-size:0.88rem; font-weight:600; }
+    .cooldown-icon { font-size:1.2rem; flex-shrink:0; }
+    .complete-btn { width:100%; background:var(--accent); border:none; border-radius:10px; padding:16px; color:#fff; font-family:'Bebas Neue',sans-serif; font-size:1.1rem; letter-spacing:0.18em; cursor:pointer; transition:all 0.2s; margin-top:8px; }
+    .complete-btn:hover { opacity:0.85; transform:translateY(-1px); }
+    .bottom-nav { position:fixed; bottom:0; left:0; right:0; height:var(--nav-h); background:rgba(8,11,16,0.95); border-top:1px solid var(--border); backdrop-filter:blur(16px); display:flex; align-items:center; justify-content:space-around; z-index:100; padding:0 8px; }
+    .nav-item { display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; padding:8px 16px; border-radius:10px; flex:1; }
+    .nav-icon { font-size:1.3rem; }
+    .nav-label { font-size:0.58rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); }
+    .nav-item.active .nav-label { color:var(--blue); }
+  </style>
+</head>
+<body>
+<div class="bg-layer"></div>
+<div class="grid-lines"></div>
+<div class="scroll-wrap">
+  <div class="workout-header">
+    <a class="back-btn" href="library.html">←</a>
+    <div>
+      <div class="header-eyebrow">🥊 MMA · No Equipment</div>
+      <div class="header-title">Beginner Session D</div>
+    </div>
+    <div class="level-badge">Zero Gear</div>
+  </div>
+
+  <div class="blueprint-card">
+    <div class="blueprint-title">📋 MMA Strike Numbers</div>
+    <div class="combo-numbers">
+      <div class="combo-num"><div class="num-badge">1</div><div class="num-label">Jab</div></div>
+      <div class="combo-num"><div class="num-badge">2</div><div class="num-label">Cross</div></div>
+      <div class="combo-num"><div class="num-badge">3</div><div class="num-label">Hook</div></div>
+      <div class="combo-num"><div class="num-badge">4</div><div class="num-label">Upper</div></div>
+      <div class="combo-num"><div class="num-badge">5</div><div class="num-label">Body</div></div>
+      <div class="combo-num"><div class="num-badge">6</div><div class="num-label">Kick</div></div>
+      <div class="combo-num"><div class="num-badge">TD</div><div class="num-label">Takedown</div></div>
+      <div class="combo-num"><div class="num-badge">SP</div><div class="num-label">Sprawl</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">🔥 Warm Up</div>
+    <div class="drill-card" id="warmup-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div class="drill-name">Floor Space Activation</div>
+        <div class="drill-status" id="warmupStatus" onclick="completeDrill('warmup')">○</div>
+      </div>
+      <div class="drill-meta"><div class="meta-chip highlight">4 Minutes</div><div class="meta-chip">No gear, no gym</div></div>
+      <div class="tips-wrap">
+        <div class="tip-row"><div class="tip-dot"></div>All you need is a body length of floor space in every direction — clear it first</div>
+        <div class="tip-row"><div class="tip-dot"></div>Hip circles, leg swings, shoulder rolls, neck rolls — MMA uses every joint</div>
+        <div class="tip-row"><div class="tip-dot"></div>10 bodyweight squats and 20 jumping jacks to raise the heart rate</div>
+      </div>
+      <div class="timer-wrap">
+        <div class="timer-label">Warm Up</div>
+        <div class="timer-display" id="warmupTimer">4:00</div>
+        <div class="timer-btns">
+          <button class="timer-btn start" onclick="startTimer('warmup',240)">Start</button>
+          <button class="timer-btn reset" onclick="resetTimer('warmup',240)">Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">👟 Drill 1 — MMA Stance & Footwork</div>
+    <div class="drill-card" id="stance-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div class="drill-name">Stance Circles & Range Steps</div>
+        <div class="drill-status" id="stanceStatus" onclick="completeDrill('stance')">○</div>
+      </div>
+      <div class="drill-meta">
+        <div class="meta-chip highlight">3 Sets</div>
+        <div class="meta-chip highlight">2:00 each</div>
+        <div class="meta-chip">30 sec rest</div>
+      </div>
+      <div class="tips-wrap">
+        <div class="tip-row"><div class="tip-dot"></div><strong>MMA stance vs boxing:</strong> Feet slightly wider and squarer — you have to shoot and defend takedowns as well as strike</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Step, never cross:</strong> Lead foot moves first going forward, back foot first going back — crossed feet get you swept</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>No equipment needed:</strong> Footwork is the one thing every fighter can drill anywhere, and it is the thing beginners skip most</div>
+      </div>
+      <div class="timer-wrap">
+        <div class="timer-label">Round Timer</div>
+        <div class="timer-display" id="stanceTimer">2:00</div>
+        <div class="timer-set-info">Set <span id="stanceCurrentSet">1</span> of <span>3</span></div>
+        <div class="timer-btns">
+          <button class="timer-btn start" onclick="startTimer('stance',120)">Start</button>
+          <button class="timer-btn reset" onclick="resetTimer('stance',120)">Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">🥊 Drill 2 — Shadow Strikes</div>
+    <div class="drill-card" id="strike-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div class="drill-name">Air Combinations</div>
+        <div class="drill-status" id="strikeStatus" onclick="completeDrill('strike')">○</div>
+      </div>
+      <div class="drill-combo"><div class="combo-display">1-2-3</div><div class="combo-name">Jab — Cross — Hook</div></div>
+      <div class="drill-meta">
+        <div class="meta-chip highlight">3 Sets</div>
+        <div class="meta-chip highlight">2:00 each</div>
+        <div class="meta-chip">30 sec rest</div>
+      </div>
+      <div class="tips-wrap">
+        <div class="tip-row"><div class="tip-dot"></div><strong>Never snap the elbow:</strong> With no bag to absorb the punch, stop the shot just short of full extension — hyperextending in the air is the one real risk of shadow work</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Hands back to the chin:</strong> No target means no feedback, so make the return path the habit you build</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Add the kick when it feels smooth:</strong> Finish some rounds on a 6 to keep it MMA rather than pure boxing</div>
+      </div>
+      <div class="timer-wrap">
+        <div class="timer-label">Round Timer</div>
+        <div class="timer-display" id="strikeTimer">2:00</div>
+        <div class="timer-set-info">Set <span id="strikeCurrentSet">1</span> of <span>3</span></div>
+        <div class="timer-btns">
+          <button class="timer-btn start" onclick="startTimer('strike',120)">Start</button>
+          <button class="timer-btn reset" onclick="resetTimer('strike',120)">Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">🤼 Drill 3 — Solo Level Changes</div>
+    <div class="drill-card" id="level-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div class="drill-name">Shot Entries on Air</div>
+        <div class="drill-status" id="levelStatus" onclick="completeDrill('level')">○</div>
+      </div>
+      <div class="drill-combo"><div class="combo-display">1-2-TD</div><div class="combo-name">Jab — Cross — Level change & shot</div></div>
+      <div class="drill-meta">
+        <div class="meta-chip highlight">3 Sets</div>
+        <div class="meta-chip highlight" id="levelReps">8 each side</div>
+        <div class="meta-chip">30 sec rest</div>
+      </div>
+      <div class="tips-wrap">
+        <div class="tip-row"><div class="tip-dot"></div><strong>No partner required:</strong> Drop the level, penetration step with the lead knee, hands close on an imaginary waist, then drive up and reset</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Chest up, knees bent:</strong> The most common beginner error is bending at the waist — a mirror or a phone camera catches it instantly</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Punches set up the shot:</strong> Even on air, throw the 1-2 with real intent before the level change so the timing becomes automatic</div>
+      </div>
+      <div class="rep-counter">
+        <div class="rep-label">Rep Counter (Each Side)</div>
+        <div class="rep-display" id="levelCount">0</div>
+        <div class="rep-btns">
+          <button class="rep-btn minus" onclick="changeRep('level',-1)">−</button>
+          <button class="rep-btn plus" onclick="changeRep('level',1)">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">🛡️ Drill 4 — Solo Sprawls</div>
+    <div class="drill-card" id="sprawl-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div class="drill-name">Sprawl & Recover</div>
+        <div class="drill-status" id="sprawlStatus" onclick="completeDrill('sprawl')">○</div>
+      </div>
+      <div class="drill-combo"><div class="combo-display">SP-1-2</div><div class="combo-name">Sprawl — Up — Jab — Cross</div></div>
+      <div class="drill-meta">
+        <div class="meta-chip highlight">3 Sets</div>
+        <div class="meta-chip highlight" id="sprawlReps">10 reps</div>
+        <div class="meta-chip">30 sec rest</div>
+      </div>
+      <div class="tips-wrap">
+        <div class="tip-row"><div class="tip-dot"></div><strong>Hips hit the floor first:</strong> Kick the legs back and drop the weight — the sprawl works because your hips are heavy, not because your arms are strong</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Get up the same way every time:</strong> Hands up, back to stance, two strikes — never stand up flat-footed with your hands down</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>A carpet or mat helps</strong> but bare floor is fine if you control the drop rather than crashing down</div>
+      </div>
+      <div class="rep-counter">
+        <div class="rep-label">Rep Counter</div>
+        <div class="rep-display" id="sprawlCount">0</div>
+        <div class="rep-btns">
+          <button class="rep-btn minus" onclick="changeRep('sprawl',-1)">−</button>
+          <button class="rep-btn plus" onclick="changeRep('sprawl',1)">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">🧍 Drill 5 — Technical Stand-Up</div>
+    <div class="drill-card" id="standup-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div class="drill-name">Getting Up Safely</div>
+        <div class="drill-status" id="standupStatus" onclick="completeDrill('standup')">○</div>
+      </div>
+      <div class="drill-meta">
+        <div class="meta-chip highlight">3 Sets</div>
+        <div class="meta-chip highlight" id="standupReps">8 each side</div>
+        <div class="meta-chip">30 sec rest</div>
+      </div>
+      <div class="tips-wrap">
+        <div class="tip-row"><div class="tip-dot"></div><strong>Post, frame, stand:</strong> From seated, post on one hand, keep the other arm framing your face, load the opposite foot and stand — never turn your back</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Why it belongs in MMA:</strong> Getting knocked down happens. Standing up without eating a shot on the way is a skill, and it needs zero equipment</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Drill both sides evenly:</strong> You do not get to pick which side you land on</div>
+      </div>
+      <div class="rep-counter">
+        <div class="rep-label">Rep Counter (Each Side)</div>
+        <div class="rep-display" id="standupCount">0</div>
+        <div class="rep-btns">
+          <button class="rep-btn minus" onclick="changeRep('standup',-1)">−</button>
+          <button class="rep-btn plus" onclick="changeRep('standup',1)">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">🌊 Finisher — Full MMA Shadowboxing</div>
+    <div class="drill-card" id="shadow-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div class="drill-name">Everything Together</div>
+        <div class="drill-status" id="shadowStatus" onclick="completeDrill('shadow')">○</div>
+      </div>
+      <div class="drill-meta">
+        <div class="meta-chip highlight">2 Rounds</div>
+        <div class="meta-chip highlight">3:00 each</div>
+        <div class="meta-chip">1:00 rest</div>
+      </div>
+      <div class="random-combo" id="randomCombo" onclick="newCombo()">1-2-TD</div>
+      <div class="random-hint">👆 Tap for a random MMA combo</div>
+      <div class="tips-wrap">
+        <div class="tip-row"><div class="tip-dot"></div><strong>Use every drill from today:</strong> Strikes, level changes, sprawls, stand-ups — string them into one continuous flow</div>
+        <div class="tip-row"><div class="tip-dot"></div><strong>Fight an imaginary opponent:</strong> They move, they counter, they shoot on you — react to them instead of just throwing into space</div>
+      </div>
+      <div class="timer-wrap">
+        <div class="timer-label">Round Timer</div>
+        <div class="timer-display" id="shadowTimer">3:00</div>
+        <div class="timer-btns">
+          <button class="timer-btn start" onclick="startTimer('shadow',180)">Start</button>
+          <button class="timer-btn reset" onclick="resetTimer('shadow',180)">Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">🧘 Cool Down</div>
+    <div class="drill-card" id="cooldown-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div class="drill-name">Stretch & Recover</div>
+        <div class="drill-status" id="cooldownStatus" onclick="completeDrill('cooldown')">○</div>
+      </div>
+      <div class="cooldown-list">
+        <div class="cooldown-item"><div class="cooldown-icon">🦵</div>Hip flexor lunge stretch — 30 sec each side</div>
+        <div class="cooldown-item"><div class="cooldown-icon">🤸</div>Hamstring stretch — 30 sec each leg</div>
+        <div class="cooldown-item"><div class="cooldown-icon">🌀</div>Spinal twist — 30 sec each side</div>
+        <div class="cooldown-item"><div class="cooldown-icon">🧘</div>Child's pose — 45 sec</div>
+      </div>
+    </div>
+  </div>
+
+  <button class="complete-btn" onclick="completeSession()">✓ MMA Session D Complete — No Excuses!</button>
+</div>
+
+<div class="bottom-nav">
+  <div class="nav-item" onclick="window.location.href='dashboard.html'"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></div>
+  <div class="nav-item active"><div class="nav-icon">📚</div><div class="nav-label">Library</div></div>
+  <div class="nav-item" onclick="window.location.href='nutrition.html'"><div class="nav-icon">🥗</div><div class="nav-label">Nutrition</div></div>
+  <div class="nav-item" onclick="window.location.href='progress.html'"><div class="nav-icon">📈</div><div class="nav-label">Progress</div></div>
+  <div class="nav-item" onclick="window.location.href='profile.html'"><div class="nav-icon">👤</div><div class="nav-label">Profile</div></div>
+</div>
+
+<script>
+  const bodyData = JSON.parse(sessionStorage.getItem('omniBody') || '{}');
+  const weight = parseFloat(bodyData.weight) || 160;
+  const unit = bodyData.unit || 'imperial';
+  const weightLbs = unit === 'metric' ? weight * 2.205 : weight;
+  const isHeavy = weightLbs > 200; const isMid = weightLbs > 160 && weightLbs <= 200;
+  document.getElementById('levelReps').textContent = (isHeavy ? 5 : isMid ? 8 : 10) + ' each side';
+  document.getElementById('sprawlReps').textContent = (isHeavy ? 6 : isMid ? 10 : 12) + ' reps';
+  document.getElementById('standupReps').textContent = (isHeavy ? 5 : isMid ? 8 : 10) + ' each side';
+  const timers = {}; const repCounts = { level:0, sprawl:0, standup:0 };
+  function formatTime(s) { const m=Math.floor(s/60); const sec=s%60; return `${m}:${sec.toString().padStart(2,'0')}`; }
+  function startTimer(id, seconds) { if(timers[id]) clearInterval(timers[id]); let r=seconds; timers[id]=setInterval(()=>{ r--; document.getElementById(`${id}Timer`).textContent=formatTime(r); if(r<=0){clearInterval(timers[id]);document.getElementById(`${id}Timer`).textContent='REST!';}},1000); }
+  function resetTimer(id, seconds) { if(timers[id]) clearInterval(timers[id]); document.getElementById(`${id}Timer`).textContent=formatTime(seconds); }
+  function changeRep(id, delta) { repCounts[id]=Math.max(0,repCounts[id]+delta); document.getElementById(`${id}Count`).textContent=repCounts[id]; }
+  function completeDrill(id) { const s=document.getElementById(`${id}Status`); const c=document.getElementById(`${id}-card`); if(s){s.textContent='✓';s.classList.add('done');} if(c) c.classList.add('completed'); }
+  const combos = ['1-2-TD','1-2-6','2-SP','1-2-3-6','TD-SP','1-6-TD','2-3-SP'];
+  function newCombo() { document.getElementById('randomCombo').textContent=combos[Math.floor(Math.random()*combos.length)]; }
+  function completeSession() { const count=parseInt(sessionStorage.getItem('omniWorkouts')||'0')+1; sessionStorage.setItem('omniWorkouts',count)
+    // Update streak and last workout date
+    const today = new Date().toISOString().split('T')[0];
+    const lastDate = localStorage.getItem('omniLastWorkoutDate') || '';
+    let streak = parseInt(localStorage.getItem('omniStreak') || '0');
+    if (lastDate !== today) {
+      const last = lastDate ? new Date(lastDate) : null;
+      const now = new Date(today);
+      const diffDays = last ? Math.round((now - last) / (1000 * 60 * 60 * 24)) : 999;
+      streak = diffDays === 1 ? streak + 1 : 1;
+      localStorage.setItem('omniStreak', streak.toString());
+      localStorage.setItem('omniLastWorkoutDate', today);
+    }
+    localStorage.setItem('omniWorkouts', count.toString());
+; alert('🥊 MMA Session D Complete! No gym, no gear, no excuses — that is the whole sport in your living room!'); window.location.href='dashboard.html'; }
+</script>
+</body>
+</html>
