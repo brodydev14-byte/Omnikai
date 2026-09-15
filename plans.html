@@ -422,8 +422,43 @@
 </div>
 
 <script>
+  var premiumBtn = document.querySelector('.cta-btn.premium');
+
   function selectPlan(plan) {
-    window.location.href = 'setup.html?plan=' + plan;
+    // Free tier is unchanged: straight into onboarding.
+    if (plan !== 'warrior') {
+      window.location.href = 'setup.html?plan=' + plan;
+      return;
+    }
+
+    // Already paying (e.g. they came back to this page) — nothing to buy.
+    if (window.OmniAuth && OmniAuth.isWarrior && OmniAuth.isWarrior()) {
+      window.location.href = 'dashboard.html';
+      return;
+    }
+
+    // A user can land here mid-onboarding or as an existing member
+    // upgrading later. Send them back to wherever they still need to be:
+    // finishing setup, or the dashboard if that's already done.
+    var setupDone = sessionStorage.getItem('omniSetupComplete') === 'true';
+    var returnPage = setupDone ? 'dashboard.html' : 'setup.html';
+
+    premiumBtn.disabled = true;
+    premiumBtn.textContent = 'Opening secure checkout…';
+
+    OmniAuth.startCheckout(returnPage).catch(function (err) {
+      // startCheckout only settles on failure — success navigates away.
+      console.error('[Omnikai] checkout failed:', err);
+      premiumBtn.disabled = false;
+      premiumBtn.textContent = 'Begin as a Warrior';
+      alert('Sorry — we could not open checkout just now. Please try again.');
+    });
+  }
+
+  // Coming back from a cancelled checkout is a normal choice, not an error;
+  // just clean the URL so a refresh doesn't look like a fresh cancellation.
+  if (new URLSearchParams(location.search).get('checkout') === 'cancelled') {
+    history.replaceState({}, '', location.pathname);
   }
 </script>
 </body>

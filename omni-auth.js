@@ -279,6 +279,22 @@
     if (currentUser && syncTimer) { clearTimeout(syncTimer); pushProfile(); }
   });
 
+  /* ── Billing ───────────────────────────────────────────────────
+     Both calls hand off to an Edge Function and come back with a Stripe
+     URL to send the browser to. Nothing about tier is decided here — the
+     client can't write `plan` (the database rejects it), so the source of
+     truth stays the stripe-webhook function. This is only the doorway. */
+  function billingRedirect(fn, body) {
+    if (!currentUser) return Promise.reject(new Error('not signed in'));
+    // invoke() attaches the user's access token automatically, which is
+    // what the function uses to decide whose subscription this is.
+    return sb.functions.invoke(fn, { body: body || {} }).then(function (res) {
+      if (res.error) throw new Error(res.error.message || 'billing request failed');
+      if (!res.data || !res.data.url) throw new Error(res.data && res.data.error || 'no checkout URL');
+      location.href = res.data.url;
+    });
+  }
+
   /* ── Public API ────────────────────────────────────────────────*/
   window.OmniAuth = {
     configured: true,
@@ -315,6 +331,26 @@
     },
 
     save: pushProfile,
+
+    /** Send the user to Stripe Checkout for the Warrior tier.
+        Returns a promise that only rejects — on success the page navigates
+        away. `returnPage` must be one the function allowlists. */
+    startCheckout: function (returnPage) {
+      return billingRedirect('create-checkout-session', { returnPage: returnPage });
+    },
+
+    /** Send the user to the Stripe billing portal to update a card, see
+        invoices, or cancel. Cancelling there fires the webhook that puts
+        them back on wanderer — there is no cancel path of our own. */
+    openBillingPortal: function () {
+      return billingRedirect('create-portal-session');
+    },
+
+    /** Whether this user is currently on the paid tier. Reads the value
+        omni-auth pulled from the server, never a local guess. */
+    isWarrior: function () {
+      return sessionStorage.getItem('omniPlan') === 'warrior';
+    },
 
     signOut: function () {
       return sb.auth.signOut().then(function () {

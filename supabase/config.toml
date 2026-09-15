@@ -412,3 +412,22 @@ enabled = true
 # declarative_schema_path = "./schemas"
 # JSON string passed through to pg-delta SQL formatting.
 # format_options = "{\"keywordCase\":\"upper\",\"indent\":2,\"maxWidth\":80,\"commaStyle\":\"trailing\"}"
+
+# ===========================================================
+# EDGE FUNCTIONS
+# ===========================================================
+
+# Stripe authenticates itself with the Stripe-Signature header, not a
+# Supabase JWT. Leaving verify_jwt on would make the platform reject every
+# delivery with a 401 before our code ever runs — the function verifies the
+# signature itself instead.
+[functions.stripe-webhook]
+verify_jwt = false
+
+# Both of these are called by a signed-in browser and must keep the default
+# verify_jwt = true, which is what makes auth.getUser() trustworthy inside.
+[functions.create-checkout-session]
+verify_jwt = true
+
+[functions.create-portal-session]
+verify_jwt = true
