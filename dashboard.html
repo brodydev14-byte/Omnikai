@@ -599,6 +599,22 @@
       </div>
     </div>
 
+    <!-- UPGRADE PROMPT
+         Shown to Wanderers only, revealed by JS once the plan is known.
+         Until this existed, the only route to the paid tier was bumping into
+         locked content — someone who had already decided to pay had nowhere
+         to click. Hidden by default so it never flashes for a Warrior. -->
+    <div id="upgradeCard" style="display:none;margin-bottom:28px;">
+      <div style="background:linear-gradient(135deg,rgba(255,215,0,0.08),rgba(255,215,0,0.02));border:1px solid rgba(255,215,0,0.25);border-radius:14px;padding:20px;">
+        <div style="font-size:0.65rem;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:#ffd700;margin-bottom:8px;">🏆 Warrior</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:0.05em;line-height:1.1;margin-bottom:8px;">Unlock Every Discipline</div>
+        <div style="font-family:'Inter',sans-serif;font-size:0.8rem;line-height:1.5;color:var(--muted);margin-bottom:16px;">
+          All martial arts, advanced sessions, custom plans and full progress tracking — $9.99/month, cancel anytime.
+        </div>
+        <button onclick="window.location.href='plans.html'" style="background:#ffd700;border:none;border-radius:10px;padding:13px 26px;color:#080b10;font-family:'Bebas Neue',sans-serif;font-size:0.95rem;letter-spacing:0.15em;cursor:pointer;">Upgrade to Warrior →</button>
+      </div>
+    </div>
+
     <!-- FEATURED WORKOUT -->
     <div class="section-label">Today's Workout</div>
     <div class="featured-workout" id="featuredWorkout" onclick="goToFeatured()" style="cursor:pointer;">
@@ -706,6 +722,13 @@
   const equipment = JSON.parse(sessionStorage.getItem('omniEquipment') || '{}');
   const gymAccess = sessionStorage.getItem('omniGymAccess') === 'true';
   const isWarrior = plan === 'warrior';
+
+  // Reveal the upgrade card only for free users. `plan` comes from
+  // sessionStorage, which omni-auth.js fills from the server — so a Warrior
+  // never sees this, and nobody gets a sales pitch for what they already own.
+  if (!isWarrior) {
+    document.getElementById('upgradeCard').style.display = '';
+  }
   const focusMuscles = bodyData.focusMuscles || [];
   const goal = (bodyData.goal || 'perform').toLowerCase();
   const weight = parseFloat(bodyData.weight) || 160;

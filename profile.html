@@ -151,6 +151,21 @@
     </div>
   </div>
 
+  <!-- MEMBERSHIP
+       One row that changes with the plan: a route to subscribe for Wanderers,
+       and a route to Stripe's billing portal for Warriors. The portal is where
+       cancelling, card updates and invoices live — we deliberately host none
+       of that ourselves, so cancelling is Stripe's job and the webhook just
+       hears about it. Filled by JS so it can't show the wrong state. -->
+  <div id="membershipRow" style="display:none;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:16px;align-items:center;gap:14px;">
+    <div style="font-size:1.6rem;" id="membershipIcon">⚡</div>
+    <div style="flex:1;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:0.06em;" id="membershipTitle">Membership</div>
+      <div style="font-family:'Inter',sans-serif;font-size:0.72rem;color:var(--muted);margin-top:2px;" id="membershipSub"></div>
+    </div>
+    <button id="membershipBtn" style="background:none;border:1px solid var(--border);border-radius:8px;padding:9px 14px;color:var(--white);font-family:'Bebas Neue',sans-serif;font-size:0.8rem;letter-spacing:0.12em;cursor:pointer;white-space:nowrap;"></button>
+  </div>
+
   <!-- SWITCH PROFILE / START OVER -->
   <!-- ACHIEVEMENTS LINK -->
   <div onclick="window.location.href='achievements.html'" style="background:rgba(255,215,0,0.04);border:1px solid rgba(255,215,0,0.15);border-radius:12px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(255,215,0,0.35)'" onmouseout="this.style.borderColor='rgba(255,215,0,0.15)'">
@@ -226,6 +241,38 @@
     badge.textContent = '🌊 Wanderer Plan';
     badge.classList.add('wanderer');
   }
+
+  // ── Membership row ───────────────────────────────────────────
+  (function () {
+    const row = document.getElementById('membershipRow');
+    const btn = document.getElementById('membershipBtn');
+
+    if (isWarrior) {
+      document.getElementById('membershipIcon').textContent = '⚡';
+      document.getElementById('membershipTitle').textContent = 'Warrior Membership';
+      document.getElementById('membershipSub').textContent = 'Update your card, see invoices, or cancel';
+      btn.textContent = 'Manage →';
+      btn.onclick = function () {
+        btn.disabled = true;
+        btn.textContent = 'Opening…';
+        // Stripe hosts the portal; this only fetches a one-time link to it.
+        OmniAuth.openBillingPortal().catch(function (err) {
+          console.error('[Omnikai] billing portal failed:', err);
+          btn.disabled = false;
+          btn.textContent = 'Manage →';
+          alert('Sorry — we could not open the billing portal just now. Please try again.');
+        });
+      };
+    } else {
+      document.getElementById('membershipIcon').textContent = '🏆';
+      document.getElementById('membershipTitle').textContent = 'Wanderer — Free';
+      document.getElementById('membershipSub').textContent = 'Unlock every discipline for $9.99/month';
+      btn.textContent = 'Upgrade →';
+      btn.onclick = function () { window.location.href = 'plans.html'; };
+    }
+
+    row.style.display = 'flex';
+  })();
 
   // Stats
   document.getElementById('statWorkouts').textContent = workouts;
