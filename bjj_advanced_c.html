@@ -5,6 +5,7 @@
   <script src="omni-config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="omni-auth.js"></script>
+  <script src="omni-premium.js"></script>
 
   
   <meta charset="UTF-8"/>
@@ -72,58 +73,9 @@
 <div class="bg-layer"></div>
 <div class="grid-lines"></div>
 <div class="scroll-wrap">
-  <div class="workout-header">
-    <a class="back-btn" href="library.html">←</a>
-    <div>
-      <div class="header-eyebrow">🥋 BJJ · Advanced · Conditioning</div>
-      <div class="header-title">Advanced Session C</div>
-    </div>
-    <div class="level-badge">🏆 Advanced</div>
-  </div>
-
-  <div class="elite-banner">
-    <div class="elite-banner-icon">🏆</div>
-    <div class="elite-banner-text"><strong>Elite Level — Warrior Exclusive.</strong> Advanced sessions are for athletes who have fully internalized beginner and intermediate foundations. Techniques are referenced without explanation — execution and volume are the focus.</div>
-  </div>
-
-  <div class="section">
-    <div class="section-header">🔥 Warm Up</div>
-    <div class="drill-card" id="warmup-card">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-        <div class="drill-name">Advanced Warm Up</div>
-        <div class="drill-status" id="warmupStatus" onclick="completeDrill('warmup')">○</div>
-      </div>
-      <div class="drill-meta"><div class="meta-chip highlight">5 Minutes</div><div class="meta-chip">Includes technique activation</div></div>
-      <div class="timer-wrap">
-        <div class="timer-label">Warm Up</div>
-        <div class="timer-display" id="warmupTimer">5:00</div>
-        <div class="timer-btns">
-          <button class="timer-btn start" onclick="startTimer('warmup',300)">Start</button>
-          <button class="timer-btn reset" onclick="resetTimer('warmup',300)">Reset</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="section"><div class="section-header">🥋 Drill 1 — Competition Simulation</div><div class="drill-card" id="comp-card"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;"><div class="drill-name">6 x 5-Minute Competition Rounds</div><div class="drill-status" id="compStatus" onclick="completeDrill('comp')">○</div></div><div class="drill-meta"><div class="meta-chip highlight">6 Rounds</div><div class="meta-chip highlight">5 min each</div><div class="meta-chip">90 sec rest</div></div><div class="tips-wrap"><div class="tip-row"><div class="tip-dot"></div><strong>IBJJF adult matches are 5 minutes:</strong> 6 rounds of 5 minutes is a full competition day simulation — this is how elite competitors prepare</div><div class="tip-row"><div class="tip-dot"></div><strong>Position then submission:</strong> Flow through positions looking for openings — advanced BJJ does not force submissions, it earns them</div></div><div class="timer-wrap"><div class="timer-label">Round Timer</div><div class="timer-display" id="compTimer">5:00</div><div class="timer-set-info">Round <span id="compCurrentSet">1</span> of <span>6</span></div><div class="timer-btns"><button class="timer-btn start" onclick="startTimer('comp',300)">Start</button><button class="timer-btn reset" onclick="resetTimer('comp',300)">Reset</button></div></div></div></div>
-
-  <div class="section">
-    <div class="section-header">🧘 Cool Down</div>
-    <div class="drill-card" id="cooldown-card">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-        <div class="drill-name">Advanced Recovery</div>
-        <div class="drill-status" id="cooldownStatus" onclick="completeDrill('cooldown')">○</div>
-      </div>
-      <div class="cooldown-list">
-        <div class="cooldown-item"><div class="cooldown-icon">🤸</div>Full body stretch — 5 minutes minimum at advanced volume</div>
-        <div class="cooldown-item"><div class="cooldown-icon">🧘</div>Spinal decompression — child's pose 90 seconds</div>
-        <div class="cooldown-item"><div class="cooldown-icon">💭</div>Session review — identify one weakness to address next time</div>
-        <div class="cooldown-item"><div class="cooldown-icon">📝</div>Log your performance — advanced athletes track everything</div>
-      </div>
-    </div>
-  </div>
-
-  <button class="complete-btn" onclick="completeSession()">🏆 BJJ Advanced Session C Complete!</button>
+  <!-- Session content is fetched from premium_content after sign-in.
+       It is deliberately not in this file: served as a static page, it
+       would be readable without paying. See omni-premium.js. -->
 </div>
 
 <div class="bottom-nav">
@@ -135,19 +87,7 @@
 </div>
 
 <script>
-  const plan = sessionStorage.getItem('omniPlan') || 'wanderer';
-  if (plan !== 'warrior') {
-    document.querySelector('.scroll-wrap').innerHTML = `
-      <div style="padding:40px 20px;text-align:center;">
-        <div style="font-size:3rem;margin-bottom:16px;">🏆</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:0.06em;color:#ffd700;margin-bottom:8px;">Elite — Warrior Exclusive</div>
-        <div style="font-family:'Inter',sans-serif;font-size:0.85rem;color:var(--muted);margin-bottom:24px;line-height:1.6;">Advanced sessions are available to Warrior members only. This is the highest level content in Omnikai.</div>
-        <button onclick="window.location.href='plans.html'" style="background:#ffd700;border:none;border-radius:10px;padding:14px 28px;color:#080b10;font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:0.15em;cursor:pointer;">Upgrade to Warrior →</button>
-        <br/><br/>
-        <a href="library.html" style="color:var(--muted);font-size:0.8rem;">← Back to Library</a>
-      </div>
-    `;
-  }
+  OmniPremium.load('bjj_advanced_c');
   const timers = {}; const repCounts = {};
   function formatTime(s) { const m=Math.floor(s/60); const sec=s%60; return m+':'+sec.toString().padStart(2,'0'); }
   function startTimer(id, seconds) { if(timers[id]) clearInterval(timers[id]); let r=seconds; timers[id]=setInterval(()=>{ r--; const el=document.getElementById(id+'Timer'); if(el) el.textContent=formatTime(r); if(r<=0){clearInterval(timers[id]);if(el) el.textContent='DONE!';}},1000); }

@@ -5,6 +5,7 @@
   <script src="omni-config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="omni-auth.js"></script>
+  <script src="omni-premium.js"></script>
 
   
   <meta charset="UTF-8"/>
@@ -72,60 +73,9 @@
 <div class="bg-layer"></div>
 <div class="grid-lines"></div>
 <div class="scroll-wrap">
-  <div class="workout-header">
-    <a class="back-btn" href="library.html">←</a>
-    <div>
-      <div class="header-eyebrow">🥊 Boxing · Intermediate · Technique Focus</div>
-      <div class="header-title">Intermediate Session A</div>
-    </div>
-    <div class="level-badge">Technique</div>
-  </div>
-
-  <div class="warrior-banner">
-    <div class="warrior-banner-icon">⚔️</div>
-    <div class="warrior-banner-text"><strong>Warrior Exclusive.</strong> Intermediate sessions assume your beginner foundations are solid. Techniques are referenced by name — focus on execution quality and higher volume.</div>
-  </div>
-
-  <div class="section">
-    <div class="section-header">🔥 Warm Up</div>
-    <div class="drill-card" id="warmup-card">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-        <div class="drill-name">Extended Warm Up</div>
-        <div class="drill-status" id="warmupStatus" onclick="completeDrill('warmup')">○</div>
-      </div>
-      <div class="drill-meta"><div class="meta-chip highlight">4 Minutes</div><div class="meta-chip">Higher intensity than beginner</div></div>
-      <div class="timer-wrap">
-        <div class="timer-label">Warm Up</div>
-        <div class="timer-display" id="warmupTimer">4:00</div>
-        <div class="timer-btns">
-          <button class="timer-btn start" onclick="startTimer('warmup',240)">Start</button>
-          <button class="timer-btn reset" onclick="resetTimer('warmup',240)">Reset</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="section"><div class="section-header">🥊 Drill 1 — Slipping Punches</div><div class="drill-card" id="slip-card"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;"><div class="drill-name">Slip and Counter</div><div class="drill-status" id="slipStatus" onclick="completeDrill('slip')">○</div></div><div class="drill-meta"><div class="meta-chip highlight">4 Sets</div><div class="meta-chip highlight">2 min each</div><div class="meta-chip">30 sec rest</div></div><div class="tips-wrap"><div class="tip-row"><div class="tip-dot"></div><strong>Slip outside:</strong> Visualize a jab coming at you — rotate your head slightly outside the punch, staying upright, then fire a counter right hand</div><div class="tip-row"><div class="tip-dot"></div><strong>Slip inside:</strong> Slip to the inside of an imaginary cross, then hook to the body or head</div><div class="tip-row"><div class="tip-dot"></div><strong>Stay compact:</strong> Slips are small movements — you are not ducking, you are rotating at the waist just enough to make the punch miss</div><div class="tip-row"><div class="tip-dot"></div><strong>Counter immediately:</strong> Every slip is followed by a punch — defense without offense teaches nothing</div></div><div class="timer-wrap"><div class="timer-label">Round Timer</div><div class="timer-display" id="slipTimer">2:00</div><div class="timer-btns"><button class="timer-btn start" onclick="startTimer('slip',120)">Start</button><button class="timer-btn reset" onclick="resetTimer('slip',120)">Reset</button></div></div></div></div>
-  <div class="section"><div class="section-header">🥊 Drill 2 — Rolling Under Hooks</div><div class="drill-card" id="roll-card"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;"><div class="drill-name">Roll and Counter</div><div class="drill-status" id="rollStatus" onclick="completeDrill('roll')">○</div></div><div class="drill-meta"><div class="meta-chip highlight">4 Sets</div><div class="meta-chip highlight">2 min each</div><div class="meta-chip">30 sec rest</div></div><div class="tips-wrap"><div class="tip-row"><div class="tip-dot"></div><strong>U-shape movement:</strong> Bend your knees and roll under imaginary hooks — down on one side, up on the other — like ducking under a bar</div><div class="tip-row"><div class="tip-dot"></div><strong>Counter on the way up:</strong> As you come up from the roll, you are in perfect position to hook to the body or head</div><div class="tip-row"><div class="tip-dot"></div><strong>String them together:</strong> Roll left, roll right, continuously — this is what professional boxers drill for hours</div></div><div class="timer-wrap"><div class="timer-label">Round Timer</div><div class="timer-display" id="rollTimer">2:00</div><div class="timer-btns"><button class="timer-btn start" onclick="startTimer('roll',120)">Start</button><button class="timer-btn reset" onclick="resetTimer('roll',120)">Reset</button></div></div></div></div>
-  <div class="section"><div class="section-header">🥊 Drill 3 — Counter Combination Shadow</div><div class="drill-card" id="counter-card"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;"><div class="drill-name">Counter Combination Shadowboxing</div><div class="drill-status" id="counterStatus" onclick="completeDrill('counter')">○</div></div><div class="drill-meta"><div class="meta-chip highlight">3 Rounds</div><div class="meta-chip highlight">3 min each</div><div class="meta-chip">1 min rest</div></div><div class="tips-wrap"><div class="tip-row"><div class="tip-dot"></div>Always react first — visualize the opponent throwing before you throw. Slip or roll, then counter with 2-3 punch combinations</div><div class="tip-row"><div class="tip-dot"></div>Common counters: slip jab → right hand body → left hook head. Roll hook → right hand → left hook</div></div><div class="timer-wrap"><div class="timer-label">Round Timer</div><div class="timer-display" id="counterTimer">3:00</div><div class="timer-btns"><button class="timer-btn start" onclick="startTimer('counter',180)">Start</button><button class="timer-btn reset" onclick="resetTimer('counter',180)">Reset</button></div></div></div></div>
-
-  <div class="section">
-    <div class="section-header">🧘 Cool Down</div>
-    <div class="drill-card" id="cooldown-card">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-        <div class="drill-name">Stretch and Recover</div>
-        <div class="drill-status" id="cooldownStatus" onclick="completeDrill('cooldown')">○</div>
-      </div>
-      <div class="cooldown-list">
-        <div class="cooldown-item"><div class="cooldown-icon">🤸</div>Hip flexor and hamstring stretch — 45 sec each side</div>
-        <div class="cooldown-item"><div class="cooldown-icon">🧘</div>Spinal twist — 30 sec each side</div>
-        <div class="cooldown-item"><div class="cooldown-icon">🌀</div>Child's pose — 60 sec</div>
-        <div class="cooldown-item"><div class="cooldown-icon">💭</div>Review one thing you want to improve next session</div>
-      </div>
-    </div>
-  </div>
-
-  <button class="complete-btn" onclick="completeSession()">🥊 Intermediate Session A Complete!</button>
+  <!-- Session content is fetched from premium_content after sign-in.
+       It is deliberately not in this file: served as a static page, it
+       would be readable without paying. See omni-premium.js. -->
 </div>
 
 <div class="bottom-nav">
@@ -138,20 +88,7 @@
 
 <script>
   // Warrior gate
-  const plan = sessionStorage.getItem('omniPlan') || 'wanderer';
-  if (plan !== 'warrior') {
-    document.querySelector('.scroll-wrap').innerHTML = `
-      <div style="padding:40px 20px;text-align:center;">
-        <div style="font-size:3rem;margin-bottom:16px;">⚔️</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:0.06em;color:#ffd700;margin-bottom:8px;">Warrior Exclusive</div>
-        <div style="font-family:'Inter',sans-serif;font-size:0.85rem;color:var(--muted);margin-bottom:24px;line-height:1.6;">Intermediate sessions are available to Warrior members only. Upgrade to unlock all intermediate and advanced content.</div>
-        <button onclick="window.location.href='plans.html'" style="background:#ffd700;border:none;border-radius:10px;padding:14px 28px;color:#080b10;font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:0.15em;cursor:pointer;">Upgrade to Warrior →</button>
-        <br/><br/>
-        <a href="library.html" style="color:var(--muted);font-size:0.8rem;">← Back to Library</a>
-      </div>
-    `;
-  }
-
+  OmniPremium.load('boxing_intermediate_a');
   const timers = {}; const repCounts = {};
   function formatTime(s) { const m=Math.floor(s/60); const sec=s%60; return m+':'+sec.toString().padStart(2,'0'); }
   function startTimer(id, seconds) { if(timers[id]) clearInterval(timers[id]); let r=seconds; timers[id]=setInterval(()=>{ r--; const el=document.getElementById(id+'Timer'); if(el) el.textContent=formatTime(r); if(r<=0){clearInterval(timers[id]);if(el) el.textContent='DONE!';}},1000); }

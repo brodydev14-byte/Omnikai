@@ -5,6 +5,7 @@
   <script src="omni-config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="omni-auth.js"></script>
+  <script src="omni-premium.js"></script>
 
   
   <meta charset="UTF-8"/>
@@ -72,59 +73,9 @@
 <div class="bg-layer"></div>
 <div class="grid-lines"></div>
 <div class="scroll-wrap">
-  <div class="workout-header">
-    <a class="back-btn" href="library.html">←</a>
-    <div>
-      <div class="header-eyebrow">⚡ MMA · Advanced · Power Focus</div>
-      <div class="header-title">Advanced Session B</div>
-    </div>
-    <div class="level-badge">🏆 Advanced</div>
-  </div>
-
-  <div class="elite-banner">
-    <div class="elite-banner-icon">🏆</div>
-    <div class="elite-banner-text"><strong>Elite Level — Warrior Exclusive.</strong> Advanced sessions are for athletes who have fully internalized beginner and intermediate foundations. Techniques are referenced without explanation — execution and volume are the focus.</div>
-  </div>
-
-  <div class="section">
-    <div class="section-header">🔥 Warm Up</div>
-    <div class="drill-card" id="warmup-card">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-        <div class="drill-name">Advanced Warm Up</div>
-        <div class="drill-status" id="warmupStatus" onclick="completeDrill('warmup')">○</div>
-      </div>
-      <div class="drill-meta"><div class="meta-chip highlight">5 Minutes</div><div class="meta-chip">Includes technique activation</div></div>
-      <div class="timer-wrap">
-        <div class="timer-label">Warm Up</div>
-        <div class="timer-display" id="warmupTimer">5:00</div>
-        <div class="timer-btns">
-          <button class="timer-btn start" onclick="startTimer('warmup',300)">Start</button>
-          <button class="timer-btn reset" onclick="resetTimer('warmup',300)">Reset</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="section"><div class="section-header">Elite Power Training</div><div class="drill-card" id="power-card"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;"><div class="drill-name">Maximum Output Power Session</div><div class="drill-status" id="powerStatus" onclick="completeDrill('power')">○</div></div><div class="drill-meta"><div class="meta-chip highlight">5 Sets</div><div class="meta-chip highlight">10 sec max / 20 sec rest</div></div><div class="tips-wrap"><div class="tip-row"><div class="tip-dot"></div><strong>Absolute maximum output:</strong> 10 seconds of everything you have — every technique at competition power and aggression</div><div class="tip-row"><div class="tip-dot"></div><strong>Full rest between sets:</strong> Power training requires full recovery — 20 seconds is not enough rest, but that is the point</div><div class="tip-row"><div class="tip-dot"></div><strong>This builds competition power:</strong> The ability to generate maximum force under fatigue is what wins fights</div></div><div class="timer-wrap"><div class="timer-label">Burst Timer</div><div class="timer-display" id="powerTimer">0:10</div><div class="timer-btns"><button class="timer-btn start" onclick="startTimer('power',10)">Start</button><button class="timer-btn reset" onclick="resetTimer('power',10)">Reset</button></div></div></div></div>
-  <div class="section"><div class="section-header">Explosive Combination Power</div><div class="drill-card" id="combo-card"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;"><div class="drill-name">Full Power Combination Rounds</div><div class="drill-status" id="comboStatus" onclick="completeDrill('combo')">○</div></div><div class="drill-meta"><div class="meta-chip highlight">4 Sets</div><div class="meta-chip highlight">2 min each</div><div class="meta-chip">60 sec rest</div></div><div class="tips-wrap"><div class="tip-row"><div class="tip-dot"></div>2 minutes of combinations thrown with fight-night power — not cardio pace, not technique pace, power pace — every technique designed to finish</div></div><div class="timer-wrap"><div class="timer-label">Timer</div><div class="timer-display" id="comboTimer">2:00</div><div class="timer-btns"><button class="timer-btn start" onclick="startTimer('combo',120)">Start</button><button class="timer-btn reset" onclick="resetTimer('combo',120)">Reset</button></div></div></div></div>
-
-  <div class="section">
-    <div class="section-header">🧘 Cool Down</div>
-    <div class="drill-card" id="cooldown-card">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-        <div class="drill-name">Advanced Recovery</div>
-        <div class="drill-status" id="cooldownStatus" onclick="completeDrill('cooldown')">○</div>
-      </div>
-      <div class="cooldown-list">
-        <div class="cooldown-item"><div class="cooldown-icon">🤸</div>Full body stretch — 5 minutes minimum at advanced volume</div>
-        <div class="cooldown-item"><div class="cooldown-icon">🧘</div>Spinal decompression — child's pose 90 seconds</div>
-        <div class="cooldown-item"><div class="cooldown-icon">💭</div>Session review — identify one weakness to address next time</div>
-        <div class="cooldown-item"><div class="cooldown-icon">📝</div>Log your performance — advanced athletes track everything</div>
-      </div>
-    </div>
-  </div>
-
-  <button class="complete-btn" onclick="completeSession()">🏆 MMA Advanced Session B Complete!</button>
+  <!-- Session content is fetched from premium_content after sign-in.
+       It is deliberately not in this file: served as a static page, it
+       would be readable without paying. See omni-premium.js. -->
 </div>
 
 <div class="bottom-nav">
@@ -136,19 +87,7 @@
 </div>
 
 <script>
-  const plan = sessionStorage.getItem('omniPlan') || 'wanderer';
-  if (plan !== 'warrior') {
-    document.querySelector('.scroll-wrap').innerHTML = `
-      <div style="padding:40px 20px;text-align:center;">
-        <div style="font-size:3rem;margin-bottom:16px;">🏆</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:0.06em;color:#ffd700;margin-bottom:8px;">Elite — Warrior Exclusive</div>
-        <div style="font-family:'Inter',sans-serif;font-size:0.85rem;color:var(--muted);margin-bottom:24px;line-height:1.6;">Advanced sessions are available to Warrior members only. This is the highest level content in Omnikai.</div>
-        <button onclick="window.location.href='plans.html'" style="background:#ffd700;border:none;border-radius:10px;padding:14px 28px;color:#080b10;font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:0.15em;cursor:pointer;">Upgrade to Warrior →</button>
-        <br/><br/>
-        <a href="library.html" style="color:var(--muted);font-size:0.8rem;">← Back to Library</a>
-      </div>
-    `;
-  }
+  OmniPremium.load('mma_advanced_b');
   const timers = {}; const repCounts = {};
   function formatTime(s) { const m=Math.floor(s/60); const sec=s%60; return m+':'+sec.toString().padStart(2,'0'); }
   function startTimer(id, seconds) { if(timers[id]) clearInterval(timers[id]); let r=seconds; timers[id]=setInterval(()=>{ r--; const el=document.getElementById(id+'Timer'); if(el) el.textContent=formatTime(r); if(r<=0){clearInterval(timers[id]);if(el) el.textContent='DONE!';}},1000); }

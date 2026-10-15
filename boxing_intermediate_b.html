@@ -5,6 +5,7 @@
   <script src="omni-config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="omni-auth.js"></script>
+  <script src="omni-premium.js"></script>
 
   
   <meta charset="UTF-8"/>
@@ -72,59 +73,9 @@
 <div class="bg-layer"></div>
 <div class="grid-lines"></div>
 <div class="scroll-wrap">
-  <div class="workout-header">
-    <a class="back-btn" href="library.html">←</a>
-    <div>
-      <div class="header-eyebrow">🥊 Boxing · Intermediate · Power Focus</div>
-      <div class="header-title">Intermediate Session B</div>
-    </div>
-    <div class="level-badge">Power</div>
-  </div>
-
-  <div class="warrior-banner">
-    <div class="warrior-banner-icon">⚔️</div>
-    <div class="warrior-banner-text"><strong>Warrior Exclusive.</strong> Intermediate sessions assume your beginner foundations are solid. Techniques are referenced by name — focus on execution quality and higher volume.</div>
-  </div>
-
-  <div class="section">
-    <div class="section-header">🔥 Warm Up</div>
-    <div class="drill-card" id="warmup-card">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-        <div class="drill-name">Extended Warm Up</div>
-        <div class="drill-status" id="warmupStatus" onclick="completeDrill('warmup')">○</div>
-      </div>
-      <div class="drill-meta"><div class="meta-chip highlight">4 Minutes</div><div class="meta-chip">Higher intensity than beginner</div></div>
-      <div class="timer-wrap">
-        <div class="timer-label">Warm Up</div>
-        <div class="timer-display" id="warmupTimer">4:00</div>
-        <div class="timer-btns">
-          <button class="timer-btn start" onclick="startTimer('warmup',240)">Start</button>
-          <button class="timer-btn reset" onclick="resetTimer('warmup',240)">Reset</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="section"><div class="section-header">🥊 Drill 1 — Feint to Power Shot</div><div class="drill-card" id="feint-card"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;"><div class="drill-name">Feint Setup Power Combinations</div><div class="drill-status" id="feintStatus" onclick="completeDrill('feint')">○</div></div><div class="drill-meta"><div class="meta-chip highlight">4 Sets</div><div class="meta-chip highlight">10 reps each</div><div class="meta-chip">30 sec rest</div></div><div class="tips-wrap"><div class="tip-row"><div class="tip-dot"></div><strong>The feint:</strong> A short shoulder or body movement that looks like a punch but isn't — it forces your opponent to react, opening them up</div><div class="tip-row"><div class="tip-dot"></div><strong>Feint jab → power right hand:</strong> Fake the jab to make them flinch, then drive the real cross through the gap</div><div class="tip-row"><div class="tip-dot"></div><strong>Feint body → power head:</strong> Drop your shoulder toward the body, they lower their guard, then swing upstairs with the hook</div></div><div class="rep-counter"><div class="rep-label">Rep Counter</div><div class="rep-display" id="feintCount">0</div><div class="rep-btns"><button class="rep-btn minus" onclick="changeRep('feint',-1)">−</button><button class="rep-btn plus" onclick="changeRep('feint',1)">+</button></div></div></div></div>
-  <div class="section"><div class="section-header">🥊 Drill 2 — Body-Head Combinations</div><div class="drill-card" id="bodyhead-card"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;"><div class="drill-name">Body-Head Power Combos</div><div class="drill-status" id="bodyheadStatus" onclick="completeDrill('bodyhead')">○</div></div><div class="drill-meta"><div class="meta-chip highlight">4 Sets</div><div class="meta-chip highlight">2 min each</div><div class="meta-chip">45 sec rest</div></div><div class="tips-wrap"><div class="tip-row"><div class="tip-dot"></div><strong>1-body-3:</strong> Jab to the head, right hand to the body, left hook back to the head — the classic power combination</div><div class="tip-row"><div class="tip-dot"></div><strong>Dig the body shot:</strong> A real body shot bends your knees and drives through — not a tap, a dig</div><div class="tip-row"><div class="tip-dot"></div><strong>Why it works:</strong> Body punches force the guard down, opening the head for the finishing shot</div></div><div class="timer-wrap"><div class="timer-label">Round Timer</div><div class="timer-display" id="bodyheadTimer">2:00</div><div class="timer-btns"><button class="timer-btn start" onclick="startTimer('bodyhead',120)">Start</button><button class="timer-btn reset" onclick="resetTimer('bodyhead',120)">Reset</button></div></div></div></div>
-
-  <div class="section">
-    <div class="section-header">🧘 Cool Down</div>
-    <div class="drill-card" id="cooldown-card">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-        <div class="drill-name">Stretch and Recover</div>
-        <div class="drill-status" id="cooldownStatus" onclick="completeDrill('cooldown')">○</div>
-      </div>
-      <div class="cooldown-list">
-        <div class="cooldown-item"><div class="cooldown-icon">🤸</div>Hip flexor and hamstring stretch — 45 sec each side</div>
-        <div class="cooldown-item"><div class="cooldown-icon">🧘</div>Spinal twist — 30 sec each side</div>
-        <div class="cooldown-item"><div class="cooldown-icon">🌀</div>Child's pose — 60 sec</div>
-        <div class="cooldown-item"><div class="cooldown-icon">💭</div>Review one thing you want to improve next session</div>
-      </div>
-    </div>
-  </div>
-
-  <button class="complete-btn" onclick="completeSession()">🥊 Intermediate Session B Complete!</button>
+  <!-- Session content is fetched from premium_content after sign-in.
+       It is deliberately not in this file: served as a static page, it
+       would be readable without paying. See omni-premium.js. -->
 </div>
 
 <div class="bottom-nav">
@@ -137,20 +88,7 @@
 
 <script>
   // Warrior gate
-  const plan = sessionStorage.getItem('omniPlan') || 'wanderer';
-  if (plan !== 'warrior') {
-    document.querySelector('.scroll-wrap').innerHTML = `
-      <div style="padding:40px 20px;text-align:center;">
-        <div style="font-size:3rem;margin-bottom:16px;">⚔️</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:0.06em;color:#ffd700;margin-bottom:8px;">Warrior Exclusive</div>
-        <div style="font-family:'Inter',sans-serif;font-size:0.85rem;color:var(--muted);margin-bottom:24px;line-height:1.6;">Intermediate sessions are available to Warrior members only. Upgrade to unlock all intermediate and advanced content.</div>
-        <button onclick="window.location.href='plans.html'" style="background:#ffd700;border:none;border-radius:10px;padding:14px 28px;color:#080b10;font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:0.15em;cursor:pointer;">Upgrade to Warrior →</button>
-        <br/><br/>
-        <a href="library.html" style="color:var(--muted);font-size:0.8rem;">← Back to Library</a>
-      </div>
-    `;
-  }
-
+  OmniPremium.load('boxing_intermediate_b');
   const timers = {}; const repCounts = {};
   function formatTime(s) { const m=Math.floor(s/60); const sec=s%60; return m+':'+sec.toString().padStart(2,'0'); }
   function startTimer(id, seconds) { if(timers[id]) clearInterval(timers[id]); let r=seconds; timers[id]=setInterval(()=>{ r--; const el=document.getElementById(id+'Timer'); if(el) el.textContent=formatTime(r); if(r<=0){clearInterval(timers[id]);if(el) el.textContent='DONE!';}},1000); }
