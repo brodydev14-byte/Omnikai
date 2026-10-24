@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="theme.js"></script>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Omnikai – Privacy Policy</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <!-- No omni-auth.js on purpose: must be readable without an account. -->
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root { --bg:#080b10; --blue:#00c8ff; --white:#f0f4f8; --muted:#5a6a7a; --border:rgba(0,200,255,0.15); --gold:#ffd700; }
+    html,body { min-height:100%; background:var(--bg); color:var(--white); font-family:'Inter',sans-serif; }
+    .wrap { max-width:680px; margin:0 auto; padding:32px 20px 64px; }
+    .back { display:inline-block; color:var(--muted); font-size:0.8rem; text-decoration:none; margin-bottom:24px; }
+    .back:hover { color:var(--blue); }
+    h1 { font-family:'Bebas Neue',sans-serif; font-size:2.4rem; letter-spacing:0.05em; line-height:1; margin-bottom:6px; }
+    .updated { font-size:0.75rem; color:var(--muted); margin-bottom:28px; }
+    h2 { font-family:'Bebas Neue',sans-serif; font-size:1.3rem; letter-spacing:0.05em; margin:28px 0 10px; color:var(--blue); }
+    p, li { font-size:0.9rem; line-height:1.65; color:var(--white); opacity:0.9; margin-bottom:12px; }
+    ul { padding-left:22px; }
+    a { color:var(--blue); }
+    .todo { background:rgba(255,215,0,0.08); border:1px solid rgba(255,215,0,0.3); border-radius:8px; padding:12px 14px; font-size:0.82rem; color:var(--gold); margin-bottom:24px; }
+    table { width:100%; border-collapse:collapse; margin-bottom:16px; font-size:0.85rem; }
+    th, td { text-align:left; padding:8px 10px; border-bottom:1px solid var(--border); vertical-align:top; }
+    th { color:var(--muted); font-size:0.72rem; letter-spacing:0.12em; text-transform:uppercase; font-weight:700; }
+    .foot { margin-top:40px; padding-top:20px; border-top:1px solid var(--border); font-size:0.78rem; color:var(--muted); }
+    .foot a { margin-right:14px; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← Back to Omnikai</a>
+
+  <h1>Privacy Policy</h1>
+  <div class="updated">Last updated: 24 October 2026</div>
+
+  <div class="todo">
+    <strong>Before launch:</strong> replace every [BRACKETED] placeholder, then delete this
+    box. This draft describes what Omnikai genuinely does today — it was written from the
+    actual code, not from a template — but it is not legal advice.
+  </div>
+
+  <h2>The short version</h2>
+  <p>
+    We collect what the app needs to work and nothing else. There are
+    <strong>no analytics, no tracking pixels and no advertising</strong> anywhere in Omnikai —
+    not Google Analytics, not Meta, not anything. We do not sell your data and we have nothing
+    to sell it for.
+  </p>
+
+  <h2>Who is responsible</h2>
+  <p>
+    [YOUR LEGAL NAME OR BUSINESS NAME], [YOUR COUNTRY / STATE]. Questions, requests or
+    complaints: [YOUR CONTACT EMAIL].
+  </p>
+
+  <h2>What we store</h2>
+  <table>
+    <tr><th>What</th><th>Why</th></tr>
+    <tr><td>Email address</td><td>To identify your account and let you sign in or reset your password</td></tr>
+    <tr><td>Password</td><td>Stored only as a secure hash by our auth provider. We never see it</td></tr>
+    <tr><td>Your display name</td><td>To greet you in the app</td></tr>
+    <tr><td>Chosen martial arts, equipment, gym access</td><td>To pick which sessions to show you</td></tr>
+    <tr><td>Body stats you enter (weight, height, goal)</td><td>To estimate calorie and macro targets</td></tr>
+    <tr><td>Workout history, streak, personal records, achievements</td><td>Progress tracking</td></tr>
+    <tr><td>Food log (most recent 60 days)</td><td>So your nutrition log follows you between devices</td></tr>
+    <tr><td>Membership tier and subscription status</td><td>To know whether to unlock paid content</td></tr>
+  </table>
+  <p>
+    Your <strong>theme preference stays on the device</strong> and is never sent anywhere. Food
+    logs older than 60 days remain only on the device that recorded them — we don't collect them.
+  </p>
+  <p>
+    If you sign in with Google, we receive your name and email address from Google. Nothing else
+    — no contacts, no Drive, no other Google data.
+  </p>
+
+  <h2>What we do NOT store</h2>
+  <ul>
+    <li><strong>Your card details.</strong> Payment happens on Stripe's own pages. Card numbers
+      never touch our servers. We keep only Stripe's customer and subscription identifiers,
+      your subscription status and renewal date.</li>
+    <li>Your location, contacts, photos, or anything from your device beyond what you type in.</li>
+    <li>Any behavioural or advertising profile.</li>
+  </ul>
+
+  <h2>Who else is involved</h2>
+  <ul>
+    <li><strong>Supabase</strong> — hosts the database and handles sign-in. Your account and
+      training data live there, on servers in the US (us-east-2).</li>
+    <li><strong>Stripe</strong> — processes payments and holds your billing details under
+      <a href="https://stripe.com/privacy" target="_blank" rel="noopener">its own privacy policy</a>.</li>
+    <li><strong>GitHub Pages</strong> — serves the website itself.</li>
+    <li><strong>Google Fonts and jsDelivr</strong> — serve the fonts and one JavaScript library.
+      Loading a page means your browser contacts them, so they see your IP address. We send them
+      nothing about you.</li>
+    <li><strong>YouTube</strong> — some sessions <em>link</em> to tutorial videos. Nothing is
+      embedded, so YouTube learns nothing unless you click through.</li>
+  </ul>
+  <p>If you are outside the US, note that your data is processed in the US.</p>
+
+  <h2>How long we keep it</h2>
+  <p>
+    While your account exists. Delete your account and your profile and training data are
+    deleted with it. Stripe keeps payment records for its own legal and tax obligations, which
+    we do not control.
+  </p>
+
+  <h2>Your rights</h2>
+  <p>
+    Email [YOUR CONTACT EMAIL] and we will, within 30 days:
+  </p>
+  <ul>
+    <li>Send you a copy of everything we hold about you</li>
+    <li>Correct anything wrong</li>
+    <li>Delete your account and data</li>
+  </ul>
+  <p>
+    Depending on where you live (for example the UK, EU or California) you may have further
+    rights, including objecting to processing and complaining to a data protection regulator.
+    We will not make you jump through hoops to use any of them.
+  </p>
+
+  <h2>Cookies</h2>
+  <p>
+    We set no advertising or analytics cookies. We use browser storage for one purpose: keeping
+    you signed in and holding your own training data on your device. Clearing your browser data
+    signs you out.
+  </p>
+
+  <h2>Security</h2>
+  <p>
+    Your data is protected at the database level, not just in the app: the database itself
+    enforces that you can only read and write your own records. Paid content is withheld by the
+    database rather than hidden by the page. Passwords are hashed, and connections use HTTPS.
+  </p>
+  <p>
+    No system is perfectly secure. If we ever discover a breach affecting your data, we will
+    tell you.
+  </p>
+
+  <h2>Children</h2>
+  <p>
+    Omnikai is not intended for under-16s. If you believe a child has created an account,
+    contact [YOUR CONTACT EMAIL] and we will remove it.
+  </p>
+
+  <h2>Changes</h2>
+  <p>
+    If we change this policy in a way that affects you, we will tell you rather than quietly
+    updating the date.
+  </p>
+
+  <div class="foot">
+    <a href="terms.html">Terms of Service</a>
+    <a href="refund.html">Refund Policy</a>
+    <a href="index.html">Omnikai</a>
+  </div>
+</div>
+</body>
+</html>

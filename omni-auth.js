@@ -45,6 +45,35 @@
   // Read from both storages depending on the page, so it's written to both.
   var DUAL_KEYS = ['omniWorkouts'];
 
+  /* The food log can't be a fixed key above: nutrition.html writes one
+     localStorage entry per day, named omniFood_Tue_Oct_21_2026. Because the
+     lists above are fixed, those keys were never collected and the food log
+     never left the device -- log breakfast on your phone and your laptop knew
+     nothing about it.
+
+     They're gathered dynamically instead, newest first and capped. The cap
+     matters: profiles.state is pushed whole on every change, so a year of
+     daily logs would grow that payload without limit for no benefit. Days
+     older than the window stay on whichever device logged them rather than
+     being deleted. */
+  var FOOD_PREFIX = 'omniFood_';
+  var FOOD_SYNC_DAYS = 60;
+
+  function foodKeysToSync() {
+    var entries = [];
+    for (var i = 0; i < localStorage.length; i++) {
+      var k = localStorage.key(i);
+      if (!k || k.indexOf(FOOD_PREFIX) !== 0) continue;
+      // 'omniFood_Tue_Oct_21_2026' -> 'Tue Oct 21 2026', which Date can read.
+      var t = Date.parse(k.slice(FOOD_PREFIX.length).replace(/_/g, ' '));
+      entries.push({ key: k, time: isNaN(t) ? 0 : t });
+    }
+    // Newest first, so an unparseable key loses its place rather than the
+    // window it would have displaced.
+    entries.sort(function (a, b) { return b.time - a.time; });
+    return entries.slice(0, FOOD_SYNC_DAYS).map(function (e) { return e.key; });
+  }
+
   var cfg = window.OMNI_CONFIG || {};
   var configured =
     cfg.SUPABASE_URL &&
@@ -125,6 +154,10 @@
       var v = localStorage.getItem(k);
       if (v !== null) state[k] = v;
     });
+    foodKeysToSync().forEach(function (k) {
+      var v = localStorage.getItem(k);
+      if (v !== null) state[k] = v;
+    });
     return state;
   }
 
@@ -137,6 +170,8 @@
     if (SESSION_KEYS.indexOf(key) !== -1) nativeSetItem.call(sessionStorage, key, value);
     if (LOCAL_KEYS.indexOf(key) !== -1)   nativeSetItem.call(localStorage, key, value);
     if (DUAL_KEYS.indexOf(key) !== -1)    nativeSetItem.call(localStorage, key, value);
+    // Daily food logs, matched by prefix since the date is part of the name.
+    if (key.indexOf(FOOD_PREFIX) === 0)   nativeSetItem.call(localStorage, key, value);
   }
 
   /** Write the local working copy up to Supabase. */
