@@ -640,15 +640,94 @@
   ];
 
   // Search function
+  /* ── Food matching ────────────────────────────────────────────
+     The old search asked whether the user's whole typed string appeared
+     inside a food's name. That meant "spaghetti" found the spaghetti and
+     "a plate of spaghetti" found nothing, because that exact phrase is
+     not a substring of "Spaghetti & Meat Sauce (1 cup)". People type
+     phrases, so the database looked far emptier than it is.
+
+     Now the query is split into words, the filler ones are dropped, and
+     foods are ranked by how many of the remaining words they match. */
+
+  // Words people wrap food in that carry no nutritional meaning. Portion
+  // words live here too: "bowl of cereal" should find the cereal, and the
+  // quantity is handled by the amount field rather than the search.
+  const FILLER = new Set([
+    'a','an','the','of','with','and','or','some','my','i','me','ate','eat',
+    'eating','had','have','for','plate','plateful','bowl','cup','glass','can',
+    'bottle','serving','servings','portion','piece','pieces','slice','slices',
+    'bit','little','large','small','big','medium','whole','half','fresh',
+    'homemade','plain','to','in','on','it','that','this','was','is',
+  ]);
+
+  function tokenize(text) {
+    return text.toLowerCase().split(/[^a-z0-9]+/i).filter(Boolean);
+  }
+
+  /** Does this food's text contain the word? Tolerates simple plurals so
+      "eggs" finds "Egg" and "oats" finds "Oatmeal". */
+  function hasWord(haystack, word) {
+    if (haystack.indexOf(word) !== -1) return true;
+    if (word.length > 3 && word.slice(-1) === 's' &&
+        haystack.indexOf(word.slice(0, -1)) !== -1) return true;
+    return false;
+  }
+
+  function rankFoods(query) {
+    const raw = (query || '').toLowerCase().trim();
+    if (!raw) return [];
+
+    const all = tokenize(raw);
+    let words = all.filter(w => !FILLER.has(w));
+    // If someone types only filler ("a plate of"), fall back to the raw
+    // words rather than returning nothing at all.
+    if (words.length === 0) words = all;
+    if (words.length === 0) return [];
+
+    const scored = [];
+    FOOD_DB.forEach(f => {
+      const name = f.name.toLowerCase();
+      const cat = f.cat.toLowerCase();
+      let nameHits = 0, catHits = 0;
+      words.forEach(w => {
+        if (hasWord(name, w)) nameHits++;
+        else if (hasWord(cat, w)) catHits++;
+      });
+
+      /* Category matches alone are too loose to trust. The word "food"
+         matches the Fast Food category, so "xyzzy nonsense food" used to
+         return burgers; "protein shake" dragged in salmon and shrimp for
+         sitting in the Protein category. So a food qualifies on a name
+         match — or, so that browsing still works, when every word the
+         user typed matched a category ("snacks", "fast food"). */
+      const browsingACategory = catHits === words.length;
+      if (nameHits === 0 && !browsingACategory) return;
+
+      // Rank by how much of what they typed was understood, then prefer
+      // the shorter name — "Pasta (100g cooked)" is a better answer to
+      // "pasta" than a long compound dish that merely contains the word.
+      scored.push({
+        food: f,
+        score: (nameHits + catHits * 0.25) / words.length,
+        exact: (name + ' ' + cat).indexOf(raw) !== -1 ? 1 : 0,
+        len: f.name.length,
+      });
+    });
+
+    scored.sort((a, b) =>
+      (b.exact - a.exact) || (b.score - a.score) || (a.len - b.len)
+    );
+
+    return scored.slice(0, 12).map(s => s.food);
+  }
+
   function searchFoods(query) {
     const resultsEl = document.getElementById('foodResults');
     resultsEl.innerHTML = '';
     if (!query || query.trim().length < 1) return;
 
-    const q = query.toLowerCase().trim();
-    const matches = FOOD_DB.filter(f =>
-      f.name.toLowerCase().includes(q) || f.cat.toLowerCase().includes(q)
-    ).slice(0, 12);
+    const matches = rankFoods(query);
 
     if (matches.length === 0) {
       resultsEl.innerHTML = `<div style="font-family:'Inter',sans-serif;font-size:0.78rem;color:var(--muted);padding:10px 4px;">No results — use manual entry below or try a different search.</div>`;
