@@ -36,11 +36,11 @@
     }
 
     /* ── BACKGROUND ── */
-    /* Two glows, not one. A single top-anchored ellipse died out around 70%
-       and left the lower half flat black, which read as the page being
-       unfinished rather than as a deliberate vignette. A fainter second glow
-       at the bottom removes the dead zone and makes the falloff look intended. */
-    .bg-layer { position:fixed; inset:0; z-index:0; background: radial-gradient(ellipse 90% 55% at 50% 0%, rgba(0,200,255,0.07) 0%, transparent 65%), radial-gradient(ellipse 85% 45% at 50% 100%, rgba(0,200,255,0.035) 0%, transparent 70%), #080b10; }
+    /* A fallback only. theme.js overrides this with !important using the
+       user's chosen accent, so whatever is written here never renders on a
+       page that loads it — keep it plain rather than tuning a gradient that
+       cannot be seen. */
+    .bg-layer { position:fixed; inset:0; z-index:0; background: #080b10; }
 
     /* animated grid */
     .grid-lines {

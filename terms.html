@@ -14,7 +14,10 @@
     *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
     :root { --bg:#080b10; --blue:#00c8ff; --white:#f0f4f8; --muted:#5a6a7a; --border:rgba(0,200,255,0.15); --card:rgba(255,255,255,0.03); --gold:#ffd700; }
     html,body { min-height:100%; background:var(--bg); color:var(--white); font-family:'Inter',sans-serif; }
-    .wrap { max-width:680px; margin:0 auto; padding:32px 20px 64px; }
+    /* Painted by theme.js, which overrides both with the chosen accent. */
+    .bg-layer { position:fixed; inset:0; z-index:0; background:var(--bg); }
+    .grid-lines { position:fixed; inset:0; z-index:0; background-size:48px 48px; }
+    .wrap { position:relative; z-index:1; max-width:680px; margin:0 auto; padding:32px 20px 64px; }
     .back { display:inline-block; color:var(--muted); font-size:0.8rem; text-decoration:none; margin-bottom:24px; }
     .back:hover { color:var(--blue); }
     h1 { font-family:'Bebas Neue',sans-serif; font-size:2.4rem; letter-spacing:0.05em; line-height:1; margin-bottom:6px; }
@@ -29,6 +32,8 @@
   </style>
 </head>
 <body>
+<div class="bg-layer"></div>
+<div class="grid-lines"></div>
 <div class="wrap">
   <a class="back" href="index.html">← Back to Omnikai</a>
 
