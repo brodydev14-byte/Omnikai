@@ -233,21 +233,28 @@
   document.getElementById('avatarLarge').textContent = name.charAt(0).toUpperCase();
   document.getElementById('profileName').textContent = name.toUpperCase();
 
-  const badge = document.getElementById('planBadge');
-  if (isWarrior) {
-    badge.textContent = '⚡ Warrior Plan';
-    badge.classList.add('warrior');
-  } else {
-    badge.textContent = '🌊 Wanderer Plan';
-    badge.classList.add('wanderer');
-  }
+  /* Everything plan-dependent is rendered by this one function so it can be
+     run twice: once now with whatever we know, and again once the server has
+     answered. This page used to read the plan while it parsed, before
+     omni-auth.js had fetched it, so a paying member landing here first in a
+     tab was told to upgrade. */
+  function applyPlan(currentPlan) {
+    const isWarriorNow = currentPlan === 'warrior';
 
-  // ── Membership row ───────────────────────────────────────────
-  (function () {
+    const badge = document.getElementById('planBadge');
+    badge.classList.remove('warrior', 'wanderer');
+    if (isWarriorNow) {
+      badge.textContent = '⚡ Warrior Plan';
+      badge.classList.add('warrior');
+    } else {
+      badge.textContent = '🌊 Wanderer Plan';
+      badge.classList.add('wanderer');
+    }
+
     const row = document.getElementById('membershipRow');
     const btn = document.getElementById('membershipBtn');
 
-    if (isWarrior) {
+    if (isWarriorNow) {
       document.getElementById('membershipIcon').textContent = '⚡';
       document.getElementById('membershipTitle').textContent = 'Warrior Membership';
       document.getElementById('membershipSub').textContent = 'Update your card, see invoices, or cancel';
@@ -272,7 +279,18 @@
     }
 
     row.style.display = 'flex';
-  })();
+  }
+
+  applyPlan(plan);
+
+  // Re-render once the server's answer lands. On a device that has never
+  // loaded the app there is no cached plan to seed from, so this is what
+  // corrects the first view rather than making the user reload.
+  if (window.OmniAuth && OmniAuth.ready) {
+    OmniAuth.ready.then(function () {
+      applyPlan(sessionStorage.getItem('omniPlan') || 'wanderer');
+    }).catch(function () { /* leave what we rendered */ });
+  }
 
   // Stats
   document.getElementById('statWorkouts').textContent = workouts;

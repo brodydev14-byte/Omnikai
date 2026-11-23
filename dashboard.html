@@ -723,11 +723,25 @@
   const gymAccess = sessionStorage.getItem('omniGymAccess') === 'true';
   const isWarrior = plan === 'warrior';
 
-  // Reveal the upgrade card only for free users. `plan` comes from
-  // sessionStorage, which omni-auth.js fills from the server — so a Warrior
-  // never sees this, and nobody gets a sales pitch for what they already own.
-  if (!isWarrior) {
-    document.getElementById('upgradeCard').style.display = '';
+  /* Reveal the upgrade card only for free users — nobody should be sold
+     what they already own.
+
+     Applied twice: once with what we know now, and again once the server
+     answers. The plan is read from sessionStorage while this page parses,
+     which on the first page loaded in a tab happens before omni-auth.js has
+     fetched it — a paying member was being shown the upsell on their own
+     dashboard. */
+  function applyPlanToUpgradeCard(currentPlan) {
+    const card = document.getElementById('upgradeCard');
+    if (card) card.style.display = currentPlan === 'warrior' ? 'none' : '';
+  }
+
+  applyPlanToUpgradeCard(plan);
+
+  if (window.OmniAuth && OmniAuth.ready) {
+    OmniAuth.ready.then(function () {
+      applyPlanToUpgradeCard(sessionStorage.getItem('omniPlan') || 'wanderer');
+    }).catch(function () { /* leave what we rendered */ });
   }
   const focusMuscles = bodyData.focusMuscles || [];
   const goal = (bodyData.goal || 'perform').toLowerCase();

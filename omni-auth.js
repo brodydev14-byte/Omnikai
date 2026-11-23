@@ -84,6 +84,25 @@
   var page = location.pathname.split('/').pop().toLowerCase();
   var isPublic = PUBLIC_PAGES.indexOf(page) !== -1;
 
+  /* ── Plan seed ─────────────────────────────────────────────────
+     Pages read sessionStorage.omniPlan while they parse, but the real
+     value only arrives after pullProfile's network round-trip. On the
+     first page loaded in a tab that read found nothing and fell back to
+     'wanderer', so a paying member was shown "Upgrade to Warrior" on
+     their own profile. It looked intermittent because sessionStorage
+     survives navigation: wrong on the page you land on, right everywhere
+     after.
+
+     So the last known plan is cached in localStorage and copied into
+     sessionStorage here — synchronously, before any page script runs,
+     since this file is loaded first in <head>. The server's answer still
+     overwrites it a moment later.
+
+     A stale cache can briefly flatter someone who has since been
+     downgraded. That is cosmetic only: the paid content itself is
+     withheld by the database, which never consults this. */
+  var PLAN_CACHE = 'omniPlanCache';
+
   /* ── Anti-flash ────────────────────────────────────────────────
      Hide the document immediately so protected content never paints
      before we know who's looking. Revealed once auth resolves, with a
@@ -138,6 +157,16 @@
   }
   hook(sessionStorage);
   hook(localStorage);
+
+  // Seed the cached plan now that nativeSetItem exists — still synchronous,
+  // so it lands before any page's own <script> runs and sees the fallback.
+  // nativeSetItem, not setItem, so seeding doesn't schedule a pointless push.
+  try {
+    if (!sessionStorage.getItem('omniPlan')) {
+      var cachedPlan = localStorage.getItem(PLAN_CACHE);
+      if (cachedPlan) nativeSetItem.call(sessionStorage, 'omniPlan', cachedPlan);
+    }
+  } catch (e) { /* storage unavailable; the server answer still arrives */ }
 
   function scheduleSync() {
     clearTimeout(syncTimer);
@@ -231,6 +260,11 @@
         suppressSync = true;
         nativeSetItem.call(sessionStorage, 'omniName', p.name || 'Warrior');
         nativeSetItem.call(sessionStorage, 'omniPlan', p.plan || 'wanderer');
+        // Remember it for the next page load, so the seed above has
+        // something truthful to work with before the network answers.
+        try {
+          nativeSetItem.call(localStorage, PLAN_CACHE, p.plan || 'wanderer');
+        } catch (e) { /* non-fatal */ }
         Object.keys(p.state || {}).forEach(function (k) {
           restore(k, p.state[k]);
         });
@@ -391,6 +425,9 @@
       return sb.auth.signOut().then(function () {
         sessionStorage.clear();
         localStorage.removeItem('omniData');
+        // Otherwise the next person to sign in on this device is briefly
+        // shown the previous user's tier before the server corrects it.
+        localStorage.removeItem(PLAN_CACHE);
         location.replace('index.html');
       });
     },
